@@ -7,7 +7,7 @@ class ModelTrainer:
     def __init__(self, model, lr=0.005, weight_decay=5e-4):
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-        self.criterion = nn.MSELoss() # Mean Squared Error para prever o Fitness
+        self.criterion = nn.MSELoss()
         self.batch_size = 32
         self.min_buffer_size = 10
 
@@ -21,33 +21,25 @@ class ModelTrainer:
 
         self.model.train()
         
-        # Pega um batch do buffer (a função sample já deve lidar com pesos se existirem)
         data_list = buffer.sample(self.batch_size)
         
         if not data_list:
             return 0.0
 
-        # Cria o loader do PyTorch Geometric para empilhar os grafos
         loader = DataLoader(data_list, batch_size=len(data_list), shuffle=True)
         
         try:
             batch = next(iter(loader))
         except StopIteration:
             return 0.0
-
-        # 1. Zerar gradientes
         self.optimizer.zero_grad()
 
-        # 2. Forward Pass (Previsão)
-        out = self.model(batch)  # Shape esperado: [Batch_Size, 1]
+        out = self.model(batch)
         
-        # Garante que o target tenha o mesmo shape
         target = batch.y.view(-1, 1).float()
 
-        # 3. Cálculo da Perda
         loss = self.criterion(out, target)
 
-        # 4. Backward Pass (Aprendizado)
         loss.backward()
         self.optimizer.step()
 
@@ -58,7 +50,6 @@ class ModelTrainer:
         Retreina apenas se o buffer tiver dados novos suficientes.
         Retorna True se treinou.
         """
-        # Se o buffer cresceu muito desde o último treino completo, treina de novo
         if buffer.size() >= self.min_buffer_size and buffer.size() % threshold == 0:
             avg_loss = self.retrain(buffer, epochs=3)
             return True
@@ -75,7 +66,6 @@ class ModelTrainer:
         self.model.train()
         total_loss = 0
         
-        # Usa todo o dataset disponível
         data_list = buffer.get_all()
         loader = DataLoader(data_list, batch_size=self.batch_size, shuffle=True)
 

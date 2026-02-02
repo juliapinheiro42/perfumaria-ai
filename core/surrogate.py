@@ -8,9 +8,6 @@ from sklearn.gaussian_process.kernels import Matern, WhiteKernel, RBF, ConstantK
 
 class BayesianSurrogate:
     def __init__(self, max_samples: int = 2000):
-        # Kernel Matern é excelente para aproximação de funções complexas (aromas)
-        # k1: Componente principal do kernel
-        # k2: WhiteKernel ajuda a lidar com o "ruído" (variabilidade natural dos aromas)
         kernel = (
             C(1.0, (1e-3, 1e3)) * Matern(
                 nu=2.5, 
@@ -24,9 +21,9 @@ class BayesianSurrogate:
 
         self.model = GaussianProcessRegressor(
             kernel=kernel,
-            alpha=0.1, # Aumento do ruído global para estabilizar convergência
-            n_restarts_optimizer=10, # Mais tentativas para encontrar o melhor ajuste
-            normalize_y=True # Essencial quando as notas de fitness variam muito
+            alpha=0.1,
+            n_restarts_optimizer=10,
+            normalize_y=True
         )
 
         self.max_samples = max_samples
@@ -39,7 +36,6 @@ class BayesianSurrogate:
         return len(self.y)
 
     def add_observation(self, features, fitness):
-        # Garante que features seja um array 1D (vetor fixo do encode_blend)
         feat_array = np.asarray(features, dtype=np.float32).flatten()
 
         if self.n_samples >= self.max_samples:
@@ -49,7 +45,6 @@ class BayesianSurrogate:
         self.X.append(feat_array)
         self.y.append(float(fitness))
 
-        # Treina a cada 10 novas observações para não sobrecarregar o processamento
         if self.n_samples >= 10 and self.n_samples % 5 == 0:
             self.fit()
 
@@ -72,7 +67,6 @@ class BayesianSurrogate:
 
         feat_query = np.asarray(features, dtype=np.float32).reshape(1, -1)
 
-        # Retorna a média (predição) e o desvio padrão (incerteza)
         mean, std = self.model.predict(feat_query, return_std=True)
 
         return float(mean[0]), float(std[0])

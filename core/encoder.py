@@ -5,11 +5,9 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem.rdFingerprintGenerator import GetMorganGenerator
 
 class FeatureEncoder:
-    # Configurações para o Surrogate (Vetor fixo de 271 posições)
     FP_BITS = 256
     INPUT_SIZE = 15 + FP_BITS 
     
-    # Configuração para a GNN (5 características por átomo)
     NODE_FEATURES = 5 
 
     @staticmethod
@@ -19,7 +17,6 @@ class FeatureEncoder:
         mol = Chem.MolFromSmiles(smiles)
         if not mol: return None
 
-        # Características dos Nós (Número Atómico, Grau, Carga, Aromaticidade, Massa)
         nodes = []
         for atom in mol.GetAtoms():
             nodes.append([
@@ -31,7 +28,6 @@ class FeatureEncoder:
             ])
         x = torch.tensor(nodes, dtype=torch.float)
 
-        # Arestas (Conexões entre átomos)
         edge_index = []
         for bond in mol.GetBonds():
             i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()

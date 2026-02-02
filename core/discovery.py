@@ -33,11 +33,9 @@ class DiscoveryEngine:
         self.discoveries = []
         self.anchors = []
 
-        # Modo Dupe
         self.target_vector = None
         self.target_price = 100.0
 
-        # Memória de feedback humano
         self.last_human_score = 0.0
 
         print(f"[INIT] Carregando {csv_path}...")
@@ -46,7 +44,6 @@ class DiscoveryEngine:
             self.df_insumos.columns = self.df_insumos.columns.str.strip()
 
             initial_len = len(self.df_insumos)
-            # Limpeza de nomes para garantir matching
             self.df_insumos['name'] = self.df_insumos['name'].astype(str).str.strip()
             self.df_insumos.drop_duplicates(subset=["name"], keep="first", inplace=True)
 
@@ -65,14 +62,12 @@ class DiscoveryEngine:
         self._validate_and_clean_dataset()
         self.evolution = EvolutionEngine(self)
 
-    # ======================================================================
 
     def set_dupe_target(self, target_molecules, anchors=None):
         print(f"[DUPE MODE] Alvo definido com {len(target_molecules)} moléculas.")
 
         enriched = [self._enrich_with_rdkit(m) for m in target_molecules]
 
-        # Limpa nomes das âncoras
         self.anchors = [str(a).strip() for a in anchors] if anchors else []
         if self.anchors:
             print(f"[ANCHOR] Ingredientes travados: {self.anchors}")
@@ -88,7 +83,6 @@ class DiscoveryEngine:
             f"Custo Máximo Alvo: €{self.target_price:.2f}/kg"
         )
 
-    # ======================================================================
 
     def _validate_and_clean_dataset(self):
         if "smiles" not in self.df_insumos.columns:
@@ -107,7 +101,6 @@ class DiscoveryEngine:
         )
         print(f"[INIT] {len(self.df_insumos)} insumos válidos carregados.")
 
-    # ======================================================================
 
     def warmup(self, n_samples=200):
         if self.df_insumos.empty:
@@ -158,15 +151,12 @@ class DiscoveryEngine:
             print("[ERROR] Dataset vazio. Abortando descoberta.")
             return []
 
-        # --- CORREÇÃO DE MEMÓRIA: Limpa resultados anteriores ---
         self.discoveries = [] 
         best_fitness = 0.0
 
         for i in range(rounds):
 
-            # Evolução guiada por feedback humano
             if self.discoveries and self.last_human_score >= 6.0:
-                # print(f"   -> [EVOLUÇÃO] Refinando fórmula anterior...")
                 last_best = self.discoveries[-1]["molecules"]
                 raw_mols = self._mutate_formula(last_best)
             else:
@@ -180,7 +170,6 @@ class DiscoveryEngine:
             feature_vec = FeatureEncoder.encode_blend(molecules)
             result = self.evaluate(molecules)
 
-            # Se foi invalidado (ex: falta de âncora), pula
             if result["fitness"] <= 0.01:
                 continue
 
@@ -201,12 +190,11 @@ class DiscoveryEngine:
 
             chem_msg = f"| Fix {result['chemistry']['longevity']:.1f}h"
 
-            # print(f"{i:02d} | Fit {result['fitness']:.3f} | AI {result['ai_score']:.3f} {sim_msg} {chem_msg}")
 
         return self.discoveries
 
     # ======================================================================
-    # GERAÇÃO DE MOLÉCULAS (CORRIGIDO)
+    # GERAÇÃO DE MOLÉCULAS
     # ======================================================================
 
     def _generate_molecules(self, strategy=None):
@@ -215,14 +203,11 @@ class DiscoveryEngine:
         molecules = []
         current_names = set()
         
-        # 1. INJEÇÃO FORÇADA DE ÂNCORAS
-        # Esta função agora SÓ gera, nunca retorna erro.
         if self.anchors:
             for anchor_name in self.anchors:
                 clean_name = str(anchor_name).strip().lower()
                 match_key = None
                 
-                # Busca robusta (Case Insensitive)
                 for key in self.insumos_dict.keys():
                     if str(key).strip().lower() == clean_name:
                         match_key = key
@@ -234,10 +219,8 @@ class DiscoveryEngine:
                     molecules.append(self._row_to_molecule(pd.Series(row)))
                     current_names.add(match_key)
                 else:
-                    # Apenas avisa, não quebra o código
                     print(f"[AVISO] Âncora '{anchor_name}' não encontrada no estoque.")
 
-        # 2. PREENCHIMENTO
         target_size = random.randint(7, 12)
         max_price = 800.0 if self.target_vector is not None else 9999.0
         
@@ -271,7 +254,6 @@ class DiscoveryEngine:
 
         mutation_type = random.choice(["swap", "swap", "add", "remove"])
 
-        # Identifica índices seguros (não-âncoras)
         anchor_clean = [str(a).lower().strip() for a in self.anchors]
         safe_indices = []
         for i, m in enumerate(child):
@@ -292,7 +274,6 @@ class DiscoveryEngine:
         elif mutation_type == "add" and len(child) < 14:
             new_mols = self._generate_molecules()
             if new_mols:
-                # Evita duplicatas
                 existing = {m['name'] for m in child}
                 for m in new_mols:
                     if m['name'] not in existing:
@@ -306,11 +287,10 @@ class DiscoveryEngine:
         return child
 
     # ======================================================================
-    # AVALIAÇÃO (CORRIGIDO)
+    # AVALIAÇÃO (Corrigi as contas)
     # ======================================================================
 
     def evaluate(self, molecules):
-        # Validação básica de tipo
         if not molecules or not isinstance(molecules, list):
             return self._invalid_result(molecules)
             
@@ -320,14 +300,11 @@ class DiscoveryEngine:
         if len(molecules) < 2:
             return self._invalid_result(molecules)
 
-        # --- REGRA DE OURO: VALIDAÇÃO DE ÂNCORAS ---
-        # Aqui é onde penalizamos se a âncora sumiu
         if self.anchors:
             names_in_blend = [str(m.get('name', '')).strip().lower() for m in molecules]
             for a in self.anchors:
                 clean_anchor = str(a).strip().lower()
                 if clean_anchor not in names_in_blend:
-                    # Faltou âncora = Fórmula Inválida
                     return self._invalid_result(molecules)
 
         graphs = FeatureEncoder.encode_graphs(molecules)
@@ -376,7 +353,6 @@ class DiscoveryEngine:
             )
 
             if similarity < 0.01:
-                # Fallback se não houver similaridade
                 fitness = (
                     (chem["longevity"] / 10.0) * 0.4
                     + ai_score * 0.4
@@ -413,7 +389,6 @@ class DiscoveryEngine:
             "molecules": molecules,
         }
 
-    # ======================================================================
 
     def _validate_chemical_synergy(self, molecules):
         if not molecules:
@@ -421,7 +396,6 @@ class DiscoveryEngine:
         categories = {m.get("category") for m in molecules}
         return len(categories) >= 2
 
-    # ======================================================================
 
     def _row_to_molecule(self, row):
         return {
@@ -435,7 +409,6 @@ class DiscoveryEngine:
             "is_allergen": row.get("is_allergen", False),
         }
 
-    # ======================================================================
 
     def _enrich_with_rdkit(self, molecule):
         if "rdkit" in molecule or not isinstance(molecule.get("smiles"), str):
@@ -498,7 +471,6 @@ class DiscoveryEngine:
         feature_vec = FeatureEncoder.encode_blend(discovery["molecules"])
         self.surrogate.add_observation(feature_vec, new_fitness)
 
-    # ======================================================================
 
     def save_results(self, folder="results", filename="discoveries.json"):
         def sanitize(obj):
@@ -524,14 +496,12 @@ class DiscoveryEngine:
         except Exception as e:
             print(f"\n[IO ERROR] Falha ao salvar JSON: {e}")
 
-    # ======================================================================
 
     def _diversity_penalty(self, molecules):
         names = [m.get("name", "UNK") for m in molecules]
         ratio = len(set(names)) / max(len(names), 1)
         return ratio if ratio == 1 else ratio * 0.5
 
-    # ======================================================================
 
     def _invalid_result(self, molecules):
         return {
@@ -541,6 +511,7 @@ class DiscoveryEngine:
                 "projection": 0.0,
                 "longevity": 0.0,
                 "stability": 0.0,
+                
                 "technology_viability": 0.0,
             },
             "market": {

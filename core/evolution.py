@@ -62,9 +62,16 @@ class EvolutionEngine:
     # --------------------------------------------------
 
     def select_elite(self, evaluated):
+        valid_blends = [r for r in evaluated if r.get("market") != "Invalid"]
+        
+        for r in valid_blends:
+            complexity = r.get("complexity", r.get("metrics", {}).get("complexity", 0))
+            
+            r["adjusted_fitness"] = r["fitness"] + (complexity * 0.3)
+
         ranked = sorted(
-            [r for r in evaluated if r.get("market") != "Invalid"],
-            key=lambda r: r["fitness"],
+            valid_blends,
+            key=lambda r: r.get("adjusted_fitness", r["fitness"]),
             reverse=True
         )
 
@@ -74,9 +81,8 @@ class EvolutionEngine:
         k = max(1, int(len(ranked) * self.elite_ratio))
         elite = ranked[:k]
 
-        print(f"Elite selected: {len(elite)} / {len(evaluated)}")
+        print(f"Elite selected (Anti-Dupe Optimized): {len(elite)} / {len(evaluated)}")
         return elite
-
     # --------------------------------------------------
     # REPRODUCTION
     # --------------------------------------------------
@@ -118,18 +124,14 @@ class EvolutionEngine:
         a = parent_a["molecules"]
         b = parent_b["molecules"]
 
-        # Define pontos de corte iniciais
         cut_a = random.randint(1, len(a))
         cut_b = random.randint(0, len(b) - 1)
 
-        # Ajusta os pontos de corte para não quebrar acordes (Proteção de Blocos)
         cut_a = self._adjust_cut_point(a, cut_a)
         cut_b = self._adjust_cut_point(b, cut_b)
 
-        # Une os segmentos dos progenitores
         child = copy.deepcopy(a[:cut_a] + b[cut_b:])
 
-        # Remove duplicatas mantendo a integridade e ordem
         seen = set()
         filtered = []
         for m in child:
@@ -140,7 +142,6 @@ class EvolutionEngine:
 
         child = filtered
 
-        # Garante limites viáveis de tamanho de fórmula
         if len(child) < 2:
             child = copy.deepcopy(a)
         if len(child) > 6:
@@ -160,7 +161,6 @@ class EvolutionEngine:
         accord_id = target_mol.get("accord_id")
 
         if accord_id:
-            # Procura o fim do bloco do acorde para mover o corte
             last_index = cut_point
             for i in range(cut_point, len(molecules)):
                 if molecules[i].get("accord_id") == accord_id:
@@ -175,7 +175,6 @@ class EvolutionEngine:
         for i, m in enumerate(molecules):
             if random.random() < self.mutation_rate:
                 
-                # Reduz a chance de mutação se a molécula for parte de um acorde estável
                 if m.get("accord_id") and random.random() < 0.5:
                     continue
 
@@ -183,7 +182,6 @@ class EvolutionEngine:
                     molecules[i] = self.discovery._random_molecule()
                     continue
 
-                # Mutação de propriedades físico-químicas
                 mw = m.get("molecular_weight", 150.0)
                 mw *= random.uniform(1 - self.mutation_strength, 1 + self.mutation_strength)
                 m["molecular_weight"] = float(np.clip(mw, 80, 600))
@@ -197,3 +195,5 @@ class EvolutionEngine:
                 m["boiling_point"] = float(np.clip(bp, 80, 450))
 
         return molecules
+    
+    

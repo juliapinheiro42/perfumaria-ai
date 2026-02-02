@@ -25,7 +25,6 @@ class MoleculeGNN(nn.Module):
     def predict(self, batch_data):
         self.eval()
         with torch.no_grad():
-            # Executa a inferência e retorna para CPU/NumPy
             return self.forward(batch_data).cpu().numpy()
 
     def save(self, path="results/perfume_gnn.pth"):

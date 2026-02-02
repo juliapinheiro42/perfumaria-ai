@@ -5,9 +5,9 @@ import random
 class ReplayBuffer:
     def __init__(self, max_size=2000):
         self.max_size = max_size
-        self.storage = []      # Lista de listas de grafos (Data objects)
-        self.targets = []      # Lista de floats (Fitness)
-        self.weights = []      # Lista de floats (Importância para o treino)
+        self.storage = []
+        self.targets = []
+        self.weights = []
 
     def add(self, graphs, fitness, weight=1.0):
         """
@@ -21,7 +21,6 @@ class ReplayBuffer:
             self.targets.pop(0)
             self.weights.pop(0)
         
-        # Armazena
         self.storage.append(graphs)
         self.targets.append(float(fitness))
         self.weights.append(float(weight))
@@ -38,7 +37,6 @@ class ReplayBuffer:
         if current_size == 0:
             return []
 
-        # Escolhe índices aleatórios
         indices = np.random.choice(current_size, min(current_size, batch_size), replace=False)
         
         flat_data_list = []
@@ -48,13 +46,9 @@ class ReplayBuffer:
             target_val = self.targets[i]
             weight_val = self.weights[i]
             
-            # Prepara cada grafo da fórmula com o alvo (y)
             for graph in graphs_list:
-                # Clona para não estragar o original no buffer
                 g = graph.clone()
                 
-                # Anexa o Target (Fitness) e o Peso ao grafo
-                # O PyTorch Geometric espera que 'y' seja um tensor
                 g.y = torch.tensor([target_val], dtype=torch.float)
                 g.weight = torch.tensor([weight_val], dtype=torch.float)
                 

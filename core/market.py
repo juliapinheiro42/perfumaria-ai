@@ -47,10 +47,7 @@ class PerfumeBusinessEngine:
         if tech_score > 0.38: return "Premium"
         return "Mass Market"
 
-# --- FUNÇÃO EXTERNA (Fora da classe para permitir importação direta) ---
-
 def business_evaluation(molecules: List[Dict], longevity: float, projection: float, tech_score: float) -> Dict:
-    """Esta é a função que o DiscoveryEngine importa."""
     engine = PerfumeBusinessEngine() 
     
     cost = engine.estimate_cogs(molecules)
@@ -74,12 +71,10 @@ def business_evaluation(molecules: List[Dict], longevity: float, projection: flo
         "adjusted_score": max(0, tech_score - ifra["penalty"])
     }
 
-# --- BLOCO DE TESTE ---
 if __name__ == "__main__":
     minha_formula = [
         {"name": "Oakmoss Absolute", "formula_pct": 0.05}, 
         {"name": "Iso E Super", "formula_pct": 0.50}
     ]
-    # Testando a função direta que o sistema usa
     res = business_evaluation(minha_formula, 1.4, 0.9, 0.88)
     print(f"Resultado do Teste: {res}")

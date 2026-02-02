@@ -23,23 +23,17 @@ class IFRAValidator:
 
         for item in formula_composition:
             mol_id = item.get('name')
-            # Concentração da molécula dentro da essência pura (0.0 a 1.0)
             pct_in_oil = item.get('concentration', 0.0)
             
-            # Recupera o limite IFRA (Default 100% se não listado)
             molecule_spec = self.insumos_data.get(mol_id, {})
             limit = molecule_spec.get("ifra_limit", 1.0)
             
-            # O cálculo real: Concentração na essência * Diluição final
-            # Ex: 10% de Oakmoss na essência * 20% de diluição = 2% na pele.
             final_skin_concentration = pct_in_oil * dilution
 
             if final_skin_concentration > limit:
                 is_legal = False
-                # Calcula o quão acima do limite a fórmula está
                 severity = (final_skin_concentration - limit) / limit
                 
-                # Penalidade dinâmica para o AI Score (min 0.1, max 1.0)
                 total_penalty += min(1.0, 0.2 + (severity * 0.1))
                 
                 warnings.append({
@@ -58,21 +52,18 @@ class IFRAValidator:
             "warnings": warnings
         }
 
-# --- Exemplo de Uso Prático ---
 if __name__ == "__main__":
-    # Simulando sua base de insumos
     base_insumos = {
-        "Oakmoss Absolute": {"ifra_limit": 0.001},  # Muito restrito
+        "Oakmoss Absolute": {"ifra_limit": 0.001},
         "Rose Oxide": {"ifra_limit": 0.02},
         "Iso E Super": {"ifra_limit": 0.21}
     }
 
     validator = IFRAValidator(base_insumos)
 
-    # Simulando uma fórmula gótica pesada
     minha_formula = [
-        {"name": "Oakmoss Absolute", "concentration": 0.05}, # 5% na essência
-        {"name": "Iso E Super", "concentration": 0.30}      # 30% na essência
+        {"name": "Oakmoss Absolute", "concentration": 0.05},
+        {"name": "Iso E Super", "concentration": 0.30}
     ]
 
     resultado = validator.validate_formula(minha_formula, dilution=0.20)

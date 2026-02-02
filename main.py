@@ -12,9 +12,9 @@ from core.model import MoleculeGNN
 
 NODE_FEATURES = 5 
 ROUNDS = 30
-SLEEP_BETWEEN_ROUNDS = 1  # Rápido, pois o cálculo agora é local
+SLEEP_BETWEEN_ROUNDS = 1
 CHECKPOINT_INTERVAL = 5
-CSV_PATH = "insumos.csv"  # Certifique-se que este arquivo existe
+CSV_PATH = "insumos.csv"
 
 # =========================================================
 # 1. INICIALIZAÇÃO DO MODELO
@@ -54,28 +54,12 @@ engine = DiscoveryEngine(
 )
 
 # =========================================================
-# 3. CONFIGURAÇÃO DE ALVO (OPCIONAL - MODO DUPE)
-# =========================================================
-# Se você quiser que o "Sim" saia do 0.00, defina um alvo aqui.
-# Caso contrário, deixe comentado para modo "Criação Livre".
-# =========================================================
-
-# target_perfume = [
-#     {"name": "Ambroxan", "smiles": "CC1(C)CCCC2(C)C1CCC3(C)C2CCC4C3(C)CCC(=O)O4"}, # Exemplo
-#     {"name": "Iso E Super", "smiles": "CC(=O)C1C(C)(C)CCC2C1(C)CCCC2(C)C"},
-#     {"name": "Hedione", "smiles": "CCCCCC(=O)CC1C(C(=O)OC)CCCC1=C"},
-#     {"name": "Ethyl Maltol", "smiles": "CCC1=C(C(=O)C=CO1)O"}
-# ]
-# anchors = ["Ambroxan"] # Ingredientes que a IA é OBRIGADA a usar
-# engine.set_dupe_target(target_perfume, anchors=anchors)
-
-# =========================================================
 # 4. WARMUP (AQUECIMENTO)
 # =========================================================
 # Só roda se o modelo for novo para popular o buffer de memória
 if not loaded:
     print("\n🔥 [SYSTEM] Iniciando Warmup (Aquecimento)...")
-    engine.warmup(n_samples=50) # Reduzi para 50 para ser mais rápido
+    engine.warmup(n_samples=50)
 
 # =========================================================
 # 5. LOOP PRINCIPAL
@@ -89,10 +73,8 @@ try:
         try:
             print(f"\n--- ⚗️  RODADA {i}/{ROUNDS} ---")
             
-            # O engine agora decide sozinho se explora ou evolui baseado na sua última nota
             engine.discover(rounds=1)
 
-            # --- INTERAÇÃO HUMANA ---
             if engine.discoveries:
                 best = engine.discoveries[-1]
                 
@@ -100,11 +82,9 @@ try:
                 print(f"👃 AVALIAÇÃO OLFATIVA")
                 print("="*60)
                 
-                # Formata a lista de ingredientes bonitinha
                 molecules = best['molecules']
                 names = [m['name'] for m in molecules]
                 
-                # Quebra linha se for muito grande
                 formula_str = ", ".join(names)
                 if len(formula_str) > 80:
                     print(f"FÓRMULA:\n{formula_str}")
@@ -113,21 +93,18 @@ try:
                 
                 print("-" * 60)
                 
-                # Dados Técnicos
                 chem = best.get('chemistry', {})
                 longevity = chem.get('longevity', 0)
                 projection = chem.get('projection', 0)
                 ai_score = best.get('ai_score', 0)
                 sim = best.get('similarity_to_target', 0)
                 
-                # Mostra estatísticas vitais
                 stats = f"⏳ Fixação: {longevity:.1f}h  |  📢 Projeção: {projection:.1f}/10  |  🤖 IA Score: {ai_score:.3f}"
                 if sim > 0:
                     stats += f"  |  🎯 Similaridade: {sim:.2f}"
                 print(stats)
                 print("-" * 60)
                 
-                # Input do usuário
                 while True:
                     user_input = input(" > Nota (0-10) [Enter = Pular]: ")
                     
@@ -138,7 +115,6 @@ try:
                     try:
                         score = float(user_input)
                         if 0 <= score <= 10:
-                            # AQUI A MÁGICA ACONTECE: TREINO IMEDIATO
                             engine.register_human_feedback(-1, score)
                             break
                         else:
@@ -148,7 +124,6 @@ try:
 
                 print("="*60)
             
-            # Checkpoint e Salvamento
             if i % CHECKPOINT_INTERVAL == 0:
                 print(f" 💾 [CHECKPOINT] Salvando dados...")
                 engine.save_results()
