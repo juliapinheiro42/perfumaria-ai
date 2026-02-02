@@ -1,0 +1,9 @@
+torch
+pandas
+numpy
+scikit-learn
+scipy
+groq
+python-dotenv
+rdkit
+optuna
