@@ -37,6 +37,7 @@ class DiscoveryEngine:
 
         self.target_vector = None
         self.target_price = 100.0
+        self.target_complexity_score = 0.0
 
         self.last_human_score = 0.0
 
@@ -74,11 +75,20 @@ class DiscoveryEngine:
 
         self.target_vector = FeatureEncoder.encode_blend(enriched)
 
+        # Calcula complexidade alvo baseada em tiers
+        # Se não tiver 'weight_factor', assume 1.0. Tiers variam de 1 a 3.
+        total_w = sum(m.get('weight_factor', 1.0) for m in enriched)
+        weighted_tier = sum(
+            m.get('complexity_tier', 1) * m.get('weight_factor', 1.0)
+            for m in enriched
+        )
+        self.target_complexity_score = weighted_tier / total_w if total_w > 0 else 1.0
+
         self.target_price = sum(m.get("price_per_kg", 0) for m in target_molecules)
         if self.target_price == 0:
             self.target_price = 150.0
 
-        print(f"[DUPE MODE] Assinatura vetorial gerada. Custo Máximo Alvo: €{self.target_price:.2f}/kg")
+        print(f"[DUPE MODE] Assinatura vetorial gerada. Tier Alvo: {self.target_complexity_score:.2f}")
 
 
     def _validate_and_clean_dataset(self):
@@ -316,7 +326,7 @@ class DiscoveryEngine:
         # 2. Avaliação Química
         chem = self.chemistry.evaluate_blend(molecules)
         
-        # 3. Avaliação de Mercado (CORRIGIDA: 3 Argumentos)
+        # 3. Avaliação de Mercado
         tech_score = chem.get("complexity", 0.0)
         neuro_score = chem.get("neuro_score", 0.0)
         
@@ -329,6 +339,15 @@ class DiscoveryEngine:
         similarity = 0.0
         fitness = 0.0
 
+        # Normalizações Úteis (0-1)
+        norm_proj = chem.get("projection", 0) / 10.0
+        norm_long = chem.get("longevity", 0) / 10.0
+        norm_stab = chem.get("stability", 0)
+        norm_compl = min(tech_score / 10.0, 1.0)
+
+        financials = market.get("financials", {})
+        margin_pct = financials.get("margin_pct", 0.0) / 100.0
+
         if self.target_vector is not None:
             # --- MODO DUPE MATCHING ---
             candidate_vector = FeatureEncoder.encode_blend(molecules)
@@ -339,31 +358,55 @@ class DiscoveryEngine:
             if na > 0 and nb > 0:
                 similarity = dot / (na * nb)
 
-            cost_kg = market["financials"].get("cost", 9999.0)
+            # Preço: Quão perto ou abaixo do alvo?
+            cost_kg = financials.get("cost", 9999.0)
+            price_score = 1.0 if cost_kg <= self.target_price else (self.target_price / max(cost_kg, 1.0))
+
+            # Dificuldade de Dupe por Tier (NEW)
+            # Se o alvo é complexo (tier alto) e o candidato é simples, penaliza.
+            # tech_score é a soma (0-10), precisamos da média ponderada (1-3) para comparar com target.
+
+            total_w = sum(m.get('weight_factor', 1.0) for m in molecules)
+            candidate_avg_tier = sum(
+                m.get('complexity_tier', 1) * m.get('weight_factor', 1.0)
+                for m in molecules
+            ) / total_w if total_w > 0 else 1.0
+
+            # Agora comparamos Banana com Banana (Escala 1.0 a 3.0)
+            tier_diff = abs(candidate_avg_tier - self.target_complexity_score)
             
-            price_score = (
-                1.0 if cost_kg <= self.target_price else (self.target_price / cost_kg)
-            )
+            # Normaliza diferença (Max diff é 2.0 -> abs(3-1))
+            tier_match_score = max(0.0, 1.0 - (tier_diff / 2.0))
+
+            # Fórmula Fitness "Tudo Influencia"
+            # Similarity (40%) + Price (20%) + Perf (20%) + TierMatch (20%)
+            perf_score = (norm_proj + norm_long + norm_stab) / 3.0
 
             if similarity < 0.01:
-                fitness = (chem["longevity"] / 10.0 * 0.4) + (ai_score * 0.4) + (price_score * 0.2)
+                # Fallback se similaridade for nula
+                fitness = (perf_score * 0.5) + (price_score * 0.3) + (tier_match_score * 0.2)
             else:
-                fitness = (similarity * 0.6) + (price_score * 0.2) + (chem["longevity"] / 10.0 * 0.2)
+                fitness = (
+                    (similarity * 0.4) +
+                    (price_score * 0.2) +
+                    (perf_score * 0.2) +
+                    (tier_match_score * 0.2)
+                )
 
         else:
             # --- MODO DISCOVERY / LUXURY ---
-            balance = np.sqrt(chem["projection"] * chem["longevity"] + 0.1) / 5.0
-            chemistry_score = np.clip(balance, 0, 1)
-            
-            # Pega margem da estrutura nova 'financials'
-            margin_fitness = market["financials"].get("margin_pct", 0.0) / 100.0
-            anti_dupe_fitness = tech_score / 10.0
+            # Aqui queremos alta performance, alta margem e alta complexidade (Uniqueness)
             
             # Peso Estratégico L'Oréal: Química + Margem + Exclusividade
+            # Projection agora é crucial
+
+            perf_score = (norm_proj * 0.4) + (norm_long * 0.4) + (norm_stab * 0.2)
+
             fitness = (
-                (0.4 * chemistry_score) + 
-                (0.3 * margin_fitness) + 
-                (0.3 * anti_dupe_fitness)
+                (0.35 * perf_score) +
+                (0.25 * margin_pct) +
+                (0.25 * norm_compl) +
+                (0.15 * ai_score)
             ) * self._diversity_penalty(molecules)
 
         return {
