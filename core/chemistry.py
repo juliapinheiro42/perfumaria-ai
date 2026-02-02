@@ -15,7 +15,7 @@ class ChemistryEngine:
     # MAIN EVALUATION
     # ======================================================================
 
-    def evaluate_blend(self, molecules):
+    def evaluate_blend(self, molecules, target_mood=None):
         if not molecules:
             return {
                 "longevity": 0.0,
@@ -23,7 +23,8 @@ class ChemistryEngine:
                 "stability": 0.0,
                 "complexity": 0.0,
                 "technology_viability": 0.0,
-                "olfactive_profile": "Vazio"
+                "olfactive_profile": "Vazio",
+                "neuro_score": self._calculate_neuro_score(molecules, target_mood)
             }
 
         bps = []
@@ -112,32 +113,23 @@ class ChemistryEngine:
 
     def _calculate_complexity(self, molecules):
         score = 0.0
-
-        complex_materials = [
-            "Bergamot Oil FCF", "Orange Sweet Oil", "Lemon Oil",
-            "Petitgrain Oil", "Lavandin Oil", "Ylang Ylang Extra",
-            "Olibanum Oil", "Patchouli Oil", "Oakmoss Absolute",
-            "Blackcurrant Bud Absolute", "Labdanum Resinoid"
-        ]
-
-        tech_materials = [
-            "Ambrocenide", "Javanol", "Spirambrene", "Akigalawood"
-        ]
-
+        
         for m in molecules:
-            name = m.get("name", "")
-            if name in complex_materials:
+            tier = int(m.get("complexity_tier", 1))
+            
+            if tier == 3:
                 score += 3.0
-            elif name in tech_materials:
+            elif tier == 2:
                 score += 2.0
             else:
-                score += 0.1
+                score += 0.5
 
+        # Bônus de Diversidade (Mantido, pois é excelente)
         unique_ingredients = len(set(m.get("name", "") for m in molecules))
-        diversity_bonus = unique_ingredients * 0.2
+        diversity_bonus = unique_ingredients * 0.3 # Aumentei o peso da diversidade
 
         return float(np.clip(score + diversity_bonus, 0.0, 10.0))
-
+    
     # ======================================================================
     # BOILING POINT ESTIMATION
     # ======================================================================
@@ -198,10 +190,48 @@ class ChemistryEngine:
         
         volatility_gap = (avg_mw_base - avg_mw_top) / 25.0
 
-        top_families = set([m.get("sub_category", "") for m in top_mols])
-        base_families = set([m.get("sub_category", "") for m in base_mols])
+        top_families = set([m.get("olfactive_family", "") for m in top_mols])
+        base_families = set([m.get("olfactive_family", "") for m in base_mols])
         
         contrast_bonus = len(top_families.symmetric_difference(base_families)) * 1.2
 
         final_score = volatility_gap + contrast_bonus
         return float(np.clip(final_score, 1.0, 10.0))
+    
+    def _calculate_neuro_score(self, molecules, target_mood):
+        """
+        Calcula se o perfume cumpre a promessa emocional (ex: "Relaxamento").
+        Baseado nas colunas 'functional_effect' do CSV.
+        """
+        if not target_mood or not molecules:
+            return 0.0
+
+        hit_count = 0
+        synergy_bonus = 0.0
+        
+        keywords = {
+            "calming": ["Relaxation", "GABA", "Alpha Waves", "Meditative"],
+            "energy": ["Energy", "Dopamine", "Vitality", "Refreshing"],
+            "seduction": ["Sexy", "Oxytocin", "Attraction", "Aphrodisiac"],
+            "confidence": ["Confidence", "Serotonin", "Power"]
+        }
+        
+        target_keys = keywords.get(target_mood.lower(), [])
+        
+        neuro_mechanisms = set()
+
+        for m in molecules:
+            effect = m.get("functional_effect", "")
+            mechanism = m.get("neuro_target", "")
+            
+            if any(k in effect for k in target_keys) or any(k in mechanism for k in target_keys):
+                hit_count += 1
+                neuro_mechanisms.add(mechanism)
+                
+                if m.get("complexity_tier", 1) == 3:
+                    hit_count += 0.5
+
+        synergy_bonus = len(neuro_mechanisms) * 1.0
+        
+        total_score = hit_count + synergy_bonus
+        return float(np.clip(total_score, 0.0, 10.0))

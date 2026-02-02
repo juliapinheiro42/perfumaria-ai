@@ -3,21 +3,22 @@ import random
 import os
 import json
 import pandas as pd
-
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
-from torch_geometric.loader import DataLoader
+# Tenta importar torch_geometric, se falhar usa fallback
+try:
+    from torch_geometric.loader import DataLoader
+except ImportError:
+    DataLoader = None
 
 from core.evolution import EvolutionEngine
-from core.surrogate import BayesianSurrogate, expected_improvement
+from core.surrogate import BayesianSurrogate
 from core.encoder import FeatureEncoder
 from core.chemistry import ChemistryEngine
 from core.market import business_evaluation
 from core.replay_buffer import ReplayBuffer
 from core.trainer import ModelTrainer
-from core.presets import ACORDES_PRESETS
-
 
 class DiscoveryEngine:
 
@@ -54,9 +55,7 @@ class DiscoveryEngine:
 
         except Exception as e:
             print(f"[CRITICAL ERROR] Falha ao ler CSV: {e}")
-            self.df_insumos = pd.DataFrame(
-                columns=["name", "smiles", "category", "molecular_weight"]
-            )
+            self.df_insumos = pd.DataFrame()
             self.insumos_dict = {}
 
         self._validate_and_clean_dataset()
@@ -78,10 +77,7 @@ class DiscoveryEngine:
         if self.target_price == 0:
             self.target_price = 150.0
 
-        print(
-            f"[DUPE MODE] Assinatura vetorial gerada. "
-            f"Custo Máximo Alvo: €{self.target_price:.2f}/kg"
-        )
+        print(f"[DUPE MODE] Assinatura vetorial gerada. Custo Máximo Alvo: €{self.target_price:.2f}/kg")
 
 
     def _validate_and_clean_dataset(self):
@@ -103,8 +99,7 @@ class DiscoveryEngine:
 
 
     def warmup(self, n_samples=200):
-        if self.df_insumos.empty:
-            return
+        if self.df_insumos.empty: return
 
         print(f"[WARMUP] Gerando {n_samples} amostras iniciais...")
         count = 0
@@ -114,23 +109,23 @@ class DiscoveryEngine:
             attempts += 1
 
             raw_mols = self._generate_molecules()
-            if not raw_mols:
-                continue
+            if not raw_mols: continue
 
             molecules = [self._enrich_with_rdkit(m) for m in raw_mols]
 
-            if not self._validate_chemical_synergy(molecules):
-                continue
+            # Validações básicas
+            if len(molecules) < 3: continue
+            if not self._validate_chemical_synergy(molecules): continue
 
             result = self.evaluate(molecules)
-            if result["fitness"] <= 0.01:
-                continue
+            if result["fitness"] <= 0.01: continue
 
             feature_vec = FeatureEncoder.encode_blend(molecules)
             self.surrogate.add_observation(feature_vec, result["fitness"])
 
             graphs = FeatureEncoder.encode_graphs(molecules)
-            self.buffer.add(graphs, result["fitness"])
+            if graphs:
+                self.buffer.add(graphs, result["fitness"])
 
             count += 1
             if count % 50 == 0:
@@ -162,34 +157,29 @@ class DiscoveryEngine:
             else:
                 raw_mols = self._generate_molecules()
 
-            if not raw_mols:
-                continue
+            if not raw_mols: continue
 
             molecules = [self._enrich_with_rdkit(m) for m in raw_mols]
+            
+            # Pré-filtro para não perder tempo
+            if len(molecules) < 3: continue
 
             feature_vec = FeatureEncoder.encode_blend(molecules)
             result = self.evaluate(molecules)
 
-            if result["fitness"] <= 0.01:
-                continue
+            if result["fitness"] <= 0.01: continue
 
             self.surrogate.add_observation(feature_vec, result["fitness"])
 
             graphs = FeatureEncoder.encode_graphs(molecules)
-            self.buffer.add(graphs, result["fitness"], weight=1.0)
+            if graphs:
+                self.buffer.add(graphs, result["fitness"], weight=1.0)
 
             if self.trainer.maybe_retrain(self.buffer):
                 print(f"{i:02d} | 🔁 GNN re-treinada automaticamente")
 
             best_fitness = max(best_fitness, result["fitness"])
             self.discoveries.append(result)
-
-            sim_msg = ""
-            if "similarity_to_target" in result:
-                sim_msg = f"| Sim {result['similarity_to_target']:.2f}"
-
-            chem_msg = f"| Fix {result['chemistry']['longevity']:.1f}h"
-
 
         return self.discoveries
 
@@ -203,6 +193,7 @@ class DiscoveryEngine:
         molecules = []
         current_names = set()
         
+        # 1. Adiciona Âncoras
         if self.anchors:
             for anchor_name in self.anchors:
                 clean_name = str(anchor_name).strip().lower()
@@ -221,6 +212,7 @@ class DiscoveryEngine:
                 else:
                     print(f"[AVISO] Âncora '{anchor_name}' não encontrada no estoque.")
 
+        # 2. Preenche o restante
         target_size = random.randint(7, 12)
         max_price = 800.0 if self.target_vector is not None else 9999.0
         
@@ -287,7 +279,7 @@ class DiscoveryEngine:
         return child
 
     # ======================================================================
-    # AVALIAÇÃO (Corrigi as contas)
+    # AVALIAÇÃO (CORRIGIDA E ATUALIZADA)
     # ======================================================================
 
     def evaluate(self, molecules):
@@ -307,86 +299,80 @@ class DiscoveryEngine:
                 if clean_anchor not in names_in_blend:
                     return self._invalid_result(molecules)
 
-        graphs = FeatureEncoder.encode_graphs(molecules)
-        if not graphs:
-            return self._invalid_result(molecules)
+        # 1. Predição AI (GNN)
+        ai_score = 0.5
+        if self.model and DataLoader:
+            graphs = FeatureEncoder.encode_graphs(molecules)
+            if graphs:
+                try:
+                    loader = DataLoader(graphs, batch_size=len(graphs))
+                    batch = next(iter(loader))
+                    pred = self.model.predict(batch)
+                    ai_score = float(pred[0][0]) if pred is not None else 0.0
+                except:
+                    ai_score = 0.5
 
-        loader = DataLoader(graphs, batch_size=len(graphs))
-        batch = next(iter(loader))
-
-        try:
-            pred = self.model.predict(batch)
-            ai_score = float(pred[0][0]) if pred is not None else 0.0
-        except:
-            ai_score = 0.5
-
+        # 2. Avaliação Química
         chem = self.chemistry.evaluate_blend(molecules)
+        
+        # 3. Avaliação de Mercado (CORRIGIDA: 3 Argumentos)
+        tech_score = chem.get("complexity", 0.0)
+        neuro_score = chem.get("neuro_score", 0.0)
+        
         market = business_evaluation(
             molecules,
-            chem["longevity"],
-            chem["projection"],
-            chem["technology_viability"],
+            tech_score,
+            neuro_score
         )
 
         similarity = 0.0
         fitness = 0.0
 
         if self.target_vector is not None:
+            # --- MODO DUPE MATCHING ---
             candidate_vector = FeatureEncoder.encode_blend(molecules)
-
             dot = np.dot(candidate_vector, self.target_vector)
             na = np.linalg.norm(candidate_vector)
             nb = np.linalg.norm(self.target_vector)
-
+            
             if na > 0 and nb > 0:
                 similarity = dot / (na * nb)
 
-            cost_kg = (
-                sum(m.get("price_per_kg", 0) for m in molecules)
-                / max(len(molecules), 1)
-            )
-
+            cost_kg = market["financials"].get("cost", 9999.0)
+            
             price_score = (
-                1.0
-                if cost_kg <= self.target_price
-                else (self.target_price / cost_kg)
+                1.0 if cost_kg <= self.target_price else (self.target_price / cost_kg)
             )
 
             if similarity < 0.01:
-                fitness = (
-                    (chem["longevity"] / 10.0) * 0.4
-                    + ai_score * 0.4
-                    + price_score * 0.2
-                )
+                fitness = (chem["longevity"] / 10.0 * 0.4) + (ai_score * 0.4) + (price_score * 0.2)
             else:
-                fitness = (
-                    similarity * 0.6
-                    + price_score * 0.2
-                    + (chem["longevity"] / 10.0) * 0.2
-                )
+                fitness = (similarity * 0.6) + (price_score * 0.2) + (chem["longevity"] / 10.0 * 0.2)
 
         else:
-            balance = (
-                np.sqrt(chem["projection"] * chem["longevity"] + 0.1) / 5
-            )
+            # --- MODO DISCOVERY / LUXURY ---
+            balance = np.sqrt(chem["projection"] * chem["longevity"] + 0.1) / 5.0
             chemistry_score = np.clip(balance, 0, 1)
+            
+            # Pega margem da estrutura nova 'financials'
+            margin_fitness = market["financials"].get("margin_pct", 0.0) / 100.0
+            anti_dupe_fitness = tech_score / 10.0
+            
+            # Peso Estratégico L'Oréal: Química + Margem + Exclusividade
             fitness = (
-                (0.7 * chemistry_score + 0.3 * market["margin"])
-                * self._diversity_penalty(molecules)
-            )
+                (0.4 * chemistry_score) + 
+                (0.3 * margin_fitness) + 
+                (0.3 * anti_dupe_fitness)
+            ) * self._diversity_penalty(molecules)
 
         return {
             "fitness": float(np.clip(fitness, 0, 1.5)),
             "ai_score": ai_score,
             "similarity_to_target": float(similarity),
             "chemistry": chem,
-            "market": {
-                **market,
-                "cost_per_kg": sum(
-                    m.get("price_per_kg", 0) for m in molecules
-                ) / len(molecules),
-            },
+            "market": market, 
             "molecules": molecules,
+            "market_tier": market.get("market_tier", "Mass Market")
         }
 
 
@@ -398,6 +384,7 @@ class DiscoveryEngine:
 
 
     def _row_to_molecule(self, row):
+        """Mapeia dados do CSV para objeto de molécula com campos estratégicos."""
         return {
             "name": row.get("name"),
             "molecular_weight": row.get("molecular_weight", 150),
@@ -407,6 +394,12 @@ class DiscoveryEngine:
             "price_per_kg": row.get("price_per_kg", 100),
             "ifra_limit": row.get("ifra_limit", 1.0),
             "is_allergen": row.get("is_allergen", False),
+            # Novos Campos L'Oréal
+            "complexity_tier": row.get("complexity_tier", 1),
+            "neuro_target": row.get("neuro_target", "Neutral"),
+            "functional_effect": row.get("functional_effect", ""),
+            "olfactive_family": row.get("olfactive_family", "Floral"),
+            "weight_factor": random.uniform(1.0, 5.0)
         }
 
 
@@ -457,16 +450,15 @@ class DiscoveryEngine:
         discovery["fitness"] = new_fitness
         discovery["human_score"] = human_score_0_10
 
-        print(
-            f"   >>> [FEEDBACK] Nota {human_score_0_10} registrada. "
-            f"Treinando IA..."
-        )
+        print(f"   >>> [FEEDBACK] Nota {human_score_0_10} registrada.")
 
         graphs = FeatureEncoder.encode_graphs(discovery["molecules"])
-        self.buffer.add(graphs, new_fitness, weight=5.0)
+        if graphs:
+            self.buffer.add(graphs, new_fitness, weight=5.0)
 
-        loss = self.trainer.train_step(self.buffer)
-        print(f"   >>> [LEARNING] Modelo atualizado. Loss: {loss:.4f}")
+        if self.trainer:
+            loss = self.trainer.train_step(self.buffer)
+            print(f"   >>> [LEARNING] Modelo atualizado. Loss: {loss:.4f}")
 
         feature_vec = FeatureEncoder.encode_blend(discovery["molecules"])
         self.surrogate.add_observation(feature_vec, new_fitness)
@@ -504,6 +496,7 @@ class DiscoveryEngine:
 
 
     def _invalid_result(self, molecules):
+        # Atualizado para bater com a estrutura do novo PerfumeBusinessEngine e Dashboard
         return {
             "fitness": 0.01,
             "ai_score": 0.0,
@@ -511,14 +504,23 @@ class DiscoveryEngine:
                 "projection": 0.0,
                 "longevity": 0.0,
                 "stability": 0.0,
-                
+                "complexity": 0.0,
+                "neuro_score": 0.0,
+                "evolution": 0.0,
                 "technology_viability": 0.0,
             },
             "market": {
-                "market": 0.0,
-                "margin": 0.0,
-                "cost": 0.0,
-                "cost_per_kg": 0.0,
+                "financials": {
+                    "cost": 0.0, 
+                    "price": 0.0, 
+                    "margin_pct": 0.0, 
+                    "profit": 0.0, 
+                    "applied_multiplier": 1.0
+                },
+                "market_strategy": {"best": "Unknown", "rankings": {}},
+                "compliance": {"legal": False, "logs": []},
+                "market_tier": "Invalid"
             },
             "molecules": molecules,
+            "market_tier": "Invalid"
         }
