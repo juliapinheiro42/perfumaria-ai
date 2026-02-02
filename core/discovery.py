@@ -2,6 +2,7 @@ import numpy as np
 import random
 import os
 import json
+import uuid
 import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Descriptors
@@ -366,6 +367,7 @@ class DiscoveryEngine:
             ) * self._diversity_penalty(molecules)
 
         return {
+            "id": str(uuid.uuid4()),
             "fitness": float(np.clip(fitness, 0, 1.5)),
             "ai_score": ai_score,
             "similarity_to_target": float(similarity),
@@ -433,12 +435,26 @@ class DiscoveryEngine:
     # FEEDBACK HUMANO
     # ======================================================================
 
-    def register_human_feedback(self, discovery_idx, human_score_0_10):
-        try:
-            if discovery_idx == -1:
-                discovery_idx = len(self.discoveries) - 1
-            discovery = self.discoveries[discovery_idx]
-        except IndexError:
+    def register_human_feedback(self, discovery_id, human_score_0_10):
+        discovery = None
+
+        # Tenta buscar por ID (String UUID)
+        if isinstance(discovery_id, str):
+            for d in self.discoveries:
+                if d.get("id") == discovery_id:
+                    discovery = d
+                    break
+
+        # Fallback para índice numérico (Legacy Support)
+        elif isinstance(discovery_id, int):
+            try:
+                idx = len(self.discoveries) - 1 if discovery_id == -1 else discovery_id
+                discovery = self.discoveries[idx]
+            except IndexError:
+                pass
+
+        if not discovery:
+            print(f"   >>> [FEEDBACK ERROR] Discovery não encontrada: {discovery_id}")
             return
 
         self.last_human_score = float(human_score_0_10)

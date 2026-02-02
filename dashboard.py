@@ -146,14 +146,16 @@ st.markdown(f"""
 # 1. CACHE E SISTEMA
 # =========================================================
 @st.cache_resource
-def load_engine():
+def load_model():
     model = MoleculeGNN(num_node_features=5)
     try:
         if os.path.exists("results/perfume_gnn.pth"):
             model.load_state_dict(torch.load("results/perfume_gnn.pth"))
     except Exception as e:
         print(f"⚠️ Init Warning: {e}")
+    return model
 
+def get_engine(model):
     try:
         llm_client = GeminiClient()
         strategy_agent = StrategyAgent(llm_client)
@@ -168,7 +170,10 @@ def load_engine():
     return engine
 
 try:
-    engine = load_engine()
+    model = load_model()
+    if 'engine' not in st.session_state:
+        st.session_state.engine = get_engine(model)
+    engine = st.session_state.engine
 except Exception as e:
     st.error(f"System Failure: {e}")
     st.stop()
