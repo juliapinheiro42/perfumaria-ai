@@ -11,10 +11,10 @@ from core.model import MoleculeGNN
 # =========================================================
 
 NODE_FEATURES = 5 
-ROUNDS = 30
-SLEEP_BETWEEN_ROUNDS = 1
-CHECKPOINT_INTERVAL = 5
-CSV_PATH = "insumos.csv"
+ROUNDS = int(os.getenv("ROUNDS", 30))
+SLEEP_BETWEEN_ROUNDS = int(os.getenv("SLEEP_BETWEEN_ROUNDS", 1))
+CHECKPOINT_INTERVAL = int(os.getenv("CHECKPOINT_INTERVAL", 5))
+CSV_PATH = os.getenv("CSV_PATH", "insumos.csv")
 
 # =========================================================
 # 1. INICIALIZAÇÃO DO MODELO
@@ -115,7 +115,9 @@ try:
                     try:
                         score = float(user_input)
                         if 0 <= score <= 10:
-                            engine.register_human_feedback(-1, score)
+                            # Use ID if available, else fallback to -1
+                            discovery_id = best.get("id", -1)
+                            engine.register_human_feedback(discovery_id, score)
                             break
                         else:
                             print(" ⚠️  Por favor, entre uma nota entre 0 e 10.")

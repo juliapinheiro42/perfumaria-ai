@@ -70,29 +70,47 @@ class ChemistryEngine:
         longevity = float(np.clip(longevity, 1.0, 10.0))
 
         # =========================================================
-        # 2. PROJECTION (SILLAGE)
+        # 2. PROJECTION (SILLAGE) - REALISTIC WEIGHTED MODEL
         # =========================================================
-        volatility_score = 1000.0 / avg_bp
+        # Projeção é dominada pelas notas de topo (alta volatilidade) e boosters.
+        # Notas de base pesadas em excesso "seguram" a fragrância rente à pele (matam a projeção).
 
+        total_weight = sum(m.get("weight_factor", 1.0) for m in molecules)
+        weighted_volatility = 0.0
+
+        for m in molecules:
+            w = m.get("weight_factor", 1.0) / total_weight
+            bp = m.get("boiling_point", 250.0)
+            # Volatilidade inversa ao Ponto de Ebulição.
+            # BP 100C (Citrus) -> Alta Volatilidade
+            # BP 300C (Musk) -> Baixa Volatilidade
+            vol = 1000.0 / (bp + 1.0)
+            weighted_volatility += vol * w
+
+        # Penalidade por excesso de base ("Muddy")
+        heavy_molecules = [m for m in molecules if m.get("boiling_point", 0) > 300]
+        muddy_penalty = 0.0
+        if len(heavy_molecules) > len(molecules) * 0.5:
+            muddy_penalty = 2.0
+
+        # Boosters (Difusivos)
         diffusive_boost = 0.0
         names = [m.get("name", "") for m in molecules]
 
-        if "Hedione" in names:
-            diffusive_boost += 1.5
-        if "Ambroxan" in names:
-            diffusive_boost += 1.5
-        if "Iso E Super" in names:
-            diffusive_boost += 1.0
-        if "Ethyl Maltol" in names:
-            diffusive_boost += 0.8
+        boosters = {
+            "Hedione": 2.0, "Ambroxan": 1.5, "Iso E Super": 1.2,
+            "Ethyl Maltol": 1.0, "Calone": 1.5, "Aldehyde C12": 1.8
+        }
 
-        projection = (volatility_score * 2.5) + diffusive_boost
+        for name, boost in boosters.items():
+            if name in names:
+                diffusive_boost += boost
 
-        avg_logp = np.mean(logps)
-        if avg_logp > 5.0 and diffusive_boost < 1.0:
-            projection -= 2.0
+        # Cálculo Final: Volatilidade Ponderada * Escala + Boost - Penalidade
+        projection = (weighted_volatility * 2.0) + diffusive_boost - muddy_penalty
 
-        projection = float(np.clip(projection, 1.0, 10.0))
+        # Ajuste Fino para garantir realismo (0-10)
+        projection = float(np.clip(projection, 0.5, 10.0))
 
         # =========================================================
         # 3. FINAL PACKAGE
