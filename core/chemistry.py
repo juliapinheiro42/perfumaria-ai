@@ -101,6 +101,7 @@ class ChemistryEngine:
             "projection": projection,
             "stability": self._calculate_stability(molecules),
             "complexity": self._calculate_complexity(molecules),
+            "evolution": self._calculate_evolution_score(molecules),
             "technology_viability": 1.0,
             "olfactive_profile": self._determine_profile(molecules)
         }
@@ -179,3 +180,28 @@ class ChemistryEngine:
         if cats.count("Top") > len(cats) * 0.4:
             return "Cítrico/Fresco"
         return "Floral/Equilibrado"
+
+    def _calculate_evolution_score(self, molecules):
+        """
+        Mede a 'distância' entre a saída (Top) e o fundo (Base).
+        Perfumes lineares = Score baixo (Fácil de copiar).
+        Perfumes dinâmicos = Score alto (Dificulta o teste de 1 hora).
+        """
+        top_mols = [m for m in molecules if m.get("category") == "Top"]
+        base_mols = [m for m in molecules if m.get("category") == "Base"]
+
+        if not top_mols or not base_mols:
+            return 1.0
+
+        avg_mw_top = np.mean([m.get("molecular_weight", 120) for m in top_mols])
+        avg_mw_base = np.mean([m.get("molecular_weight", 280) for m in base_mols])
+        
+        volatility_gap = (avg_mw_base - avg_mw_top) / 25.0
+
+        top_families = set([m.get("sub_category", "") for m in top_mols])
+        base_families = set([m.get("sub_category", "") for m in base_mols])
+        
+        contrast_bonus = len(top_families.symmetric_difference(base_families)) * 1.2
+
+        final_score = volatility_gap + contrast_bonus
+        return float(np.clip(final_score, 1.0, 10.0))
