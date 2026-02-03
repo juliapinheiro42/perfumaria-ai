@@ -132,7 +132,7 @@ Iso E Super,234.38,3.6,CC1CC2=C(CC1(C)C(=O)C)C(CCC2)(C)C,Base,15.0,Amadeirado â
 Isoamyl Acetate,130.18,2.0,CC(C)CCOC(=O)C,Top,8.0,Banana doce frutada,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
 Isoamyl Butyrate,158.24,3.1,CC(C)CCOC(=O)CCC,Top,15.0,Banana pera doce,Frutado,100.00%,False,1,Diversão / Infantil,10.0,Medium,0.7,0.8,Alta (Estudo Clínico)
 Isobornyl Acetate,196.29,3.0,CC1(C2CCC1(C(=O)C2)C)OC(=O)C,Top,8.0,Pinho cânfora herbal,Amadeirado,100.00%,False,1,Refrescante / Foco,80.0,Medium,0.3,0.6,Média (Estudo Clínico)
-Isobutyl Quinoline,173.26,3.4,CC(C)CC1=NC2=CC=CC=C2C=C1,Base,120.0,Couro verde seco,Couro,1.0,False,1,Confidence / Mystery,,low,0.7,0.5,Associação Cultural
+Isobutyl Quinoline,173.26,3.4,CC(C)CC1=NC2=CC=CC=C2C=C1,Base,120.0,Couro verde seco,Couro,1.0,False,1,Confidence / Mystery,,High,0.7,0.5,Associação Cultural
 Isocyclocitral,152.23,2.9,CC1=C(C(CC1)(C)C)C=O,Top,55.0,Verde herbal folhagem,Verde,100.00%,False,1,Alerta / Corte,5.0,High,0.2,0.9,Alta (Resposta Trigeminal)
 Isoeugenol,164.2,2.5,COC1=C(C=CC(=C1)C=CC)O,Heart,35.0,Cravo floral doce,Especiado,0.10%,True,1,Riqueza / Calor,5.0,High,0.9,-0.2,Alta (Psicologia Evolutiva)
 Javanol,252.4,4.8,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,400.0,Sândalo cremoso potente,Amadeirado Sândalo,1.0,False,2,Calming / Wellness,,low,0.4,-0.5,Média (Estudo Clínico)

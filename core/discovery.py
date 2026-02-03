@@ -7,6 +7,10 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
+
+from core.encoder import FeatureEncoder
+
+
 try:
     from torch_geometric.loader import DataLoader
 except ImportError:
@@ -374,7 +378,7 @@ class DiscoveryEngine:
 
         chem = self.chemistry.evaluate_blend(molecules)
         is_safe, safety_logs, safety_stats = self.compliance.check_safety(molecules)
-        safety_penalty = 1.0 if is_safe else 0.1
+        safety_penalty = 1.0 if is_safe else 0.00001
         chem["safety_logs"] = safety_logs
         chem["safety_stats"] = safety_stats
         tech_score = chem.get("complexity", 0.0)
@@ -478,7 +482,7 @@ class DiscoveryEngine:
             "russell_valence": row.get("russell_valence", 0.0),
             "russell_arousal": row.get("russell_arousal", 0.0),
             "evidence_level": row.get("evidence_level", "None"),
-            
+            "odor_potency": str(row.get("odor_potency", "medium")).lower().strip(),
             "weight_factor": random.uniform(1.0, 5.0)
         }
 
@@ -513,25 +517,27 @@ class DiscoveryEngine:
     # FEEDBACK HUMANO
     # ======================================================================
 
-    def register_human_feedback(self, discovery_id, feedback_data):
-        """
-        Processa feedback granular (Vetorial) e converte em sinal escalar para o RL.
-        feedback_data espera: {"hedonic": 0-10, "technical": 0-10, "creative": 0-10}
-        """
+    def register_human_feedback(self, discovery_id, feedback_data, custom_mols=None):
+    
         discovery = None
-        
-        if isinstance(discovery_id, str):
-            for d in self.discoveries:
-                if d.get("id") == discovery_id:
-                    discovery = d
-                    break
-        elif isinstance(discovery_id, int):
-            try:
-                idx = len(self.discoveries) - 1 if discovery_id == -1 else discovery_id
-                discovery = self.discoveries[idx]
-            except IndexError:
-                pass
-
+    
+        if custom_mols:
+            discovery = {
+                "molecules": custom_mols,
+                "ai_score": 0.5
+            }
+        else:
+            if isinstance(discovery_id, str):
+                for d in self.discoveries:
+                    if d.get("id") == discovery_id:
+                        discovery = d
+                        break
+            elif isinstance(discovery_id, int):
+                try:
+                    idx = len(self.discoveries) - 1 if discovery_id == -1 else discovery_id
+                    discovery = self.discoveries[idx]
+                except IndexError:
+                    pass
         if not discovery:
             print(f"   >>> [FEEDBACK ERROR] Discovery não encontrada: {discovery_id}")
             return
@@ -552,18 +558,23 @@ class DiscoveryEngine:
             (technical / 10.0) * 0.2 + 
             (creative / 10.0) * 0.2
         )
-        
+    
         ai_score = discovery.get("ai_score", 0.5)
         new_fitness = (ai_score * 0.2) + (weighted_score * 0.8)
 
-        discovery["fitness"] = new_fitness
-        discovery["human_feedback_vector"] = feedback_data
+        if not custom_mols:
+            discovery["fitness"] = new_fitness
+            discovery["human_feedback_vector"] = feedback_data
 
-        print(f"   >>> [RLHF] Feedback Vector: H{hedonic}/T{technical}/C{creative} -> Fitness: {new_fitness:.4f}")
+        print(f"   >>> [RLHF] Feedback {'(SYNTHETIC)' if custom_mols else ''}: H{hedonic}/T{technical}/C{creative} -> Fitness: {new_fitness:.4f}")
 
+    # Treinamento da GNN e Surrogate
+    
         graphs = FeatureEncoder.encode_graphs(discovery["molecules"])
         if graphs:
-            self.buffer.add(graphs, new_fitness, weight=5.0)
+        # Aumentamos o peso para exemplos negativos se desejar que a rede aprenda mais rápido
+            prio_weight = 10.0 if custom_mols else 5.0 
+            self.buffer.add(graphs, new_fitness, weight=prio_weight)
 
         if self.trainer:
             loss = self.trainer.train_step(self.buffer)
@@ -571,7 +582,7 @@ class DiscoveryEngine:
 
         feature_vec = FeatureEncoder.encode_blend(discovery["molecules"])
         self.surrogate.add_observation(feature_vec, new_fitness)
-
+    
     def save_results(self, folder="results", filename="discoveries.json"):
         def sanitize(obj):
             if isinstance(obj, dict):

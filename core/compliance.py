@@ -13,6 +13,14 @@ class ComplianceEngine:
             "Benzyl Benzoate": 4.8,
             "Oakmoss Absolute": 0.1
         }
+        
+        self.POTENCY_MASS_LIMITS = {
+            "ultra": 0.01,
+            "high": 0.10,
+            "medium": 1.0,
+            "low": 1.0,
+            "weak": 1.0
+        }
 
         self.NATURALS_COMPOSITION = {
             "Lemon Oil": {"Citral": 0.03, "Limonene": 0.65, "Geraniol": 0.01},
@@ -36,6 +44,11 @@ class ComplianceEngine:
         total_weight = sum(m.get('weight_factor', 1.0) for m in formula_molecules)
         if total_weight == 0: return True, [], {}
 
+        violations = []
+        stats = {}
+        is_safe = True
+
+        # --- 1. Verificação IFRA (Segurança Dermatológica) ---
         chemical_totals = {chem: 0.0 for chem in self.IFRA_LIMITS.keys()}
         
         for ingredient in formula_molecules:
@@ -46,30 +59,41 @@ class ComplianceEngine:
                 chemical_totals[name] += weight
 
             matched_natural = self._find_natural_composition(name)
-            
             if matched_natural:
                 for chem_name, fraction in matched_natural.items():
                     if chem_name in chemical_totals:
                         chemical_totals[chem_name] += weight * fraction
 
-        violations = []
-        stats = {}
-        is_safe = True
-
         for chem, total_amount in chemical_totals.items():
             concentration_pct = (total_amount / total_weight) * 100
             limit = self.IFRA_LIMITS[chem]
-            
             stats[chem] = concentration_pct
             
             if concentration_pct > limit:
                 is_safe = False
                 violations.append(
-                    f"⛔ {chem}: Found {concentration_pct:.3f}% (Limit: {limit}%)"
+                    f"⛔ IFRA Violation - {chem}: Found {concentration_pct:.3f}% (Limit: {limit}%)"
+                )
+
+        # --- 2. Verificação de Potência (Equilíbrio Olfativo) ---
+        # [CORREÇÃO] Este bloco agora está FORA do loop da IFRA
+        for m in formula_molecules:
+            # Garante que temos a potência; se não tiver, assume 'medium' para não bloquear
+            potency = m.get('odor_potency', 'medium').lower() 
+            limit_pct = self.POTENCY_MASS_LIMITS.get(potency, 1.0) * 100 # Convertendo para % (ex: 0.01 -> 1%)
+            
+            # Cálculo da % real deste ingrediente na fórmula
+            actual_pct = (m.get('weight_factor', 1.0) / total_weight) * 100
+            
+            if actual_pct > limit_pct:
+                is_safe = False
+                violations.append(
+                    f"⛔ Potency Overdose: {m.get('name')} ({potency}) is {actual_pct:.2f}% "
+                    f"(Max allowed: {limit_pct:.2f}%)"
                 )
 
         if is_safe:
-            return True, ["✅ IFRA Compliant"], stats
+            return True, ["✅ Compliant & Balanced"], stats
         else:
             return False, violations, stats
 

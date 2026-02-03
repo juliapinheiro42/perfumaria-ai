@@ -46,6 +46,8 @@ class ChemistryEngine:
         "Clareza / Foco": (0.4, 0.7),
         "Relaxamento / Frescor": (0.7, -0.5)
     }
+    
+    TIME_STEPS = [0.1, 0.5, 1.0, 3.0, 6.0, 10.0]
 
     def __init__(self):
         pass
@@ -77,17 +79,21 @@ class ChemistryEngine:
         neuro_score, neuro_vectors = self._calculate_neuro_impact(molecules)
 
         stability = self._calculate_stability(molecules)
+        temporal_projections = self._calculate_temporal_evaporation(molecules, vapor_pressures)
+        evolution = self._calculate_evolution_score(molecules, temporal_projections)
+        
 
         return {
             "longevity": longevity,
             "projection": projection,
             "stability": stability,
             "complexity": self._calculate_complexity(molecules),
-            "evolution": self._calculate_evolution_score(molecules),
+            "evolution": evolution,
+    "temporal_curve": temporal_projections,
             "technology_viability": 1.0,
             "olfactive_profile": self._determine_profile(molecules),
             "neuro_score": neuro_score,
-            "neuro_vectors": neuro_vectors # Essencial para o Dashboard
+            "neuro_vectors": neuro_vectors
         }
 
     # ======================================================================
@@ -280,8 +286,41 @@ class ChemistryEngine:
         if cats.count("Top") > len(cats)*0.4: return "Cítrico/Fresco"
         return "Floral/Equilibrado"
 
-    def _calculate_evolution_score(self, molecules):
-        return 5.0 
+    def _calculate_temporal_evaporation(self, molecules, vapor_pressures):
+    
+        temporal_projection = []
+    
+        for t in self.TIME_STEPS:
+            total_oav_at_t = 0.0
+        
+            for i, m in enumerate(molecules):
+                vp = vapor_pressures[i]
+                remaining_factor = math.exp(-(vp * 0.05) * t) 
+            
+                threshold = self.POTENCY_MAP.get(str(m.get("odor_potency", "medium")).lower(), 50.0)
+            
+                conc_t = (m.get("weight_factor", 1.0) * vp * remaining_factor)
+                oav_t = conc_t / max(threshold, 1e-6)
+            
+                total_oav_at_t += math.pow(oav_t, 0.5) # Expoente de Stevens
+            
+            proj_t = math.log10(total_oav_at_t + 1.0) * 3.5
+            temporal_projection.append(round(float(proj_t), 2))
+        
+        return temporal_projection
+
+    def _calculate_evolution_score(self, molecules, temporal_projection):
+
+        if not temporal_projection:
+            return 5.0
+
+        initial = temporal_projection[0]
+        mid = temporal_projection[2] # 1 hora
+
+        drop_off = initial - mid
+
+        stability_score = 10.0 - (drop_off * 1.5)
+        return float(np.clip(stability_score, 1.0, 10.0))
 
     def _empty_result(self):
         return {

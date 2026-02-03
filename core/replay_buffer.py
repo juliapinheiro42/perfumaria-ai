@@ -74,3 +74,25 @@ class ReplayBuffer:
                 flat_data_list.append(g)
                 
         return flat_data_list
+    
+    def generate_negative_examples(formula, compliance_engine, num_variants=3):
+
+        negatives = []
+    
+        restricted_chems = list(compliance_engine.IFRA_LIMITS.keys())
+
+        for _ in range(num_variants):
+            corrupted_formula = [m.copy() for m in formula]
+        
+            target_chem = random.choice(restricted_chems)
+        
+            for ingredient in corrupted_formula:
+                if target_chem in ingredient['name']:
+                    ingredient['weight_factor'] *= random.uniform(10.0, 50.0)
+        
+            is_safe, _, _ = compliance_engine.check_safety(corrupted_formula)
+        
+            if not is_safe:
+                negatives.append((corrupted_formula, 0.05)) 
+            
+        return negatives

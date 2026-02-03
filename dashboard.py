@@ -13,6 +13,7 @@ from core.strategy import StrategyAgent
 from core.discovery import DiscoveryEngine
 from core.model import MoleculeGNN
 from core.market import PerfumeBusinessEngine
+from core.compliance import ComplianceEngine
 
 # =========================================================
 # CONFIGURAÇÃO VISUAL L'ORÉAL LUXE (DESIGN EDITORIAL)
@@ -197,6 +198,45 @@ def render_olfactory_pyramid(formula):
 
     return fig
 
+def render_evaporation_curve(temporal_curve):
+    """
+    Renderiza o gráfico de projeção vs tempo (Dry-down).
+    """
+    if not temporal_curve: return None
+    
+    time_labels = ["0.1h", "0.5h", "1h", "3h", "6h", "10h"]
+    
+    # Criando o DataFrame para o Altair
+    df_curve = pd.DataFrame({
+        "Time": time_labels,
+        "Projection": temporal_curve,
+        "Order": range(len(time_labels))
+    })
+
+    # Gráfico de Linha com Área (Estilo Luxo)
+    line = alt.Chart(df_curve).mark_area(
+        line={'color': LOREAL_GOLD},
+        color=alt.Gradient(
+            gradient='linear',
+            stops=[alt.GradientStop(color='white', offset=0),
+                   alt.GradientStop(color=LOREAL_GOLD, offset=1)],
+            x1=1, x2=1, y1=1, y2=0
+        ),
+        opacity=0.3,
+        interpolate='monotone'
+    ).encode(
+        x=alt.X('Time', sort=alt.EncodingSortField(field="Order", order="ascending"), title="Tempo após aplicação"),
+        y=alt.Y('Projection', title="Intensidade da Projeção", scale=alt.Scale(domain=[0, 10])),
+        tooltip=['Time', 'Projection']
+    ).properties(height=250)
+
+    # Adicionando pontos para destacar os marcos
+    points = line.mark_point(color=LOREAL_BLACK, size=50).encode(
+        opacity=alt.value(1)
+    )
+
+    return line + points
+
 def get_engine(model):
     try:
         llm_client = GeminiClient()
@@ -212,6 +252,10 @@ engine = st.session_state.engine
 if 'current_formula' not in st.session_state: st.session_state.current_formula = None
 if 'history' not in st.session_state: st.session_state.history = []
 if 'round_count' not in st.session_state: st.session_state.round_count = 0
+
+if 'compliance_engine' not in st.session_state:
+    st.session_state.compliance_engine = ComplianceEngine()
+comp_engine = st.session_state.compliance_engine
 
 # =========================================================
 # SIDEBAR
@@ -326,6 +370,13 @@ else:
         if fig:
             st.plotly_chart(fig, use_container_width=True)
             
+    st.markdown("#### Evaporation Curve (Non-Linear)")
+    curve_data = chem.get('temporal_curve')
+    if curve_data:
+        chart = render_evaporation_curve(curve_data)
+        st.altair_chart(chart, use_container_width=True)
+    else:
+        st.info("Curva temporal não disponível para esta fórmula.")
     with col_data:
         st.markdown("**Composition Data**")
         df_show = pd.DataFrame(formula)
@@ -363,11 +414,18 @@ else:
             </div>
         """, unsafe_allow_html=True)
         
-        risks, _ = engine.chemistry._detect_chemical_risks(mols)
-        if risks:
-            for r in risks: st.error(f"STABILITY ALERT: {r}")
+        is_safe, report, stats = comp_engine.check_safety(mols)
+    
+        if not is_safe:
+            st.error("⚠️ IFRA COMPLIANCE VIOLATION")
+            for r in report:
+                st.warning(r)
+            # Sugestão de correção
+            fixes = comp_engine.suggest_fix(report, mols)
+            for f in fixes:
+                st.info(f"💡 {f}")
         else:
-            st.caption("✨ FORMULA STABILITY CERTIFIED")
+            st.success("✨ IFRA COMPLIANT")
             
 
 
@@ -386,25 +444,39 @@ else:
 
         if st.button("🧬 TRAIN NEURAL NETWORK", type="primary", use_container_width=True):
             if st.session_state.current_formula:
+                current_data = st.session_state.current_formula
                 feedback_vector = {
                     "hedonic": f_hedonic,
                     "technical": f_tech,
                     "creative": f_creative
                 }
-                
-                current_data = st.session_state.current_formula
                 engine.register_human_feedback(current_data.get("id"), feedback_vector)
-                
-                st.session_state.history.insert(0, {
-                    "GEN": f"#{st.session_state.round_count:02d}",
-                    "SCORE": f"{f_hedonic}/10",
-                    "PROFILE": f"T{f_tech} C{f_creative}",
-                    "NOTES": len(current_data['molecules'])
-                })
+        
+            restricted_chems = list(comp_engine.IFRA_LIMITS.keys())
+        
+            for _ in range(2):
+                corrupted_mols = [m.copy() for m in current_data['molecules']]
+            
+                target_bad_chem = random.choice(restricted_chems)
+            
+                found = False
+                for m in corrupted_mols:
+                    if target_bad_chem in m['name']:
+                        m['weight_factor'] *= 20.0 
+                        found = True
+            
+                if not found:
+                    corrupted_mols.append({'name': target_bad_chem, 'weight_factor': 0.8, 'category': 'Base'})
 
-                engine.save_results()
-                
-                st.success("Neuro-weights updated & Saved to Disk!")
+                engine.register_human_feedback(
+                    None,
+                    {"hedonic": 0.1, "technical": 0.0, "creative": 0.0}, 
+                    custom_mols=corrupted_mols 
+                )
+
+                engine.trainer.train_step(engine.buffer) #
+        
+                st.success("Neuro-weights updated with Safety Examples!")
                 time.sleep(1)
                 
                 generate_next() 
