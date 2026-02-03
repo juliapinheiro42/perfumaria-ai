@@ -4,9 +4,9 @@ import time
 import os
 import torch
 import numpy as np
-import altair as alt # Adicionado para gráficos elegantes
+import altair as alt
 
-# Ajuste os imports conforme a estrutura da sua pasta
+# Imports de infraestrutura (mantidos conforme original)
 from infra.gemini_client import GeminiClient
 from core.strategy import StrategyAgent
 from core.discovery import DiscoveryEngine
@@ -14,7 +14,7 @@ from core.model import MoleculeGNN
 from core.market import PerfumeBusinessEngine
 
 # =========================================================
-# CONFIGURAÇÃO VISUAL L'ORÉAL (CSS INJECT)
+# CONFIGURAÇÃO VISUAL L'ORÉAL LUXE (DESIGN EDITORIAL)
 # =========================================================
 st.set_page_config(
     page_title="L'Oréal Luxe • AI Lab",
@@ -23,127 +23,85 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Paleta de Cores L'Oréal Luxe
+# Paleta de Cores de Luxo
 LOREAL_BLACK = "#000000"
 LOREAL_GOLD = "#C5A059" 
 LOREAL_WHITE = "#FFFFFF"
-LOREAL_GREY = "#F9F9F9"
-LOREAL_DARK_GREY = "#333333"
+LOREAL_GREY = "#F2F2F2"
 
 st.markdown(f"""
 <style>
-    /* RESET GERAL E FONTE */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600&display=swap');
+
     .stApp {{
         background-color: {LOREAL_WHITE};
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
     }}
     
-    /* REMOVER PADDING PADRÃO DO STREAMLIT PARA CABEÇALHO LIMPO */
-    .block-container {{
-        padding-top: 2rem;
-        padding-bottom: 5rem;
+    /* Headers de Luxo */
+    h1, h2, h3 {{
+        font-family: 'Inter', sans-serif;
+        font-weight: 100 !important;
+        text-transform: uppercase;
+        letter-spacing: 5px !important;
+        color: {LOREAL_BLACK};
     }}
 
-    /* HEADERS */
-    h1 {{
-        font-weight: 200 !important;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        font-size: 2.5rem;
-        margin-bottom: 0px;
-        color: {LOREAL_BLACK};
-    }}
-    h3 {{
-        font-weight: 400 !important;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: 1.1rem;
-        color: {LOREAL_BLACK};
-        border-bottom: 2px solid {LOREAL_GOLD};
-        padding-bottom: 10px;
-        margin-top: 30px;
-    }}
-    
-    /* SIDEBAR */
+    /* Sidebar Customizada */
     [data-testid="stSidebar"] {{
         background-color: {LOREAL_BLACK};
-        border-right: 1px solid #222;
-    }}
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
-        color: {LOREAL_WHITE} !important;
-        border-color: {LOREAL_GOLD};
+        border-right: 1px solid {LOREAL_GOLD};
     }}
     
-    /* CARDS DE KPI (Minimalistas) */
-    .kpi-container {{
-        background-color: {LOREAL_WHITE};
-        border-left: 3px solid {LOREAL_GOLD};
-        padding: 15px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        transition: transform 0.2s;
-    }}
-    .kpi-container:hover {{
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }}
-    .kpi-label {{
-        font-size: 0.75rem;
-        color: #888;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        margin-bottom: 5px;
-    }}
-    .kpi-value {{
-        font-size: 1.8rem;
-        color: {LOREAL_BLACK};
-        font-weight: 300;
-    }}
-    .kpi-sub {{
-        font-size: 0.7rem;
-        color: {LOREAL_GOLD};
-        margin-top: 2px;
-        font-weight: 600;
-    }}
-
-    /* BOTÕES (Estilo Editorial) */
+    /* Botões Estilo Boutique */
     .stButton > button {{
         background-color: transparent;
-        color: {LOREAL_BLACK} !important;
+        color: {LOREAL_BLACK};
         border: 1px solid {LOREAL_BLACK};
         border-radius: 0px;
-        text-transform: uppercase;
-        font-size: 12px;
         letter-spacing: 2px;
-        padding: 15px 25px;
-        transition: all 0.4s ease;
-        font-weight: 600;
+        font-weight: 300;
+        transition: all 0.3s;
+        width: 100%;
     }}
     .stButton > button:hover {{
         background-color: {LOREAL_BLACK};
         color: {LOREAL_GOLD} !important;
-        border-color: {LOREAL_BLACK};
-    }}
-    /* Botão Primário (Confirm) */
-    div[data-testid="stVerticalBlock"] > div > div > div > div > button:focus {{
-        border-color: {LOREAL_GOLD};
-        color: {LOREAL_GOLD};
     }}
 
-    /* TABELAS */
-    [data-testid="stDataFrame"] {{
-        border: 1px solid #eee;
+    /* KPI Cards Robustos */
+    .kpi-card {{
+        background-color: {LOREAL_WHITE};
+        padding: 20px;
+        border: 1px solid #EEE;
+        border-bottom: 3px solid {LOREAL_GOLD};
+        text-align: center;
     }}
-    
-    /* CUSTOM ALERTS */
-    .stToast {{
-        background-color: {LOREAL_BLACK} !important;
-        color: {LOREAL_WHITE} !important;
+    .kpi-val {{
+        font-size: 2rem;
+        font-weight: 100;
+        color: {LOREAL_BLACK};
+    }}
+    .kpi-lab {{
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+        color: {LOREAL_GOLD};
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }}
+
+    /* Container de Negócios (Dark Mode) */
+    .biz-card {{
+        background-color: {LOREAL_BLACK};
+        color: {LOREAL_WHITE};
+        padding: 30px;
+        border-radius: 0px;
     }}
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# 1. CACHE E SISTEMA
+# SISTEMA E CACHE
 # =========================================================
 @st.cache_resource
 def load_model():
@@ -151,267 +109,173 @@ def load_model():
     try:
         if os.path.exists("results/perfume_gnn.pth"):
             model.load_state_dict(torch.load("results/perfume_gnn.pth"))
-    except Exception as e:
-        print(f"⚠️ Init Warning: {e}")
+    except: pass
     return model
 
 def get_engine(model):
     try:
         llm_client = GeminiClient()
         strategy_agent = StrategyAgent(llm_client)
-    except:
-        strategy_agent = None
-        
-    engine = DiscoveryEngine(
-        model=model,
-        strategy_agent=strategy_agent,
-        csv_path="insumos.csv"
-    )
-    return engine
+    except: strategy_agent = None
+    return DiscoveryEngine(model=model, strategy_agent=strategy_agent, csv_path="insumos.csv")
 
-try:
-    model = load_model()
-    if 'engine' not in st.session_state:
-        st.session_state.engine = get_engine(model)
-    engine = st.session_state.engine
-except Exception as e:
-    st.error(f"System Failure: {e}")
-    st.stop()
+model = load_model()
+if 'engine' not in st.session_state:
+    st.session_state.engine = get_engine(model)
+engine = st.session_state.engine
+
+if 'current_formula' not in st.session_state: st.session_state.current_formula = None
+if 'history' not in st.session_state: st.session_state.history = []
+if 'round_count' not in st.session_state: st.session_state.round_count = 0
 
 # =========================================================
-# 2. STATE
-# =========================================================
-if 'current_formula' not in st.session_state:
-    st.session_state.current_formula = None
-if 'history' not in st.session_state:
-    st.session_state.history = []
-if 'round_count' not in st.session_state:
-    st.session_state.round_count = 0
-
-# =========================================================
-# 3. SIDEBAR
+# SIDEBAR
 # =========================================================
 with st.sidebar:
-    # --- LOGO TIPOGRÁFICO (Nunca quebra) ---
     st.markdown(f"""
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color:{LOREAL_WHITE}; font-size:32px; letter-spacing:4px; margin:0; padding:0;">L'ORÉAL</h1>
-            <span style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:5px; text-transform:uppercase;">Paris • Luxe</span>
+        <div style="text-align: center; padding: 20px 0;">
+            <h2 style="color:white; margin:0;">L'ORÉAL</h2>
+            <p style="color:{LOREAL_GOLD}; font-size:9px; letter-spacing:4px;">LUXE R&D AI</p>
         </div>
     """, unsafe_allow_html=True)
     
-    st.markdown(f"<div style='font-size:10px; letter-spacing:3px; color:#666; margin-bottom:30px; text-align:center;'>AI R&D DIVISION</div>", unsafe_allow_html=True)
-    
-    st.markdown("### 🧬 FORMULA DNA")
-    
+    st.markdown("---")
+    st.markdown(f"""<h1 style="color:{LOREAL_GOLD}; font-size:16px; letter-spacing:2px;">🧬 PARAMETERS</h1>""", unsafe_allow_html=True)
     all_ingredients = sorted(engine.insumos_dict.keys())
-    anchors = st.multiselect(
-        "MANDATORY INGREDIENTS", 
-        options=all_ingredients,
-        help="Locks specific molecules in the generation process."
-    )
+    anchors = st.multiselect("MANDATORY NOTES", options=all_ingredients)
     
     if anchors != engine.anchors:
         engine.anchors = anchors
-        st.toast("Constraints Updated", icon="⚓")
+        st.toast("Formula DNA Updated")
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    if st.button("🗑️ RESET LAB BENCH"):
+    st.markdown("<br>"*10, unsafe_allow_html=True)
+    if st.button("RESET LABORATORY"):
         st.session_state.history = []
         st.session_state.round_count = 0
         st.session_state.current_formula = None
         st.rerun()
 
 # =========================================================
-# 4. LÓGICA
+# LÓGICA DE GERAÇÃO
 # =========================================================
 def generate_next():
-    with st.spinner("⚗️ SYNTHESIZING MOLECULAR STRUCTURE..."):
+    with st.spinner("SYNTHESIZING..."):
         discoveries = engine.discover(rounds=1)
         if discoveries:
             st.session_state.current_formula = discoveries[-1]
             st.session_state.round_count += 1
-        else:
-            st.error("Convergence Failure. Adjust constraints.")
 
 def submit_feedback():
     score = st.session_state.feedback_slider
-    if st.session_state.current_formula:
-        engine.register_human_feedback(-1, score)
-        data = st.session_state.current_formula
-        st.session_state.history.insert(0, {
-            "GEN": f"#{st.session_state.round_count:02d}",
-            "SCORE": score,
-            "COMPLEXITY": f"{data['chemistry'].get('complexity', 0):.1f}",
-            "NOTES": f"{len(data['molecules'])}"
-        })
-        st.toast(f"Learning Applied: Score {score}", icon="🧠")
-        generate_next()
+    engine.register_human_feedback(-1, score)
+    data = st.session_state.current_formula
+    st.session_state.history.insert(0, {
+        "GEN": f"#{st.session_state.round_count}", "SCORE": score, 
+        "COMPLEXITY": f"{data['chemistry'].get('complexity', 0):.1f}", "NOTES": len(data['molecules'])
+    })
+    generate_next()
 
 # =========================================================
-# 5. UI PRINCIPAL
+# UI PRINCIPAL
 # =========================================================
 
-# --- HERO SECTION ---
-c_title, c_gen = st.columns([3, 1], gap="large")
-with c_title:
-    st.title("AI PERFUMER")
-    st.markdown(f"<div style='color:#666; letter-spacing:1px;'>COMPUTATIONAL OLFACTORY DESIGN // WORKBENCH</div>", unsafe_allow_html=True)
+# --- CABEÇALHO ---
+col_h1, col_h2 = st.columns([2, 1])
+with col_h1:
+    st.title("AI Perfumer")
+    st.markdown("<p style='letter-spacing:2px; color:#666;'>MOLECULAR DISCOVERY & OLFACTORY STRATEGY</p>", unsafe_allow_html=True)
 
-with c_gen:
+with col_h2:
     if st.session_state.current_formula:
         st.markdown(f"""
-        <div style="text-align:right; border-right: 4px solid {LOREAL_GOLD}; padding-right:15px; margin-top:10px;">
-            <div style="font-size:10px; color:#999; letter-spacing:2px;">GENERATION</div>
-            <div style="font-size:32px; font-weight:100;">#{st.session_state.round_count:02d}</div>
-        </div>
+            <div style="text-align:right;">
+                <span style="font-size:10px; color:{LOREAL_GOLD}; letter-spacing:3px;">BATCH ID</span>
+                <h1 style="margin:0;">#{st.session_state.round_count:02d}</h1>
+            </div>
         """, unsafe_allow_html=True)
 
-st.markdown("---")
+st.markdown("<hr style='border-color:#EEE;'>", unsafe_allow_html=True)
 
-# --- CONTEÚDO PRINCIPAL ---
+# --- ESTADO VAZIO OU CONTEÚDO ---
 if st.session_state.current_formula is None:
-    # Estado Vazio Elegante
-    st.markdown(f"""
-    <div style='display:flex; justify-content:center; align-items:center; height:300px; flex-direction:column; color:#999;'>
-        <div style='font-size:40px; margin-bottom:10px;'>🧪</div>
-        <div style='text-transform:uppercase; letter-spacing:2px;'>System Ready for Synthesis</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col_center = st.columns([1,1,1])
-    with col_center[1]:
-        if st.button("🚀 INITIALIZE SEQUENCE", type="primary", use_container_width=True):
-            generate_next()
-            st.rerun()
-
+    st.markdown("<div style='height:200px;'></div>", unsafe_allow_html=True)
+    col_btn, _ = st.columns([1, 2])
+    if col_btn.button("START SYNTHESIS SEQUENCE", type="primary"):
+        generate_next()
+        st.rerun()
 else:
     data = st.session_state.current_formula
-    mols = data['molecules']
     chem = data['chemistry']
-    
+    mols = data['molecules']
     biz_engine = PerfumeBusinessEngine()
-    tech_score = chem.get('complexity', 0.0)
-    neuro_score = chem.get('neuro_score', 0.0)
-    market_analysis = biz_engine.calculate_global_fit(mols)
-    financials = biz_engine.estimate_financials(mols, tech_score, neuro_score)
+    market = biz_engine.calculate_global_fit(mols)
+    finances = biz_engine.estimate_financials(mols, chem.get('complexity',0), chem.get('neuro_score',0))
 
-    # 1. CARDS DE KPI (HTML/CSS Customizado)
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-    
-    def render_kpi(col, label, value, sub):
-        col.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-label">{label}</div>
-            <div class="kpi-value">{value}</div>
-            <div class="kpi-sub">{sub}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    render_kpi(kpi1, "LONGEVITY", f"{chem.get('longevity',0):.1f}h", "SKIN TEST")
-    render_kpi(kpi2, "SILLAGE", f"{chem.get('projection',0):.1f}<span style='font-size:12px'>/10</span>", "PROJECTION")
-    render_kpi(kpi3, "UNIQUENESS", f"{tech_score:.1f}<span style='font-size:12px'>/10</span>", "ANTI-DUPE")
-    render_kpi(kpi4, "HARMONY", f"{chem.get('evolution',0):.1f}<span style='font-size:12px'>/10</span>", "OLFACTIVE SCORE")
+    # 1. KPIs SUPERIORES
+    k1, k2, k3, k4 = st.columns(4)
+    for col, lab, val in zip([k1,k2,k3,k4], 
+                             ["Longevity", "Sillage", "Uniqueness", "Harmony"],
+                             [f"{chem.get('longevity',0):.1f}h", f"{chem.get('projection',0):.1f}/10", f"{chem.get('complexity',0):.1f}/10", f"{chem.get('evolution',0):.1f}/10"]):
+        col.markdown(f'<div class="kpi-card"><div class="kpi-lab">{lab}</div><div class="kpi-val">{val}</div></div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 2. COLUNAS DE DETALHE
-    col_left, col_right = st.columns([2, 1], gap="large")
+    # 2. COLUNA DUPLA: CIÊNCIA vs NEGÓCIO
+    col_left, col_right = st.columns([1.8, 1], gap="large")
 
     with col_left:
-        st.markdown("### OLFACTIVE PYRAMID & COMPOSITION")
+        st.markdown("### ⚗️ Formula Analysis")
+        df_mols = pd.DataFrame(mols)
+        st.dataframe(df_mols[['name', 'category', 'weight_factor']], 
+                     column_config={
+                         "weight_factor": st.column_config.ProgressColumn("Concentration", format="%.2f", min_value=0, max_value=1),
+                         "name": "Ingredient", "category": "Family"
+                     }, use_container_width=True, hide_index=True)
+
         
-        # Preparar dados para o DataFrame
-        df_display = pd.DataFrame(mols)
-        total_w = sum([m.get('weight_factor', 1) for m in mols])
-        df_display['formula_pct'] = [m.get('weight_factor', 1)/total_w for m in mols]
-        df_display['Tier'] = df_display['name'].apply(lambda x: engine.insumos_dict.get(x, {}).get('complexity_tier', 1))
-        
-        # Tabela Limpa
-        st.dataframe(
-            df_display[['name', 'category', 'formula_pct', 'Tier']],
-            column_config={
-                "name": st.column_config.TextColumn("INGREDIENT", width="medium"),
-                "category": st.column_config.TextColumn("FAMILY", width="small"),
-                "formula_pct": st.column_config.ProgressColumn("CONC.", format="%.1f%%", min_value=0, max_value=0.5),
-                "Tier": st.column_config.NumberColumn("TIER", format="%d 💎")
-            },
-            hide_index=True,
-            use_container_width=True,
-            height=250
-        )
-        
-        st.markdown("### MARKET RESONANCE")
-        # Visualização Altair no lugar de HTML cru
-        rankings = market_analysis.get('rankings', {})
-        df_rank = pd.DataFrame(list(rankings.items()), columns=['Region', 'Score'])
-        
-        chart = alt.Chart(df_rank).mark_bar(color=LOREAL_BLACK).encode(
-            x=alt.X('Score', scale=alt.Scale(domain=[0, 10])),
-            y=alt.Y('Region', sort='-x', title=None),
-            tooltip=['Region', 'Score']
-        ).properties(height=200).configure_axis(
-            grid=False, domain=False
-        ).configure_view(strokeWidth=0)
-        
-        st.altair_chart(chart, use_container_width=True)
+
+        st.markdown("### 🧠 Neuro-Olfactive Impact")
+        vectors = chem.get('neuro_vectors', {'energy': 0.1, 'calm': 0.1, 'mood': 0.1})
+        n_df = pd.DataFrame(list(vectors.items()), columns=['Axis', 'Value'])
+        n_chart = alt.Chart(n_df).mark_bar(color=LOREAL_GOLD).encode(
+            x=alt.X('Value', scale=alt.Scale(domain=[0, 2])),
+            y=alt.Y('Axis', sort='-x')
+        ).properties(height=150)
+        st.altair_chart(n_chart, use_container_width=True)
 
     with col_right:
-        # BUSINESS CARD PREMIUM
-        st.markdown("### PRODUCT STRATEGY")
-        
-        tier = financials.get('market_tier', 'Luxury').upper()
-        price = financials.get('price', 0)
-        cost = financials.get('cost', 0)
-        margin = financials.get('margin_pct', 0)
-        target_mkt = market_analysis.get('best', 'Global')
-        label_mkt = market_analysis.get('label', '')
-        
-        # ATENÇÃO: O HTML abaixo deve ficar colado na esquerda (sem indentação)
-        card_html = f"""
-<div style="background-color:{LOREAL_BLACK}; color:white; padding:20px; border-top:4px solid {LOREAL_GOLD}; border-radius: 0px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-<div style="font-size:10px; letter-spacing:2px; color:#aaa; margin-bottom:5px;">POSITIONING</div>
-<div style="font-size:24px; font-weight:bold; margin-bottom:20px; letter-spacing:1px; color:white;">{tier}</div>
-<div style="border-top:1px solid #444; padding-top:15px; margin-top:10px;">
-<div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-<span style="font-size:12px; color:#ccc;">RETAIL TARGET</span>
-<span style="font-size:16px; font-weight:bold; color:{LOREAL_GOLD};">${price:.2f}</span>
-</div>
-<div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-<span style="font-size:12px; color:#ccc;">COG ESTIMATE</span>
-<span style="font-size:14px; color:white;">${cost:.2f}</span>
-</div>
-<div style="display:flex; justify-content:space-between;">
-<span style="font-size:12px; color:#ccc;">GROSS MARGIN</span>
-<span style="font-size:14px; color:white;">{margin}%</span>
-</div>
-</div>
-</div>
-"""
-        # Renderiza o HTML
-        st.markdown(card_html, unsafe_allow_html=True)
-        
-        # TARGET MARKET (Estilo Box Clean)
-        target_html = f"""<div style="margin-top: 15px; padding: 15px; background-color: {LOREAL_GREY}; border-left: 3px solid {LOREAL_BLACK};"><div style="font-size: 14px; font-weight: bold; color: {LOREAL_BLACK};">🎯 Target Market: {target_mkt}</div><div style="font-size: 12px; color: #666; margin-top: 5px;">{label_mkt}</div></div>"""
-        st.markdown(target_html, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # ÁREA DE FEEDBACK
-        with st.container():
-            st.markdown(f"""
-            <div style='background-color:{LOREAL_GREY}; padding:15px; border:1px solid #eee;'>
-                <div style='text-align:center; font-size:11px; letter-spacing:1px; margin-bottom:10px; color:{LOREAL_BLACK};'>HUMAN-IN-THE-LOOP EVALUATION</div>
+        st.markdown("### 💼 Business Strategy")
+        st.markdown(f"""
+            <div class="biz-card">
+                <p style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:2px; margin-bottom:5px;">MARKET POSITION</p>
+                <h2 style="color:white; margin-bottom:20px;">{finances.get('market_tier', 'Prestige').upper()}</h2>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">
+                    <span>Target Price</span><span style="color:{LOREAL_GOLD}; font-weight:bold;">${finances.get('price', 0):.2f}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">
+                    <span>Est. Margin</span><span>{finances.get('margin_pct', 0)}%</span>
+                </div>
+                <div style="margin-top:20px;">
+                    <p style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:2px; margin-bottom:5px;">PRIMARY MARKET</p>
+                    <p style="font-size:18px;">{market.get('best', 'Global')}</p>
+                </div>
             </div>
-            """, unsafe_allow_html=True)
-            
-            # O slider precisa ficar fora do HTML puro para funcionar a interatividade
-            st.slider("Qualidade", 0.0, 10.0, 5.0, 0.1, key="feedback_slider", label_visibility="collapsed")
-            
-            st.button("APPROVE & EVOLVE ➤", on_click=submit_feedback, use_container_width=True)
+        """, unsafe_allow_html=True)
+        
+        # Alertas de Risco
+        risks, _ = engine.chemistry._detect_chemical_risks(mols)
+        if risks:
+            for r in risks: st.error(f"STABILITY ALERT: {r}")
+        else:
+            st.caption("✨ FORMULA STABILITY CERTIFIED")
 
-# --- RODAPÉ COM HISTÓRICO ---
+        # Feedback Loop
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.slider("SENSORY QUALITY", 0.0, 10.0, 5.0, key="feedback_slider")
+        st.button("EVOLVE FORMULA ➤", on_click=submit_feedback)
+
+# --- FOOTER / HISTORY ---
 if st.session_state.history:
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    with st.expander("📜 VIEW GENERATION LINEAGE", expanded=False):
-        st.dataframe(pd.DataFrame(st.session_state.history), use_container_width=True)
+    st.markdown("---")
+    with st.expander("VIEW PREVIOUS ITERATIONS"):
+        st.table(pd.DataFrame(st.session_state.history))
