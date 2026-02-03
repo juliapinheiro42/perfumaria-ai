@@ -1,18 +1,10 @@
 import time
 import torch
 import os
-import sys
 from infra.gemini_client import GeminiClient
 from core.strategy import StrategyAgent
 from core.discovery import DiscoveryEngine
 from core.model import MoleculeGNN
-
-# --- IMPORTAÇÃO DO DASHBOARD ---
-try:
-    from dashboard import render_dashboard
-except ImportError:
-    print("⚠️ Dashboard não encontrado. Rodando em modo texto.")
-    render_dashboard = None
 
 # =========================================================
 # CONFIGURAÇÃO GLOBAL
@@ -20,13 +12,12 @@ except ImportError:
 
 NODE_FEATURES = 5 
 ROUNDS = int(os.getenv("ROUNDS", 30))
-# Reduzi o sleep para 0 porque o input já pausa o programa
-SLEEP_BETWEEN_ROUNDS = 0 
+SLEEP_BETWEEN_ROUNDS = int(os.getenv("SLEEP_BETWEEN_ROUNDS", 1))
 CHECKPOINT_INTERVAL = int(os.getenv("CHECKPOINT_INTERVAL", 5))
 CSV_PATH = os.getenv("CSV_PATH", "insumos.csv")
 
 # =========================================================
-# 1. INICIALIZAÇÃO
+# 1. INICIALIZAÇÃO DO MODELO
 # =========================================================
 
 print("\n🧪 [SYSTEM] Inicializando Graph Neural Network (GNN)...")
@@ -39,16 +30,21 @@ try:
 except Exception as e:
     print(f"⚠️ Erro ao carregar pesos: {e}. Iniciando do zero.")
 
+if loaded:
+    print("✅ Pesos da GNN carregados com sucesso.")
+else:
+    print("🆕 Iniciando nova rede neural do zero.")
+
 # =========================================================
-# 2. AGENTES E ENGINE
+# 2. INICIALIZAÇÃO DOS AGENTES
 # =========================================================
 
 print("🤖 [SYSTEM] Inicializando Agentes...")
 try:
     llm_client = GeminiClient()
     strategy_agent = StrategyAgent(llm_client)
-except:
-    print("⚠️ Aviso: GeminiClient offline.")
+except Exception as e:
+    print(f"⚠️ Aviso: GeminiClient não configurado ({e}). IA rodará sem estratégia textual.")
     strategy_agent = None
 
 engine = DiscoveryEngine(
@@ -57,97 +53,98 @@ engine = DiscoveryEngine(
     csv_path=CSV_PATH
 )
 
+# =========================================================
+# 4. WARMUP (AQUECIMENTO)
+# =========================================================
+# Só roda se o modelo for novo para popular o buffer de memória
 if not loaded:
-    print("\n🔥 [SYSTEM] Iniciando Warmup...")
-    engine.warmup(n_samples=20)
+    print("\n🔥 [SYSTEM] Iniciando Warmup (Aquecimento)...")
+    engine.warmup(n_samples=50)
 
 # =========================================================
-# 3. LOOP PRINCIPAL (AGORA INTERATIVO)
+# 5. LOOP PRINCIPAL
 # =========================================================
 
-print(f"\n🚀 Ciclo Hard Science iniciado ({ROUNDS} rodadas)...")
+print(f"\n🚀 Ciclo de descobertas iniciado ({ROUNDS} rodadas)...")
+print("   Dica: Dê notas altas (>6) para manter a fórmula, notas baixas para mudar.")
 
 try:
     for i in range(1, ROUNDS + 1):
         try:
-            # 1. Gera e Evolui
+            print(f"\n--- ⚗️  RODADA {i}/{ROUNDS} ---")
+            
             engine.discover(rounds=1)
 
-            # 2. Pega o Melhor Resultado
             if engine.discoveries:
                 best = engine.discoveries[-1]
+                
+                print("\n" + "="*60)
+                print(f"👃 AVALIAÇÃO OLFATIVA")
+                print("="*60)
+                
                 molecules = best['molecules']
+                names = [m['name'] for m in molecules]
                 
-                # 3. Prepara Dados para o Dashboard
-                stats = best['chemistry']
-                # Injeta o score final para aparecer no painel
-                stats['final_score'] = best.get('fitness', 0.0)
-                # Garante que os vetores neurais estejam acessíveis
-                if 'neuro_vectors' not in stats and 'neuro_vectors' in best.get('chemistry', {}):
-                     stats['neuro_vectors'] = best['chemistry']['neuro_vectors']
-                
-                risks, _ = engine.chemistry._detect_chemical_risks(molecules)
-                
-                # 4. RENDERIZA O DASHBOARD
-                if render_dashboard:
-                    # Limpa a tela para dar destaque ao painel
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    
-                    render_dashboard(
-                        formula_name=f"Gen {i} - {stats.get('olfactive_profile', 'Blend')}",
-                        molecules=molecules,
-                        stats=stats,
-                        risks=risks
-                    )
+                formula_str = ", ".join(names)
+                if len(formula_str) > 80:
+                    print(f"FÓRMULA:\n{formula_str}")
                 else:
-                    # Fallback Texto Simples (caso o dashboard falhe)
-                    print(f"\n--- RODADA {i} ---")
-                    print(f"Fórmula: {', '.join([m['name'] for m in molecules])}")
-                    print(f"Score: {best['fitness']:.3f} | Fixação: {stats['longevity']:.1f}h")
-
-                # 5. INTERAÇÃO HUMANA (RESTAURADA!)
-                print("\n" + "-"*60)
-                print(" 📝 Dê sua nota para ensinar a IA (ou Enter para pular)")
-                print("-"*60)
+                    print(f"FÓRMULA: {formula_str}")
+                
+                print("-" * 60)
+                
+                chem = best.get('chemistry', {})
+                longevity = chem.get('longevity', 0)
+                projection = chem.get('projection', 0)
+                ai_score = best.get('ai_score', 0)
+                sim = best.get('similarity_to_target', 0)
+                
+                stats = f"⏳ Fixação: {longevity:.1f}h  |  📢 Projeção: {projection:.1f}/10  |  🤖 IA Score: {ai_score:.3f}"
+                if sim > 0:
+                    stats += f"  |  🎯 Similaridade: {sim:.2f}"
+                print(stats)
+                print("-" * 60)
                 
                 while True:
-                    user_input = input(" > Nota (0-10): ")
+                    user_input = input(" > Nota (0-10) [Enter = Pular]: ")
                     
                     if not user_input.strip():
-                        print(" ⏩ Pulando feedback...")
+                        print(" ⏩ Avaliação pulada.")
                         break
-                    
-                    if user_input.lower() in ['q', 's', 'exit']:
-                        raise KeyboardInterrupt # Permite sair digitando 'q'
                     
                     try:
                         score = float(user_input)
                         if 0 <= score <= 10:
-                            # O PULO DO GATO: Registra o feedback e treina a GNN na hora
+                            # Use ID if available, else fallback to -1
                             discovery_id = best.get("id", -1)
                             engine.register_human_feedback(discovery_id, score)
-                            print(f" ✅ Aprendizado registrado! A IA ajustará os pesos.")
-                            time.sleep(1) # Breve pausa para ler a confirmação
                             break
                         else:
-                            print(" ⚠️  A nota deve ser entre 0 e 10.")
+                            print(" ⚠️  Por favor, entre uma nota entre 0 e 10.")
                     except ValueError:
                         print(" ⚠️  Entrada inválida. Digite um número.")
 
-            # Checkpoint Automático
+                print("="*60)
+            
             if i % CHECKPOINT_INTERVAL == 0:
-                print(f" 💾 Salvando progresso...")
+                print(f" 💾 [CHECKPOINT] Salvando dados...")
                 engine.save_results()
                 if hasattr(model, 'save'): model.save()
 
+            if i < ROUNDS:
+                time.sleep(SLEEP_BETWEEN_ROUNDS)
+
         except Exception as e:
             print(f"❌ Erro na rodada {i}: {e}")
-            time.sleep(2)
+            import traceback
+            traceback.print_exc()
+            time.sleep(5)
 
 except KeyboardInterrupt:
-    print("\n🛑 Encerrando e salvando memórias...")
+    print("\n\n🛑 Interrupção pelo usuário.")
 
 finally:
+    print("\n💾 Salvando estado final...")
     engine.save_results()
     if hasattr(model, 'save'): model.save()
-    print("👋 Bye.")
+    print("👋 Encerrado.")

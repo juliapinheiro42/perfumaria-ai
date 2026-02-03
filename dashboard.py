@@ -5,8 +5,9 @@ import os
 import torch
 import numpy as np
 import altair as alt
+import plotly.graph_objects as go
+import random
 
-# Imports de infraestrutura (mantidos conforme original)
 from infra.gemini_client import GeminiClient
 from core.strategy import StrategyAgent
 from core.discovery import DiscoveryEngine
@@ -23,7 +24,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Paleta de Cores de Luxo
 LOREAL_BLACK = "#000000"
 LOREAL_GOLD = "#C5A059" 
 LOREAL_WHITE = "#FFFFFF"
@@ -112,6 +112,91 @@ def load_model():
     except: pass
     return model
 
+def render_olfactory_pyramid(formula):
+    """
+    Renderiza uma pirâmide olfativa 'High-End'.
+    - Estilo: Wireframe minimalista.
+    - Cores: Ouro, Rose Gold, Bronze Profundo.
+    """
+    if not formula: return None
+
+    LUXE_PALETTE = {
+        "Top":   "rgba(197, 160, 89, 0.9)",
+        "Heart": "rgba(212, 175, 55, 0.6)",
+        "Base":  "rgba(40, 40, 40, 0.85)"
+    }
+
+    categories = {"Top": [], "Heart": [], "Base": []}
+    for mol in formula:
+        cat = mol.get('category', 'Heart')
+        if cat not in categories: cat = "Heart"
+        categories[cat].append(mol)
+
+    fig = go.Figure()
+
+    fig.update_layout(
+        shapes=[
+            dict(type="path", path="M 0,100 L 50,0 L -50,0 Z", 
+                 fillcolor="rgba(0,0,0,0)",
+                 line=dict(color="#E0E0E0", width=1, dash="solid")),
+            dict(type="line", x0=-15, y0=70, x1=15, y1=70, line=dict(color="#EEE", width=1, dash="dot")),
+            dict(type="line", x0=-35, y0=35, x1=35, y1=35, line=dict(color="#EEE", width=1, dash="dot")),
+        ],
+        xaxis=dict(visible=False, range=[-60, 60], fixedrange=True),
+        yaxis=dict(visible=False, range=[-10, 110], fixedrange=True),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        height=550,
+        showlegend=False,
+        margin=dict(l=0, r=0, t=20, b=0)
+    )
+
+    y_ranges = {"Top": (75, 95), "Heart": (40, 65), "Base": (5, 30)}
+    
+    for cat_name, mols in categories.items():
+        x_vals, y_vals, sizes, hover_texts, colors = [], [], [], [], []
+        
+        for m in mols:
+            y = random.uniform(*y_ranges[cat_name])
+            width_factor = (100 - y) / 100 * 45 
+            x = random.uniform(-width_factor + 3, width_factor - 3)
+            
+            x_vals.append(x)
+            y_vals.append(y)
+            
+            w = m.get('weight_factor', 1.0)
+            sizes.append(10 + (w * 15))
+            
+            colors.append(LUXE_PALETTE.get(cat_name))
+            
+            hover_texts.append(
+                f"<span style='font-size:14px; color:#C5A059'><b>{m.get('name')}</b></span><br>" +
+                f"<span style='color:gray'>Fam: {m.get('olfactive_family', 'N/A')}</span><br>" +
+                f"<i>Conc: {w:.2f}</i>"
+            )
+
+        fig.add_trace(go.Scatter(
+            x=x_vals, y=y_vals,
+            mode='markers',
+            marker=dict(
+                size=sizes,
+                color=colors,
+                line=dict(width=1, color='white'),
+                opacity=1.0
+            ),
+            hoverinfo='text',
+            hovertext=hover_texts,
+            hoverlabel=dict(bgcolor="white", font_size=12, font_family="Inter")
+        ))
+
+    for y_pos, label in zip([85, 50, 15], ["TOP NOTES", "HEART NOTES", "BASE NOTES"]):
+        fig.add_annotation(
+            x=55, y=y_pos, text=label, showarrow=False,
+            font=dict(family="Inter", size=10, color="#999"), xanchor="left"
+        )
+
+    return fig
+
 def get_engine(model):
     try:
         llm_client = GeminiClient()
@@ -179,7 +264,6 @@ def submit_feedback():
 # UI PRINCIPAL
 # =========================================================
 
-# --- CABEÇALHO ---
 col_h1, col_h2 = st.columns([2, 1])
 with col_h1:
     st.title("AI Perfumer")
@@ -211,7 +295,6 @@ else:
     market = biz_engine.calculate_global_fit(mols)
     finances = biz_engine.estimate_financials(mols, chem.get('complexity',0), chem.get('neuro_score',0))
 
-    # 1. KPIs SUPERIORES
     k1, k2, k3, k4 = st.columns(4)
     for col, lab, val in zip([k1,k2,k3,k4], 
                              ["Longevity", "Sillage", "Uniqueness", "Harmony"],
@@ -220,7 +303,6 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 2. COLUNA DUPLA: CIÊNCIA vs NEGÓCIO
     col_left, col_right = st.columns([1.8, 1], gap="large")
 
     with col_left:
@@ -232,7 +314,26 @@ else:
                          "name": "Ingredient", "category": "Family"
                      }, use_container_width=True, hide_index=True)
 
-        
+        if st.session_state.current_formula:
+            formula = st.session_state.current_formula['molecules']
+    
+    st.markdown("### 👃 Olfactory Structure")
+    
+    col_graph, col_data = st.columns([2, 1])
+    
+    with col_graph:
+        fig = render_olfactory_pyramid(formula)
+        if fig:
+            st.plotly_chart(fig, use_container_width=True)
+            
+    with col_data:
+        st.markdown("**Composition Data**")
+        df_show = pd.DataFrame(formula)
+        st.dataframe(
+            df_show[['name', 'category', 'weight_factor']], 
+            hide_index=True,
+            use_container_width=True
+        )
 
         st.markdown("### 🧠 Neuro-Olfactive Impact")
         vectors = chem.get('neuro_vectors', {'energy': 0.1, 'calm': 0.1, 'mood': 0.1})
@@ -262,19 +363,54 @@ else:
             </div>
         """, unsafe_allow_html=True)
         
-        # Alertas de Risco
         risks, _ = engine.chemistry._detect_chemical_risks(mols)
         if risks:
             for r in risks: st.error(f"STABILITY ALERT: {r}")
         else:
             st.caption("✨ FORMULA STABILITY CERTIFIED")
+            
 
-        # Feedback Loop
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.slider("SENSORY QUALITY", 0.0, 10.0, 5.0, key="feedback_slider")
-        st.button("EVOLVE FORMULA ➤", on_click=submit_feedback)
 
-# --- FOOTER / HISTORY ---
+        st.markdown("---")
+        st.markdown("### 🧠 Sensory Training Loop")
+        st.caption("Ajude a IA a refinar seus critérios:")
+
+        c1, c2, c3 = st.columns(3)
+        
+        with c1:
+            f_hedonic = st.slider("💖 Hedonic", 0, 10, 5, help="O quanto você gostou do cheiro? (Subjetivo)")
+        with c2:
+            f_tech = st.slider("🛠️ Technical", 0, 10, 5, help="Performance: 0=Pífio, 10=Excelente Projeção/Fixação")
+        with c3:
+            f_creative = st.slider("🎨 Creative", 0, 10, 5, help="Originalidade: 0=Clichê, 10=Inovador")
+
+        if st.button("🧬 TRAIN NEURAL NETWORK", type="primary", use_container_width=True):
+            if st.session_state.current_formula:
+                feedback_vector = {
+                    "hedonic": f_hedonic,
+                    "technical": f_tech,
+                    "creative": f_creative
+                }
+                
+                current_data = st.session_state.current_formula
+                engine.register_human_feedback(current_data.get("id"), feedback_vector)
+                
+                st.session_state.history.insert(0, {
+                    "GEN": f"#{st.session_state.round_count:02d}",
+                    "SCORE": f"{f_hedonic}/10",
+                    "PROFILE": f"T{f_tech} C{f_creative}",
+                    "NOTES": len(current_data['molecules'])
+                })
+
+                engine.save_results()
+                
+                st.success("Neuro-weights updated & Saved to Disk!")
+                time.sleep(1)
+                
+                generate_next() 
+                
+                st.rerun()
+
 if st.session_state.history:
     st.markdown("---")
     with st.expander("VIEW PREVIOUS ITERATIONS"):

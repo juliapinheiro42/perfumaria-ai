@@ -7,7 +7,6 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
-# Tenta importar torch_geometric, se falhar usa fallback
 try:
     from torch_geometric.loader import DataLoader
 except ImportError:
@@ -20,6 +19,8 @@ from core.chemistry import ChemistryEngine
 from core.market import business_evaluation
 from core.replay_buffer import ReplayBuffer
 from core.trainer import ModelTrainer
+from core.presets import ACORDES_LIB, PERFUME_SKELETONS
+from core.compliance import ComplianceEngine
 
 class DiscoveryEngine:
 
@@ -38,6 +39,7 @@ class DiscoveryEngine:
         self.target_vector = None
         self.target_price = 100.0
         self.target_complexity_score = 0.0
+        self.compliance = ComplianceEngine()
 
         self.last_human_score = 0.0
 
@@ -63,35 +65,8 @@ class DiscoveryEngine:
         self._validate_and_clean_dataset()
         self.evolution = EvolutionEngine(self)
 
-
-    def set_dupe_target(self, target_molecules, anchors=None):
-        print(f"[DUPE MODE] Alvo definido com {len(target_molecules)} moléculas.")
-
-        enriched = [self._enrich_with_rdkit(m) for m in target_molecules]
-
-        self.anchors = [str(a).strip() for a in anchors] if anchors else []
-        if self.anchors:
-            print(f"[ANCHOR] Ingredientes travados: {self.anchors}")
-
-        self.target_vector = FeatureEncoder.encode_blend(enriched)
-
-        # Calcula complexidade alvo baseada em tiers
-        # Se não tiver 'weight_factor', assume 1.0. Tiers variam de 1 a 3.
-        total_w = sum(m.get('weight_factor', 1.0) for m in enriched)
-        weighted_tier = sum(
-            m.get('complexity_tier', 1) * m.get('weight_factor', 1.0)
-            for m in enriched
-        )
-        self.target_complexity_score = weighted_tier / total_w if total_w > 0 else 1.0
-
-        self.target_price = sum(m.get("price_per_kg", 0) for m in target_molecules)
-        if self.target_price == 0:
-            self.target_price = 150.0
-
-        print(f"[DUPE MODE] Assinatura vetorial gerada. Tier Alvo: {self.target_complexity_score:.2f}")
-
-
     def _validate_and_clean_dataset(self):
+        if self.df_insumos.empty: return
         if "smiles" not in self.df_insumos.columns:
             return
 
@@ -107,7 +82,83 @@ class DiscoveryEngine:
             self.df_insumos[valid_mask].copy().reset_index(drop=True)
         )
         print(f"[INIT] {len(self.df_insumos)} insumos válidos carregados.")
+        
+    def _generate_structured_formula(self):
+        """Gera um perfume baseado em arquitetura (Skeletons) e não aleatoriamente."""
+        if self.df_insumos.empty: return []
 
+        molecules = []
+        added_names = set()
+
+        skeleton_name = random.choice(list(PERFUME_SKELETONS.keys()))
+        accord_names = PERFUME_SKELETONS[skeleton_name]
+        
+        print(f"   >>> Construindo estrutura: {skeleton_name}")
+
+        for acc_name in accord_names:
+            accord_data = ACORDES_LIB.get(acc_name)
+            if not accord_data: continue
+
+            mols = accord_data["molecules"]
+            ratios = accord_data.get("ratios", [1.0]*len(mols))
+
+            for i, mol_name in enumerate(mols):
+                found_row = self._fuzzy_find_ingredient(mol_name)
+                
+                if found_row is not None and found_row['name'] not in added_names:
+                    mol_obj = self._row_to_molecule(found_row)
+                    
+                    base_weight = ratios[i] if i < len(ratios) else 1.0
+                    mol_obj['weight_factor'] = base_weight * random.uniform(2.0, 4.0) 
+                    
+                    mol_obj['accord_origin'] = acc_name 
+                    
+                    molecules.append(mol_obj)
+                    added_names.add(found_row['name'])
+
+        target_size = random.randint(10, 15)
+        while len(molecules) < target_size:
+            if self.df_insumos.empty: break
+            row = self.df_insumos.sample(1).iloc[0]
+            if row['name'] not in added_names:
+                molecules.append(self._row_to_molecule(row))
+                added_names.add(row['name'])
+
+        return molecules
+
+    def _fuzzy_find_ingredient(self, target_name):
+        """Tenta achar o ingrediente no dicionário, tolerando pequenas diferenças."""
+        target_clean = str(target_name).strip()
+        
+        if target_clean in self.insumos_dict:
+            data = self.insumos_dict[target_clean].copy()
+            data['name'] = target_clean
+            return pd.Series(data)
+            
+        target_lower = target_clean.lower()
+        
+        best_match = None
+        shortest_len = 999
+        
+        for name_key, data_values in self.insumos_dict.items():
+            name_str = str(name_key)
+            name_lower = name_str.lower().strip()
+            
+            if name_lower == target_lower:
+                data = data_values.copy()
+                data['name'] = name_str
+                return pd.Series(data)
+            
+            if target_lower in name_lower:
+                if len(name_lower) < shortest_len:
+                    shortest_len = len(name_lower)
+                    best_match = data_values.copy()
+                    best_match['name'] = name_str
+
+        if best_match:
+            return pd.Series(best_match)
+                
+        return None
 
     def warmup(self, n_samples=200):
         if self.df_insumos.empty: return
@@ -124,7 +175,6 @@ class DiscoveryEngine:
 
             molecules = [self._enrich_with_rdkit(m) for m in raw_mols]
 
-            # Validações básicas
             if len(molecules) < 3: continue
             if not self._validate_chemical_synergy(molecules): continue
 
@@ -166,13 +216,15 @@ class DiscoveryEngine:
                 last_best = self.discoveries[-1]["molecules"]
                 raw_mols = self._mutate_formula(last_best)
             else:
-                raw_mols = self._generate_molecules()
+                if random.random() < 0.8:
+                    raw_mols = self._generate_structured_formula()
+                else:
+                    raw_mols = self._generate_molecules()
 
             if not raw_mols: continue
 
             molecules = [self._enrich_with_rdkit(m) for m in raw_mols]
             
-            # Pré-filtro para não perder tempo
             if len(molecules) < 3: continue
 
             feature_vec = FeatureEncoder.encode_blend(molecules)
@@ -195,7 +247,7 @@ class DiscoveryEngine:
         return self.discoveries
 
     # ======================================================================
-    # GERAÇÃO DE MOLÉCULAS
+    # GERAÇÃO DE MOLÉCULAS (LEGADO / FALLBACK)
     # ======================================================================
 
     def _generate_molecules(self, strategy=None):
@@ -204,7 +256,6 @@ class DiscoveryEngine:
         molecules = []
         current_names = set()
         
-        # 1. Adiciona Âncoras
         if self.anchors:
             for anchor_name in self.anchors:
                 clean_name = str(anchor_name).strip().lower()
@@ -223,7 +274,6 @@ class DiscoveryEngine:
                 else:
                     print(f"[AVISO] Âncora '{anchor_name}' não encontrada no estoque.")
 
-        # 2. Preenche o restante
         target_size = random.randint(7, 12)
         max_price = 800.0 if self.target_vector is not None else 9999.0
         
@@ -290,7 +340,7 @@ class DiscoveryEngine:
         return child
 
     # ======================================================================
-    # AVALIAÇÃO (CORRIGIDA E ATUALIZADA)
+    # AVALIAÇÃO
     # ======================================================================
 
     def evaluate(self, molecules):
@@ -310,7 +360,6 @@ class DiscoveryEngine:
                 if clean_anchor not in names_in_blend:
                     return self._invalid_result(molecules)
 
-        # 1. Predição AI (GNN)
         ai_score = 0.5
         if self.model and DataLoader:
             graphs = FeatureEncoder.encode_graphs(molecules)
@@ -323,10 +372,11 @@ class DiscoveryEngine:
                 except:
                     ai_score = 0.5
 
-        # 2. Avaliação Química
         chem = self.chemistry.evaluate_blend(molecules)
-        
-        # 3. Avaliação de Mercado
+        is_safe, safety_logs, safety_stats = self.compliance.check_safety(molecules)
+        safety_penalty = 1.0 if is_safe else 0.1
+        chem["safety_logs"] = safety_logs
+        chem["safety_stats"] = safety_stats
         tech_score = chem.get("complexity", 0.0)
         neuro_score = chem.get("neuro_score", 0.0)
         
@@ -335,11 +385,12 @@ class DiscoveryEngine:
             tech_score,
             neuro_score
         )
+        market["compliance"] = {"legal": is_safe, "logs": safety_logs}
 
         similarity = 0.0
         fitness = 0.0
+        fitness = fitness * safety_penalty
 
-        # Normalizações Úteis (0-1)
         norm_proj = chem.get("projection", 0) / 10.0
         norm_long = chem.get("longevity", 0) / 10.0
         norm_stab = chem.get("stability", 0)
@@ -349,7 +400,6 @@ class DiscoveryEngine:
         margin_pct = financials.get("margin_pct", 0.0) / 100.0
 
         if self.target_vector is not None:
-            # --- MODO DUPE MATCHING ---
             candidate_vector = FeatureEncoder.encode_blend(molecules)
             dot = np.dot(candidate_vector, self.target_vector)
             na = np.linalg.norm(candidate_vector)
@@ -358,13 +408,8 @@ class DiscoveryEngine:
             if na > 0 and nb > 0:
                 similarity = dot / (na * nb)
 
-            # Preço: Quão perto ou abaixo do alvo?
             cost_kg = financials.get("cost", 9999.0)
             price_score = 1.0 if cost_kg <= self.target_price else (self.target_price / max(cost_kg, 1.0))
-
-            # Dificuldade de Dupe por Tier (NEW)
-            # Se o alvo é complexo (tier alto) e o candidato é simples, penaliza.
-            # tech_score é a soma (0-10), precisamos da média ponderada (1-3) para comparar com target.
 
             total_w = sum(m.get('weight_factor', 1.0) for m in molecules)
             candidate_avg_tier = sum(
@@ -372,18 +417,12 @@ class DiscoveryEngine:
                 for m in molecules
             ) / total_w if total_w > 0 else 1.0
 
-            # Agora comparamos Banana com Banana (Escala 1.0 a 3.0)
             tier_diff = abs(candidate_avg_tier - self.target_complexity_score)
-            
-            # Normaliza diferença (Max diff é 2.0 -> abs(3-1))
             tier_match_score = max(0.0, 1.0 - (tier_diff / 2.0))
 
-            # Fórmula Fitness "Tudo Influencia"
-            # Similarity (40%) + Price (20%) + Perf (20%) + TierMatch (20%)
             perf_score = (norm_proj + norm_long + norm_stab) / 3.0
 
             if similarity < 0.01:
-                # Fallback se similaridade for nula
                 fitness = (perf_score * 0.5) + (price_score * 0.3) + (tier_match_score * 0.2)
             else:
                 fitness = (
@@ -394,12 +433,6 @@ class DiscoveryEngine:
                 )
 
         else:
-            # --- MODO DISCOVERY / LUXURY ---
-            # Aqui queremos alta performance, alta margem e alta complexidade (Uniqueness)
-            
-            # Peso Estratégico L'Oréal: Química + Margem + Exclusividade
-            # Projection agora é crucial
-
             perf_score = (norm_proj * 0.4) + (norm_long * 0.4) + (norm_stab * 0.2)
 
             fitness = (
@@ -439,11 +472,13 @@ class DiscoveryEngine:
             "price_per_kg": row.get("price_per_kg", 100),
             "ifra_limit": row.get("ifra_limit", 1.0),
             "is_allergen": row.get("is_allergen", False),
-            # Novos Campos L'Oréal
             "complexity_tier": row.get("complexity_tier", 1),
-            "neuro_target": row.get("neuro_target", "Neutral"),
-            "functional_effect": row.get("functional_effect", ""),
             "olfactive_family": row.get("olfactive_family", "Floral"),
+            "traditional_use": row.get("traditional_use", ""),
+            "russell_valence": row.get("russell_valence", 0.0),
+            "russell_arousal": row.get("russell_arousal", 0.0),
+            "evidence_level": row.get("evidence_level", "None"),
+            
             "weight_factor": random.uniform(1.0, 5.0)
         }
 
@@ -478,17 +513,18 @@ class DiscoveryEngine:
     # FEEDBACK HUMANO
     # ======================================================================
 
-    def register_human_feedback(self, discovery_id, human_score_0_10):
+    def register_human_feedback(self, discovery_id, feedback_data):
+        """
+        Processa feedback granular (Vetorial) e converte em sinal escalar para o RL.
+        feedback_data espera: {"hedonic": 0-10, "technical": 0-10, "creative": 0-10}
+        """
         discovery = None
-
-        # Tenta buscar por ID (String UUID)
+        
         if isinstance(discovery_id, str):
             for d in self.discoveries:
                 if d.get("id") == discovery_id:
                     discovery = d
                     break
-
-        # Fallback para índice numérico (Legacy Support)
         elif isinstance(discovery_id, int):
             try:
                 idx = len(self.discoveries) - 1 if discovery_id == -1 else discovery_id
@@ -500,16 +536,30 @@ class DiscoveryEngine:
             print(f"   >>> [FEEDBACK ERROR] Discovery não encontrada: {discovery_id}")
             return
 
-        self.last_human_score = float(human_score_0_10)
+        if isinstance(feedback_data, (int, float)):
+            hedonic = float(feedback_data)
+            technical = 5.0
+            creative = 5.0
+        else:
+            hedonic = float(feedback_data.get("hedonic", 5.0))
+            technical = float(feedback_data.get("technical", 5.0))
+            creative = float(feedback_data.get("creative", 5.0))
 
-        normalized = human_score_0_10 / 10.0
+        self.last_human_score = hedonic
+
+        weighted_score = (
+            (hedonic / 10.0) * 0.6 + 
+            (technical / 10.0) * 0.2 + 
+            (creative / 10.0) * 0.2
+        )
+        
         ai_score = discovery.get("ai_score", 0.5)
+        new_fitness = (ai_score * 0.2) + (weighted_score * 0.8)
 
-        new_fitness = ai_score * 0.3 + normalized * 0.7
         discovery["fitness"] = new_fitness
-        discovery["human_score"] = human_score_0_10
+        discovery["human_feedback_vector"] = feedback_data
 
-        print(f"   >>> [FEEDBACK] Nota {human_score_0_10} registrada.")
+        print(f"   >>> [RLHF] Feedback Vector: H{hedonic}/T{technical}/C{creative} -> Fitness: {new_fitness:.4f}")
 
         graphs = FeatureEncoder.encode_graphs(discovery["molecules"])
         if graphs:
@@ -517,36 +567,68 @@ class DiscoveryEngine:
 
         if self.trainer:
             loss = self.trainer.train_step(self.buffer)
-            print(f"   >>> [LEARNING] Modelo atualizado. Loss: {loss:.4f}")
+            print(f"   >>> [LEARNING] Pesos neurais ajustados. Loss: {loss:.4f}")
 
         feature_vec = FeatureEncoder.encode_blend(discovery["molecules"])
         self.surrogate.add_observation(feature_vec, new_fitness)
 
-
     def save_results(self, folder="results", filename="discoveries.json"):
         def sanitize(obj):
             if isinstance(obj, dict):
-                return {k: sanitize(v) for k, v in obj.items()}
-            if isinstance(obj, list):
+                return {str(k): sanitize(v) for k, v in obj.items()}
+            
+            if isinstance(obj, (list, tuple)):
                 return [sanitize(v) for v in obj]
+            
             if isinstance(obj, (np.integer, int)):
                 return int(obj)
             if isinstance(obj, (np.floating, float)):
-                return float(obj)
+                val = float(obj)
+                if np.isnan(val) or np.isinf(val):
+                    return None 
+                return val
+                
             if isinstance(obj, (np.bool_, bool)):
                 return bool(obj)
-            return obj
+            if isinstance(obj, np.ndarray):
+                return sanitize(obj.tolist())
+            if obj is None:
+                return None
+                
+            return str(obj)
 
         os.makedirs(folder, exist_ok=True)
         path = os.path.join(folder, filename)
 
         try:
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(sanitize(self.discoveries), f, indent=4, ensure_ascii=False)
-            print(f"\n[IO] Resultados salvos em {path}")
-        except Exception as e:
-            print(f"\n[IO ERROR] Falha ao salvar JSON: {e}")
+            existing_data = []
+            if os.path.exists(path):
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        content = f.read().strip()
+                        if content:
+                            existing_data = json.loads(content)
+                            if not isinstance(existing_data, list): existing_data = []
+                except Exception:
+                    existing_data = []
 
+            clean_current_discoveries = sanitize(self.discoveries)
+            
+            existing_ids = {d.get("id") for d in existing_data if isinstance(d, dict)}
+            count_new = 0
+            
+            for d in clean_current_discoveries:
+                if isinstance(d, dict) and d.get("id") and d.get("id") not in existing_ids:
+                    existing_data.append(d)
+                    count_new += 1
+
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(existing_data, f, indent=4, ensure_ascii=False)
+                
+            print(f"\n[IO] Salvos {count_new} novos perfumes em {path}")
+            
+        except Exception as e:
+            print(f"\n[CRITICAL IO ERROR] Detalhe do erro: {type(e).__name__}: {e}")
 
     def _diversity_penalty(self, molecules):
         names = [m.get("name", "UNK") for m in molecules]
@@ -555,7 +637,6 @@ class DiscoveryEngine:
 
 
     def _invalid_result(self, molecules):
-        # Atualizado para bater com a estrutura do novo PerfumeBusinessEngine e Dashboard
         return {
             "fitness": 0.01,
             "ai_score": 0.0,

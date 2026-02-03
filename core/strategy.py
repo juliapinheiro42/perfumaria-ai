@@ -1,7 +1,7 @@
 import json
 import re
 import random
-from core.presets import ACORDES_PRESETS
+from core.presets import ACORDES_LIB, PERFUME_SKELETONS
 
 class StrategyAgent:
     def __init__(self, llm_client):
@@ -10,15 +10,11 @@ class StrategyAgent:
     def propose_strategy(self, discoveries, goal):
         try:
             history = sorted(discoveries, key=lambda d: d['fitness'], reverse=True)[:5]
-            
-            accords_info = "\n".join([
-                f"- {name}: {data['description']} (Categoria: {data['category']})"
-                for name, data in ACORDES_PRESETS.items()
-            ])
+
 
             prompt = (
                 f"You are a Master Perfumer AI. Goal: {goal}.\n\n"
-                f"Available Accords Library (Building Blocks):\n{accords_info}\n\n"
+                f"Available Accords Library (Building Blocks):\n{json.dumps(ACORDES_LIB, indent=2)}\n\n"
                 f"Analyze the history and propose a new search strategy. "
                 f"Choose the most suitable accord from the library above to serve as the core of this goal.\n\n"
                 f"RETURN ONLY RAW JSON. NO MARKDOWN. NO COMMENTS.\n"

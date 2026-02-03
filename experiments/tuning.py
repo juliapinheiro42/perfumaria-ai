@@ -93,15 +93,15 @@ def objective(trial):
     return final_loss.item()
 
 if __name__ == "__main__":
-    print("🚀 Iniciando Tuning de Hiperparâmetros...")
+    print(" Iniciando Tuning de Hiperparâmetros...")
     
     study = optuna.create_study(direction="minimize")
     study.optimize(objective, n_trials=20)
 
-    print("\n🏆 Melhores Hiperparâmetros:")
+    print("\n Melhores Hiperparâmetros:")
     print(study.best_params)
     
     os.makedirs("results", exist_ok=True)
     with open("results/best_params.json", "w") as f:
         json.dump(study.best_params, f)
-    print("✅ Parâmetros salvos em results/best_params.json")
+    print(" Parâmetros salvos em results/best_params.json")
