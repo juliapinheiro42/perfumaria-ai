@@ -1,237 +1,237 @@
-name,molecular_weight,polarity,smiles,category,price_per_kg,olfactive_notes,olfactive_family,ifra_limit,is_allergen,complexity_tier,traditional_use,odor_threshold_ppb,odor_potency,russell_valence,russell_arousal,evidence_level
-2-6-Nonadienal,138.21,2.8,CCC=CCC=CC=O,Top,350.0,Folha de violeta pepino,Verde,0.02%,False,1,Natureza / Água,0.01,Ultra,0.8,0.2,Média (Aromacologia)
-2-6-Nonadienol,140.22,2.6,CCC=CCC=CCO,Top,380.0,Pepino melão violeta,Verde,100.00%,False,1,Relaxamento / Frescor,1.0,Ultra,0.6,-0.7,Alta (Estudo Clínico)
-Acetyl Pyrazine,122.12,0.2,CC(=O)C1=CN=CC=N1,Heart,550.0,Pipoca noz pão,Gourmand,100.00%,False,1,Fome / Aconchego,1.0,Ultra,0.9,-0.2,Alta (Psicologia Evolutiva)
-Aldehyde C-10,156.27,2.8,CCCCCCCCCC=O,Top,18.0,Aldeídico cítrico metálico,Aldeídico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural
-Aldehyde C-11 MOA,170.29,4.1,CC(CCCCCCCC)CC=O,Top,45.0,Cítrico coentro metálico,Aldeídico,1.50%,False,1,Clareza / Foco,0.8,High,0.3,0.6,Média (Estudo Clínico)
-Aldehyde C-11 Undecylenic,168.28,3.9,C=CCCCCCCCCC=O,Top,25.0,Aldeídico cera rosa,Aldeídico,100.00%,False,1,Limpeza / Brilho,2.0,High,0.3,0.6,Média (Estudo Clínico)
-Aldehyde C-11 Undecylenic,170.29,3.1,CCCCCCCCCCC=O,Top,22.0,Aldeídico verde potente,Aldeídico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural
-Aldehyde C-12 Lauric,184.32,3.4,CCCCCCCCCCCC=O,Top,25.0,Aldeídico ceroso limpo,Aldeídico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural
-Aldehyde C-12 MNA,184.32,4.7,CC(CCCCCCCCCC)C=O,Top,35.0,Metálico fresco incenso,Aldeídico,1.20%,False,1,Foco / Organização,0.02,Ultra,0.3,0.6,Média (Estudo Clínico)
-Aldehyde C-6 (Hexanal),100.16,1.8,CCCCCC=O,Top,15.0,Verde grama frutado imaturo,Aldeídico Verde,5.00%,False,1,Alerta / Prontidão,4.5,High,0.2,0.9,Alta (Resposta Trigeminal)
-Aldehyde C-9 (Nonanal),142.24,3.4,CCCCCCCCC=O,Top,20.0,Ceroso floral rosa casca,Aldeídico,100.00%,False,1,Frescor / Limpeza,1.1,High,0.5,0.0,Associação Cultural
-Allyl Amyl Glycolate,186.25,2.3,CC(C)CCOCC(=O)OCC=C,Top,25.0,Abacaxi verde frutado,Frutado Verde,1.0,False,1,Balancing,,High,0.5,0.0,Associação Cultural
-Allyl Caproate,156.22,2.7,CCCCCC(=O)OCC=C,Top,18.0,Abacaxi frutado tropical,Frutado Tropical,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Allyl Cyclohexyl Propionate,196.29,4.1,C1CCCCC1CCC(=O)OCC=C,Heart,35.0,Abacaxi verde metálico,Frutado,100.00%,True,1,Energia / Tropical,20.0,High,0.7,0.8,Alta (Estudo Clínico)
-Allyl Heptanoate,170.25,3.2,CCCCCCC(=O)OCC=C,Top,18.0,Abacaxi frutado suculento,Frutado Tropical,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Alpha-Damascone,192.3,3.6,CC1=C(C(CCC1)C(=O)C=CC)C,Heart,240.0,Rosa maçã menta,Frutado Floral,0.02%,True,1,Frescor / Doçura,1.5,Ultra,0.8,0.2,Média (Aromacologia)
-Alpha-Isomethyl Ionone,206.32,3.3,CC1=CCCC(C1C=C(C)C(=O)C)(C)C,Heart,30.0,Violeta floral amadeirada,Floral Amadeirado,1.0,False,1,Grounding / Focus,,medium,0.4,-0.5,Média (Estudo Clínico)
-Alpha-Pinene,136.23,2.8,CC1=CCC2CC1C2(C)C,Top,7.0,Pinheiro resinoso seco,Amadeirado Resinoso,1.0,False,1,Grounding / Focus,,weak,0.4,-0.5,Média (Estudo Clínico)
-Alpha-Sinensal,218.33,4.5,CC(=CCCC(=CC=O)C)CCC(=C)C=C,Heart,900.0,Laranja concentrada floral,Cítrico,100.00%,False,1,Alegria / Radiância,0.5,Ultra,0.7,0.8,Alta (Estudo Clínico)
-Amber Xtreme,250.42,5.8,CC1(CCCC2(C1)C3(CCCC3(C)C)O2)C,Base,900.0,Âmbar seco esteróide,Âmbar,100.00%,False,1,Potência / Radiância,0.05,Ultra,0.2,0.9,Alta (Resposta Trigeminal)
-Ambermax,238.4,5.0,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,180.0,Âmbar seco agressivo,Âmbar Potente,1.0,False,1,Balancing,,high,0.5,0.0,Associação Cultural
-Ambrettolide,252.39,5.5,C1CCCCOC(=O)CCCCCC=CCCC1,Base,250.0,Musk frutado natural,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Ambrettone,268.43,5.4,C1CCCCCCCC=CCCCCC(=O)O1,Base,350.0,Musk vegetal sensual,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Ambrinol,194.31,4.2,CC1(CCCC2(C1=CCC2)C)O,Base,180.0,Âmbar terroso animal,Âmbar,100.00%,False,1,Animalesco / Intimidade,2.0,High,0.7,0.3,Associação Cultural
-Ambrocenide,278.4,4.5,CC1CCC2C13CC(C2(C)C)C4(C(C3)OC(O4)(C)C)C,Base,1200.0,Âmbar ultra potente,Âmbar Potente,1.0,False,2,Balancing,,low,0.5,0.0,Associação Cultural
-Ambroxan,236.39,4.7,CC1(CCCC2(C1CCC3(C2CCO3)C)C)C,Base,500.0,Âmbar cinzento mineral,Âmbar,1.0,False,1,Attraction / Radiance,,high,0.7,0.3,Associação Cultural
-Amyl Cinnamic Aldehyde (ACA),202.3,4.7,CCCCCC=C(CC1=CC=CC=C1)C=O,Heart,10.0,Jasmim gorduroso floral,Floral,7.00%,True,1,Acolhimento / Suave,80.0,Medium,0.8,0.2,Média (Aromacologia)
-Amyl Salicylate,208.25,4.5,CCCCCOC(=O)C1=CC=CC=C1O,Heart,14.0,Trevo orquídea herbal,Floral,100.00%,False,1,Foco / Natureza,300.0,Medium,0.5,0.0,Associação Cultural
-Amyl Vinyl Carbinol,128.21,2.6,C=CC(O)CCCCC,Top,40.0,Terroso cogumelo lavanda,Verde,100.00%,False,1,Natureza / Solo,50.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Anethole,148.2,3.3,CC=CC1=CC=C(C=C1)OC,Heart,18.0,Anis doce licoroso,Anisado Doce,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural
-Anisaldehyde,136.15,1.7,COC1=CC=C(C=C1)C=O,Heart,25.0,Anis doce mimosa,Floral Especiado,0.21%,True,1,Doçura / Atração,30.0,High,0.7,0.8,Alta (Estudo Clínico)
-Applelide,212.33,3.1,CCOC(=O)C1CCC(CC1)C,Top,35.0,Maçã verde fresca,Frutado Maçã,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Aurantione,260.37,3.8,CCOC1=CC=CC=C1C(C)(C)CC=O,Heart,45.0,Flor de laranjeira quente,Floral Branco,1.0,False,1,Mood Balance / Joy,,Ultra,0.8,0.2,Média (Aromacologia)
-Bacdanol,208.34,3.6,CCC(=CCC1CC=C(C1(C)C)C)CO,Base,40.0,Sândalo moderno doce,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG)
-Benzyl Acetate,150.17,2.0,CC(=O)OCC1=CC=CC=C1,Top,5.0,Jasmim frutado doce,Floral Frutado,1.0,False,1,Mood Balance / Joy,,weak,0.8,0.2,Média (Aromacologia)
-Benzyl Alcohol,108.14,1.1,OCC1=CC=CC=C1,Heart,4.0,Floral doce leve,Floral,0.025,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Benzyl Benzoate,212.24,4.0,C1=CC=C(C=C1)C(=O)OCC2=CC=CC=C2,Base,12.0,Balsâmico fraco doce,Floral,4.80%,True,1,Calmante / Fixador,5000.0,Weak,0.6,-0.7,Alta (Estudo Clínico)
-Benzyl Cinnamate,238.28,4.2,C1=CC=C(C=C1)C=CC(=O)OCC2=CC=CC=C2,Base,55.0,Balsâmico doce especiado,Floral,0.50%,True,1,Calor / Conforto,2000.0,Low,0.9,-0.2,Alta (Psicologia Evolutiva)
-Benzyl Propionate,164.2,2.4,CCC(=O)OCC1=CC=CC=C1,Heart,12.0,Floral frutado jasmim,Floral Frutado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Benzyl Salicylate,228.24,3.2,C1=CC=C(C=C1)COC(=O)C2=CC=CC=C2O,Base,10.0,Floral solar balsâmico,Floral Balsâmico,0.08,True,1,Mood Balance / Joy,,low,0.8,0.2,Média (Aromacologia)
-Bergamot Oil FCF,168.23,3.1,CC1=CCC(CC1)C(=C)C,Top,18.0,Cítrico fresco verde,Cítrico,1.0,False,3,Uplifting / Joy,,weak,0.8,0.2,Média (Aromacologia)
-Beta-Caryophyllene,204.36,6.3,CC1=CC2CC2CC1C(=C)C,Heart,60.0,Amadeirado pimenta cravo,Amadeirado,100.00%,False,1,Anti-ansiedade,150.0,Medium,0.5,-0.3,Média (Estudo Clínico)
-Beta-Pinene,136.23,3.1,CC1(C2CCC(=C)C1C2)C,Top,8.0,Pinheiro verde amadeirado,Amadeirado Resinoso,1.0,False,1,Grounding / Focus,,weak,0.4,-0.5,Média (Estudo Clínico)
-Blackcurrant Bud Absolute,250.0,4.5,C1=CC=C(C=C1)C(C)C,Heart,600.0,Cassis verde sulfuroso,Frutado Verde,1.0,False,3,Balancing,,medium,0.5,0.0,Associação Cultural
-Borneol,154.25,2.6,CC1(C2CCC1(C(C2)O)C)C,Top,45.0,Pinho cânfora balsâmico,Agreste,100.00%,False,1,Relaxamento / Respiração,150.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Bourgeonal,190.28,3.3,CC(C)C1=CC=C(C=C1)CCC=O,Heart,60.0,Muguet verde aquoso,Floral,100.00%,True,1,Atração / Potência,5.0,High,0.7,0.3,Associação Cultural
-Calone,190.24,2.5,CC1(C(=O)COC2=CC=CC=C2O1)C,Heart,85.0,Marinho melancia ostra,Aquático,100.00%,False,1,Liberdade / Espaço,0.05,Ultra,0.8,0.2,Média (Aromacologia)
-Camphene,136.23,4.2,CC1(C2CCC1(C2)C=C)C,Top,12.0,Cânfora madeira úmida,Terpeno,100.00%,False,1,Frescor / Limpeza,200.0,Medium,0.2,0.9,Alta (Resposta Trigeminal)
-Camphor,152.23,2.2,CC1(C2CCC1(C(=O)C2)C)C,Top,10.0,Canforado medicinal fresco,Aromático Canforado,1.0,False,1,Refreshing / Clarity,,High,0.3,0.6,Média (Estudo Clínico)
-Carvone,150.22,2.4,CC1=CCC(CC1=O)C(=C)C,Top,35.0,Hortelã cominho herbal,Aromático Herbal,1.0,False,1,Refreshing / Clarity,,weak,0.3,0.6,Média (Estudo Clínico)
-Cashmeran,206.32,3.3,CC1C(C2=C(C1(C)C)C(=O)CCC2)(C)C,Base,85.0,Amadeirado quente almiscarado,Amadeirado Almiscarado,1.0,False,1,Grounding / Focus,,high,0.4,-0.5,Média (Estudo Clínico)
-Cashmeran,206.33,3.1,CC1C(C2=C(C1(C)C)C(=O)CCC2)C,Base,85.0,Musk amadeirado especiado,Musk Amadeirado,100.00%,False,1,Textura / Conforto,1000.0,High,0.5,0.0,Associação Cultural
-Cedramber,236.4,5.3,CC1(CCCC2(C1CCC2OC)C)C,Base,35.0,Cedro seco âmbar,Amadeirado,100.00%,False,1,Força / Estrutura,200.0,Weak,0.4,-0.5,Média (Estudo Clínico)
-Cedrol,222.37,3.9,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,40.0,Cedro seco amadeirado,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Cedryl Acetate,264.4,4.5,CC1CCC2C13CCC(C(C3)C2(C)C)(C)OC(=O)C,Base,35.0,Cedro cremoso elegante,Amadeirado Cremoso,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Cedryl Methyl Ether,236.4,5.4,CC1(CCCC2(C1CCC2OC)C)C,Base,45.0,Cedro seco ambarado,Amadeirado,100.00%,False,1,Estrutura,150.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Cetalox,236.39,4.7,CC1(CCCC2(C1CCC3(C2CCO3)C)C)C,Base,550.0,Âmbar cinzento seco,Âmbar,1.0,False,1,Balancing,,low,0.5,0.0,Associação Cultural
-Cinnamic Aldehyde,132.16,1.9,C1=CC=C(C=C1)C=CC=O,Heart,12.0,Canela quente especiada,Especiado,0.0025,True,1,Stimulating / Warmth,,medium,0.7,0.8,Alta (Estudo Clínico)
-Cinnamyl Acetate,176.21,2.8,CC(=O)OCC=CC1=CC=CC=C1,Heart,30.0,Canela balsâmico doce,Especiado,100.00%,False,1,Aconchego / Calor,100.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva)
-Cinnamyl Alcohol,134.17,1.9,C1=CC=C(C=C1)C=CCO,Heart,18.0,Canela suave balsâmica,Especiado Floral,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Cinnamyl Nitrile,129.16,2.4,C1=CC=C(C=C1)C=CC#N,Heart,65.0,Canela metálico seco,Especiado,100.00%,False,1,Estabilidade / Secura,80.0,High,0.3,0.6,Média (Estudo Clínico)
-Cis-3-Hexenol,100.16,1.6,CCC=CCCO,Top,30.0,Grama cortada folhagem fresca,Verde,100.00%,False,1,Revigorante / Natural,70.0,High,0.7,0.8,Alta (Estudo Clínico)
-Cis-3-Hexenyl Acetate,142.2,2.6,CCC=CCCOC(=O)C,Top,25.0,Banana verde pera solvente,Verde Frutado,100.00%,False,1,Energia / Despertar,100.0,High,0.2,0.9,Alta (Resposta Trigeminal)
-Cis-3-Hexenyl Benzoate,204.27,4.2,C1=CC=C(C=C1)C(=O)OCC=CCC,Heart,55.0,Verde herbáceo lenhoso,Verde Balsâmico,100.00%,False,1,Estabilidade / Calma,150.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Cis-3-Hexenyl Salicylate,220.26,4.8,CCC=CCCOC(=O)C1=CC=CC=C1O,Heart,60.0,Verde floral metálico,Floral,100.00%,False,1,Revigorante,80.0,High,0.2,0.9,Alta (Resposta Trigeminal)
-Cis-Jasmone,164.25,2.8,CC1=C(CCC1=O)CC=CC,Heart,350.0,Jasmim especiado aipo,Floral,100.00%,False,1,Alerta / Foco,50.0,High,0.4,0.6,Alta (EEG)
-Citral,152.23,3.0,CC(=CCCC(=CC=O)C)C,Top,18.0,Limão aldeídico verde,Cítrico Aldeídico,0.006,True,1,Uplifting / Energy,6.0,medium,0.7,0.8,Alta (Estudo Clínico)
-Citronellal,154.25,3.5,CC(CCC=C(C)C)CC=O,Top,15.0,Erva-cidreira verde metálico,Cítrico,0.40%,False,1,Repelente / Foco,40.0,Medium,0.2,0.9,Alta (Resposta Trigeminal)
-Citronellol,156.26,3.2,CC(CCC=C(C)C)CCO,Heart,16.0,Rosa fresca cítrica,Floral Rosado,0.12,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Citronellyl Nitrile,151.25,3.2,CC(CCC=C(C)C)CC#N,Heart,25.0,Verde cítrico seco,Verde Floral,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Civettone,250.42,6.8,C1=CCCCCCCCC(=O)CCCCCC1,Base,900.0,Animal quente pele,Musk,100.00%,False,1,Atração / Calor,0.5,Ultra,0.7,0.3,Associação Cultural
-Clearwood,238.4,4.5,C1CCCC2C(C1)CCCC2O,Base,75.0,Patchouli limpo moderno,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Cosmone,240.38,5.3,C1CCCCCCCCOC(=O)CCCC1,Base,90.0,Musk limpo aéreo,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Coumarin,146.14,1.4,C1=CC=C2C(=C1)C=CC(=O)O2,Base,22.0,Amêndoa feno tonka,Gourmand,0.016,True,1,Indulgence / Comfort,10.0,low,0.9,-0.2,Alta (Psicologia Evolutiva)
-Cyclal C,138.21,2.6,C1CC(C=C1)C=O,Top,40.0,Verde hera potente,Verde,2.20%,True,1,Impacto / Choque,5.0,Ultra,0.2,0.9,Alta (Resposta Trigeminal)
-Cyclamen Aldehyde,190.28,3.3,CC(C)C1=CC=C(C=C1)CC(C)C=O,Heart,25.0,Floral aquático limpo,Floral Aquático,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Cyclogalbanate,196.24,2.9,C1CC(C1)COC(=O)CC2=CC=CC=C2,Top,55.0,Gálbano abacaxi verde,Verde,100.00%,False,1,Energia / Modernidade,15.0,High,0.7,0.8,Alta (Estudo Clínico)
-Cyclopentadecanolide,242.4,5.1,C1CCCCCCCCCCC(=O)O1,Base,180.0,Musk natural macio,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Damascenone,190.28,3.2,CC=CC(=O)C1=C(C=CCC1(C)C)C,Heart,1000.0,Rosa frutada tabaco,Floral Frutado,0.002,True,1,Mood Balance / Joy,0.002,ultra,0.8,0.2,Média (Aromacologia)
-Delta-Damascone,192.3,3.6,CC1=C(C(CCC1)(C)C)C(=O)C=CC,Heart,250.0,Rosa maçã groselha,Frutado Floral,0.02%,True,1,Alegria / Radiância,1.0,Ultra,0.8,0.2,Média (Aromacologia)
-Delta-Decalactone,170.25,2.5,CCCCCC1CCCC(=O)O1,Heart,25.0,Coco pêssego cremoso,Frutado,100.00%,False,1,Creme / Suavidade,20.0,Medium,0.8,-0.4,Média (Aromacologia)
-Delta-Dodecalactone,198.3,3.2,CCCCCCCC1CCCC(=O)O1,Heart,35.0,Pêssego leite quente,Lactônico,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural
-Dihydro Jasmone,166.26,2.9,CC1=C(CCC1=O)CCCCC,Heart,110.0,Jasmim frutado lactônico,Floral,100.00%,False,1,Relaxamento,100.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Dihydro Myrcenol,156.26,3.0,CCC(=C)CCCC(C)(C)O,Top,12.0,Fresco limpo cítrico,Fresco Cítrico,1.0,False,1,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico)
-Dimetol,158.28,2.6,CC(C)C(CC(C)(C)O)C,Top,18.0,Lavanda lima fresco,Cítrico,100.00%,False,1,Limpeza / Higiene,50.0,Medium,0.2,0.9,Alta (Resposta Trigeminal)
-Diphenyl Oxide,170.21,4.2,C1=CC=C(C=C1)OC2=CC=CC=C2,Top,12.0,Gerânio metálico químico,Floral Verde,100.00%,False,1,Frio / Distanciamento,100.0,High,0.2,0.9,Alta (Resposta Trigeminal)
-Ebanol,208.34,3.3,CC1=CCC(C1(C)C)C=CC(C)C(C)O,Base,45.0,Sândalo seco âmbar,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG)
-Estragole,148.2,3.4,COC1=CC=C(C=C1)CC=C,Heart,20.0,Anis verde herbal,Anisado Verde,0.002,False,1,Balancing,,Ultra,0.5,0.0,Associação Cultural
-Ethyl 2-Methyl Butyrate,130.18,1.9,CCC(C)C(=O)OCC,Top,20.0,Maçã verde doce,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Ethyl Acetate,88.11,0.7,CCOC(=O)C,Top,2.0,Frutado leve solvente,Etéreo Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Ethyl Butyrate,116.16,1.3,CCCC(=O)OCC,Top,20.0,Abacaxi fruta tropical,Frutado Tropical,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Ethyl Heptanoate,158.24,2.4,CCC=CCC(=O)OCC,Top,25.0,Frutado uva conhaque,Frutado,100.00%,False,1,Indulgência,10.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva)
-Ethyl Linalool,168.28,3.3,CCC(C)(C=C)CCC=C(C)C,Heart,22.0,Bergamota floral suave,Floral,100.00%,False,1,Calma / Versatilidade,10.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Ethyl Maltol,140.14,0.8,CCC1=C(C(=O)C=CO1)O,Base,25.0,Açúcar queimado caramelo,Gourmand,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva)
-Ethyl Vanillin,166.17,1.6,CCOC1=C(C=CC(=C1)C=O)O,Base,22.0,Baunilha chocolate,Gourmand,100.00%,False,1,Aconchego / Doçura,0.02,Ultra,0.9,-0.2,Alta (Psicologia Evolutiva)
-Ethylene Brassylate,270.36,4.2,C1CCCCCC(=O)OCCOC(=O)CCCCC1,Base,12.0,Musk macio limpo,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Eugenol,164.2,2.5,COC1=C(C=CC(=C1)CC=C)O,Heart,20.0,Cravo especiado medicinal,Especiado,2.50%,True,1,Estimulante / Calor,10.0,High,0.2,0.9,Alta (Resposta Trigeminal)
-Evernyl,196.29,3.1,COC1=CC=C(C=C1)C(C)C,Base,18.0,Musgo limpo doce,Chipre,1.0,False,1,Balancing,,low,0.5,0.0,Associação Cultural
-Exaltolide,240.38,5.8,C1CCCCCCCOC(=O)CCCCCC1,Base,150.0,Musk pele macio,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Exaltone,224.38,5.9,C1CCCCCCC(=O)CCCCCCC1,Base,600.0,Animal pele fina,Musk,100.00%,False,1,Intimidade / Pele,1.0,High,0.8,-0.4,Média (Aromacologia)
-Farnesol,222.37,4.8,CC(=CCCC(=CCCC(=CCO)C)C)C,Base,250.0,Floral seco amadeirado,Floral Amadeirado,0.012,True,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Firsantol,222.37,4.0,CC1=CCC(C(C1)C=CC(C)C)C,Base,110.0,Sândalo natural macio,Amadeirado,100.00%,False,1,Meditação,5.0,High,0.5,-0.7,Alta (EEG)
-Floralozone,190.28,3.5,CCC(C)(C=O)CC1=CC=C(C=C1)C,Heart,45.0,Floral ozônico ar,Aldeídico,100.00%,False,1,Leveza / Ar,20.0,High,0.8,0.2,Média (Aromacologia)
-Florhydral,190.28,3.4,CC(C)C1=CC=C(C=C1)CC=O,Heart,50.0,Muguet marinho fresco,Floral,100.00%,False,1,Frescor / Abertura,5.0,High,0.3,0.6,Média (Estudo Clínico)
-Florol,156.26,1.9,CC(C)(C)CCC(CCO)O,Heart,30.0,Lírio-do-vale limpo,Floral Aquático,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Florosa,202.3,2.6,CC1CCC(CC1O)C2=CC=CC=C2,Heart,20.0,Muguet rosa suave,Floral,100.00%,False,1,Maciez / Conforto,80.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Frambinone Methyl Ether,178.23,2.2,CC(=O)CCC1=CC=C(C=C1)OC,Base,110.0,Framboesa anis floral,Frutado,100.00%,False,1,Conforto / Doçura,300.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva)
-Fructone,174.19,0.2,CCOC(=O)CC1(OCCO1)C,Top,25.0,Maçã frutas vermelhas aquoso,Frutado Aquático,1.0,False,1,Clean / Focus,,weak,0.5,0.4,Associação Cultural
-Galaxolide,258.4,4.8,CC1COCC2=CC3=C(C=C12)C(C(C3(C)C)C)(C)C,Base,15.0,Musk limpo doce,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Gamma-Dodecalactone,198.3,4.1,CCCCCC1CCC(=O)O1,Heart,28.0,Pêssego manteiga,Frutado,100.00%,False,1,Saciedade / Calma,10.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva)
-Gamma-Nonalactone (Aldehyde C-18),156.22,2.2,CCCCCC1CCC(=O)O1,Heart,18.0,Coco leitoso,Lactônico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural
-Gamma-Octalactone,142.2,2.1,CCCCCC1CCC(=O)O1,Heart,22.0,Coco cremoso,Lactônico,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural
-Gamma-Undecalactone (C14),184.28,3.6,CCCCC1CCC(=O)O1,Heart,18.0,Pêssego cremoso pele,Frutado,100.00%,False,1,Conforto / Nutrição,6.0,Medium,0.8,-0.4,Média (Aromacologia)
-Geraniol,154.25,2.9,CC(=CCCC(=CCO)C)C,Heart,18.0,Rosa floral doce,Floral Rosado,0.047,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Geranyl Acetate,196.29,3.5,CC(=CCCC(=CCOC(=O)C)C)C,Heart,20.0,Floral frutado rosa pera,Floral Frutado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Geranyl Formate,182.26,3.1,CC(=CCCC(=COC=O)C)C,Top,40.0,Rosa fresca verde,Floral,100.00%,False,1,Elevação / Crocância,100.0,Medium,0.7,0.8,Alta (Estudo Clínico)
-Globanone,266.42,5.2,C1CCCC(CCCC(=O)OCCCC1)C,Base,180.0,Almíscar volumoso limpo,Musk,100.00%,False,1,Conforto / Volume,10.0,Medium,0.8,0.2,Média (Aromacologia)
-Guaiol,222.37,4.5,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,80.0,Amadeirado seco,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Habanolide,238.37,5.2,C1CCCCC=CCCCOC(=O)CCCC1,Base,60.0,Musk metálico moderno,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Hedione,226.31,2.7,O=C(OC)CC1C(C(=O)CC1)CCCCC,Heart,25.0,Jasmim transparente aéreo,Floral Jasmínico,1.0,False,1,Attraction / Radiance,,low,0.7,0.3,Associação Cultural
-Helional,156.18,1.7,CC1=CC=CC(C=C1)C=O,Heart,25.0,Verde aquático ozônico,Aquático,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural
-Heliotropin,150.13,1.2,C1OC2=C(O1)C=C(C=C2)C=O,Base,50.0,Amêndoa cereja pó,Gourmand,Restricted,False,1,Conforto / Comida,200.0,Medium,0.8,0.2,Média (Aromacologia)
-Helvetolide,284.4,4.5,CCC(=O)OCC(C)(C)OC(C)C1CCCC(C1)(C)C,Base,300.0,Musk pera limpo,Musk Frutado,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Hexyl Cinnamic Aldehyde,216.32,4.8,CCCCCCC(=CC1=CC=CC=C1)C=O,Base,12.0,Jasmim floral quente,Floral Branco,1.0,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Hexyl Salicylate,222.28,5.5,CCCCCCOC(=O)C1=CC=CC=C1O,Heart,15.0,Floral suave herbal,Floral,100.00%,False,1,Calma / Foco,250.0,Weak,0.6,-0.7,Alta (Estudo Clínico)
-Hindinol,208.34,3.9,CC1=CCC(C(C1)C=C(C)C)O,Base,55.0,Sândalo cremoso cosmético,Amadeirado,100.00%,False,1,Suavidade / Cuidado,20.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Homofuraneol,142.15,0.5,CC1=C(C(=O)C(O1)C)O,Base,400.0,Caramelo açúcar queimado,Gourmand,100.00%,False,1,Apetite / Conforto,0.04,High,0.9,-0.2,Alta (Psicologia Evolutiva)
-Hydroxycitronellal,172.26,1.6,CC(CCCC(C)(C)O)CC=O,Heart,25.0,Lírio-do-vale aquoso,Floral Aquático,0.01,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Indole,117.15,2.1,C1=CC=C2C(=C1)C=CN2,Base,150.0,Animal floral narcótico,Animal Floral,1.0,False,1,Mood Balance / Joy,,low,0.8,0.2,Média (Aromacologia)
-Iso E Super,234.38,3.6,CC1CC2=C(CC1(C)C(=O)C)C(CCC2)(C)C,Base,15.0,Amadeirado âmbar aveludado,Amadeirado Âmbar,0.214,True,1,Attraction / Radiance,,low,0.7,0.3,Associação Cultural
-Isoamyl Acetate,130.18,2.0,CC(C)CCOC(=O)C,Top,8.0,Banana doce frutada,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Isoamyl Butyrate,158.24,3.1,CC(C)CCOC(=O)CCC,Top,15.0,Banana pera doce,Frutado,100.00%,False,1,Diversão / Infantil,10.0,Medium,0.7,0.8,Alta (Estudo Clínico)
-Isobornyl Acetate,196.29,3.0,CC1(C2CCC1(C(=O)C2)C)OC(=O)C,Top,8.0,Pinho cânfora herbal,Amadeirado,100.00%,False,1,Refrescante / Foco,80.0,Medium,0.3,0.6,Média (Estudo Clínico)
-Isobutyl Quinoline,173.26,3.4,CC(C)CC1=NC2=CC=CC=C2C=C1,Base,120.0,Couro verde seco,Couro,1.0,False,1,Confidence / Mystery,,Ultra,0.7,0.5,Associação Cultural
-Isocyclocitral,152.23,2.9,CC1=C(C(CC1)(C)C)C=O,Top,55.0,Verde herbal folhagem,Verde,100.00%,False,1,Alerta / Corte,5.0,High,0.2,0.9,Alta (Resposta Trigeminal)
-Isoeugenol,164.2,2.5,COC1=C(C=CC(=C1)C=CC)O,Heart,35.0,Cravo floral doce,Especiado,0.10%,True,1,Riqueza / Calor,5.0,High,0.9,-0.2,Alta (Psicologia Evolutiva)
-Javanol,252.4,4.8,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,400.0,Sândalo cremoso potente,Amadeirado Sândalo,1.0,False,2,Calming / Wellness,,low,0.4,-0.5,Média (Estudo Clínico)
-Karanal,262.43,5.4,CC(C)C1=CC=C(C=C1)CC(C)O,Base,150.0,Âmbar seco radiante,Âmbar,0.00%,True,1,Força (Restrito EU),0.5,Ultra,0.2,0.9,Alta (Resposta Trigeminal)
-Kephalis,224.34,3.1,CCOC(=C)C1C(CC(=O)CC1(C)C)(C)C,Base,35.0,Âmbar tabaco amadeirado,Âmbar Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Kohinool,226.41,4.5,CC(C)C1CCC(C(C1)O)C(C)(C)C,Base,40.0,Amadeirado seco vetiver,Amadeirado,100.00%,False,1,Modernidade / Limpeza,50.0,Medium,0.8,0.2,Média (Aromacologia)
-Labdanum Resinoid,250.0,4.8,C1=CC=C(C=C1)C(C)C,Base,60.0,Âmbar resinoso quente,Âmbar,1.0,False,3,Confidence / Mystery,,low,0.7,0.5,Associação Cultural
-Lavandin Oil,196.29,3.2,CC(=CCCC(C)(C=C)OC(=O)C)C,Heart,15.0,Lavanda herbal fresca,Floral Aromático,1.0,False,3,Calming / Relaxation,,medium,0.6,-0.7,Alta (Estudo Clínico)
-Lemon Oil,136.23,3.3,CC1=CCC(CC1)C(=C)C,Top,7.0,Limão fresco vibrante,Cítrico,1.0,False,3,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico)
-Lilial,204.31,2.4,CC(C)(C)CC1=CC=C(C=C1)C=O,Heart,20.0,Lírio-do-vale doce,Floral Aquático,0.0,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Lime Oxide,154.25,2.9,CC1(C2CCC(O1)CC2)C,Top,45.0,Cítrico fresco limpo,Cítrico,100.00%,False,1,Alerta / Limpeza,200.0,Weak,0.2,0.9,Alta (Resposta Trigeminal)
-Limonene,136.23,3.4,CC1=CCC(CC1)C(=C)C,Top,6.0,Cítrico laranja limão fresco,Cítrico,1.0,True,1,Uplifting / Energy,200.0,weak,0.7,0.8,Alta (Estudo Clínico)
-Linalool,154.25,2.7,CC(=CCCC(C)(C=C)O)C,Heart,15.0,Floral lavanda cítrico suave,Floral,1.0,True,1,Calming / Relaxation,6.0,medium,0.6,-0.7,Alta (Estudo Clínico)
-Linalyl Acetate,196.29,3.3,CC(=CCCC(C)(C=C)OC(=O)C)C,Heart,18.0,Lavanda floral doce fresco,Floral,1.0,False,1,Calming / Relaxation,,medium,0.6,-0.7,Alta (Estudo Clínico)
-Lyral,210.31,1.7,CC(C)(CCCC1=CCC(CC1)C=O)O,Heart,45.0,Lírio-do-vale limpo,Floral Aquático,0.002,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Magnolan,196.24,2.7,C1CC2=C(C1)C(=CC(=C2)O)C,Heart,40.0,Magnólia lírio toranja,Floral,100.00%,False,1,Alegria / Exotismo,50.0,Medium,0.7,0.8,Alta (Estudo Clínico)
-Majantol,192.3,2.9,CC(C)C1=CC=C(C=C1)C(C)O,Heart,45.0,Muguet suave limpo,Floral,100.00%,False,1,Serenidade / Calma,15.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Maltol,126.11,0.4,CC1=C(C(=O)C=CO1)O,Base,20.0,Caramelo algodão-doce,Gourmand,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva)
-Mandarinal,190.28,3.5,C1=CC(=CC=C1C=O)C(C)C,Top,80.0,Mandarina aldeídico fresco,Cítrico,100.00%,False,1,Elevação / Humor,10.0,High,0.8,0.2,Média (Aromacologia)
-Manzanate,144.21,2.4,CCCC(C)C(=O)OCC,Top,12.0,Maçã verde fresca,Frutado Maçã,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Massoia Lactone,170.25,3.2,CCCCCC1CC(=O)O1,Heart,1200.0,Coco cremoso figo,Gourmand,0.01%,True,1,Exotismo / Creme,10.0,Ultra,0.8,0.2,Média (Aromacologia)
-Melonal,140.22,2.5,CC(CCC=C(C)C)C=O,Top,40.0,Melancia aquosa verde,Aquático Verde,1.0,False,1,Clean / Focus,,weak,0.5,0.4,Associação Cultural
-Methyl Anthranilate,151.16,1.9,COC(=O)C1=CC=CC=C1N,Heart,12.0,Flor de laranjeira uva,Floral Doce,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Methyl Cinnamate,162.19,2.6,COC(=O)C=CC1=CC=CC=C1,Base,40.0,Morango balsâmico canela,Balsâmico,100.00%,True,1,Doçura / Conforto,50.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva)
-Methyl Diantilis,182.22,1.6,CCOC1=C(C=CC(=C1)COC)O,Base,60.0,Floral doce anisado,Floral Anisado,1.0,False,1,Mood Balance / Joy,,low,0.8,0.2,Média (Aromacologia)
-Methyl Diantilis,224.25,3.2,COC1=C(C=CC(=C1)COC)OCC,Base,180.0,Cravo baunilha doce,Especiado,100.00%,False,1,Conforto / Doçura,50.0,Medium,0.8,0.2,Média (Aromacologia)
-Methyl Pamplemousse,186.29,3.2,CC(=CCC(C)(C)C(OC)OC)C,Top,35.0,Toranja cítrico moderno,Cítrico Frutado,1.0,False,1,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico)
-Methyl Phenyl Acetate,150.18,2.1,COC(=O)CC1=CC=CC=C1,Heart,25.0,Mel floral doce,Floral,100.00%,False,1,Natureza / Mel,80.0,Medium,0.8,0.2,Média (Aromacologia)
-Muscenone,238.37,5.4,C1CCCCCCCCOC(=O)CCCC1,Base,200.0,Musk natural animal,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Muscone,238.41,6.2,CC1CCCCCCCCCCCCC(=O)C1,Base,1100.0,Almíscar natural atalcado,Musk,100.00%,False,1,Sensualidade / Pele,0.5,Ultra,0.7,0.3,Associação Cultural
-Musk Ketone,294.3,3.7,CC1=C(C(=C(C(=C1[N+](=O)[O-])C(C)(C)C)[N+](=O)[O-])C)C(=O)C,Base,60.0,Musk doce clássico,Musk,0.014,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Musk T (Ethylene Brassylate),270.36,4.2,C1CCCCCC(=O)OCCOC(=O)CCCCC1,Base,12.0,Almíscar doce floral,Musk,100.00%,False,1,Conforto / Segurança,50.0,Low,0.8,-0.4,Média (Aromacologia)
-Musk Xylol,297.26,3.8,CC1=C(C(=C(C(=C1[N+](=O)[O-])C(C)(C)C)[N+](=O)[O-])C)[N+](=O)[O-],Base,40.0,Musk em pó,Musk,0.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Myrcene,136.23,4.3,CC(=CCCC(=C)C=C)C,Top,10.0,Verde resinoso terpenado,Verde Terpenado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Neobutenone Alpha,192.3,3.3,CC1=C(C(CCC1)(C)C)C(=O)C,Top,120.0,Verde metálico gálbano,Verde,0.05%,False,1,Difusão / Potência,0.5,Ultra,0.2,0.9,Alta (Resposta Trigeminal)
-Nerol,154.25,2.9,CC(=CCCC(=CCO)C)C,Heart,25.0,Rosa fresca cítrica,Floral Rosado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Nerolidol,222.37,4.6,CC(=CCCC(=CCCC(C)(C=C)O)C)C,Heart,40.0,Floral amadeirado verde,Floral Amadeirado,1.0,False,1,Grounding / Focus,,medium,0.4,-0.5,Média (Estudo Clínico)
-Neryl Acetate,196.29,3.5,CC(=CCCC(=CCOC(=O)C)C)C,Top,35.0,Rosa framboesa doce,Floral Frutado,100.00%,False,1,Alegria / Doçura,100.0,Medium,0.7,0.8,Alta (Estudo Clínico)
-Nirvanolide,256.42,5.1,CC1(CCCC(=O)OCCCC=C1)C,Base,250.0,Atalcado frutado limpo,Musk,100.00%,False,1,Felicidade / Conforto,1.0,High,0.9,-0.2,Alta (Psicologia Evolutiva)
-Nootkatone,218.33,4.2,CC1=CC2C(CC1=O)C(=C)CCC2(C)C,Heart,450.0,Toranja amadeirado casca,Cítrico,100.00%,False,1,Energia / Metabolismo,170.0,Ultra,0.7,0.5,Alta (Estudo Clínico)
-Norlimbanol,226.4,5.2,CCCC(CCC1C(CCCC1(C)C)C)O,Base,300.0,Amadeirado seco agressivo,Amadeirado Seco,1.0,False,1,Grounding / Focus,,high,0.4,-0.5,Média (Estudo Clínico)
-Oakmoss Absolute,254.4,4.9,C1=CC=C(C=C1)C(C)C,Base,120.0,Musgo úmido terroso,Chipre,0.001,True,3,Balancing,,low,0.5,0.0,Associação Cultural
-Octanal (Aldehyde C-8),128.21,2.7,CCCCCCCC=O,Top,15.0,Cítrico aldeídico casca,Aldeídico Cítrico,1.0,False,1,Uplifting / Energy,,medium,0.7,0.8,Alta (Estudo Clínico)
-Octyl Acetate,172.27,3.8,CCCCCCCCOC(=O)C,Top,20.0,Laranja ceroso verde,Cítrico,100.00%,False,1,Naturalidade / Casca,60.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Okoumal,288.4,5.1,CC1COC(O1)(C)C2=CC3=C(C=C2)C(CCC3(C)C)(C)C,Base,45.0,Âmbar amadeirado quente,Âmbar Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Olibanum Oil,222.37,4.0,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,90.0,Incenso cítrico resinoso,Resinoso,1.0,False,3,Confidence / Mystery,,low,0.7,0.5,Associação Cultural
-Orange Sweet Oil,136.23,3.4,CC1=CCC(CC1)C(=C)C,Top,6.0,Laranja doce suculenta,Cítrico,1.0,False,3,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico)
-Para-Cymene,134.22,4.1,CC1=CC=C(C=C1)C(C)C,Top,10.0,Especiado seco terpenado,Aromático Especiado,1.0,False,1,Stimulating / Warmth,,High,0.7,0.8,Alta (Estudo Clínico)
-Patchouli Oil,222.37,4.7,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,55.0,Terroso amadeirado,Amadeirado,1.0,False,3,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Patchoulol,222.37,4.8,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,70.0,Patchouli limpo seco,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Pear Ester,188.26,2.6,CCOC(=O)CC(C)C,Top,25.0,Pera suculenta doce,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Peonile,204.26,3.2,CCC(C)C1=CC=C(C=C1)CC#N,Heart,85.0,Peônia gerânio pó,Floral,100.00%,False,1,Limpeza / Estabilidade,10.0,High,0.6,-0.6,Alta (Estudo Clínico)
-Petalia,192.3,3.1,CC1=CC=C(C=C1)OCC(C)O,Heart,150.0,Rosa frutal lichia,Floral,100.00%,False,1,Suavidade / Feminilidade,50.0,High,0.8,0.2,Média (Aromacologia)
-Petitgrain Oil,154.25,3.0,CC(=CCCC(C)(C=C)O)C,Top,22.0,Verde amargo floral,Cítrico Verde,1.0,False,3,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico)
-Phenyl Ethyl Alcohol,122.16,1.4,C1=CC=C(C=C1)CCO,Heart,8.0,Rosa natural mel,Floral Rosado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Phenyl Propyl Alcohol,136.19,1.6,CCC1=CC=CC=C1O,Heart,10.0,Floral rosado suave,Floral,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia)
-Phenylacetaldehyde,120.15,1.7,C1=CC=C(C=C1)CC=O,Heart,30.0,Jacinto verde mel,Verde Floral,0.03%,True,1,Primavera / Embriaguez,4.0,High,0.8,0.2,Média (Aromacologia)
-Phenylethyl Acetate,164.2,2.3,CC(=O)OCCC1=CC=CC=C1,Heart,18.0,Rosa mel frutado,Floral,100.00%,False,1,Romance / Alegria,200.0,Medium,0.8,0.2,Média (Aromacologia)
-Polysantol,234.38,4.6,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,90.0,Sândalo doce moderno,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG)
-Prenyl Acetate,128.17,1.8,CC(=CCOC(=O)C)C,Top,18.0,Banana verde pera,Frutado,100.00%,False,1,Energia / Impacto,50.0,Medium,0.7,0.8,Alta (Estudo Clínico)
-Raspberry Ketone,164.2,1.5,CC(=O)CCC1=CC=C(C=C1)O,Base,40.0,Framboesa doce,Gourmand Frutado,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva)
-Rhubafuran,182.26,3.4,CC1(CO1)C2=CC=C(C=C2)C,Top,85.0,Ruibarbo toranja amargo,Verde,100.00%,False,1,Vigor / Amargor,2.0,High,0.2,0.9,Alta (Resposta Trigeminal)
-Romandolide,254.37,3.8,CC1(C(=O)OCCCCCOC(=O)C)C,Base,80.0,Almíscar frutado pera,Musk,100.00%,False,1,Suavidade / Limpeza,20.0,Medium,0.8,-0.4,Média (Aromacologia)
-Romandolide,254.4,5.5,C1CCCCCCCCOC(=O)CCCCC1,Base,120.0,Musk metálico moderno,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Rose Oxide,154.25,2.9,CC1CCOC(C1)C=C(C)C,Top,150.0,Rosa verde metálica,Floral Verde,0.002,False,1,Mood Balance / Joy,0.002,ultra,0.8,0.2,Média (Aromacologia)
-Safraleine,202.25,4.1,CC1=C(C=C(C=C1)C2=C(C=C(C=C2)C)O)C,Base,200.0,Açafrão couro tabaco,Especiado,100.00%,False,1,Mistério / Calor,5.0,High,0.9,-0.2,Alta (Psicologia Evolutiva)
-Safranal,150.22,2.1,CC1=C(C(CC=C1)(C)C)C=O,Heart,500.0,Açafrão couro mel,Especiado Couro,0.0003,True,1,Stimulating / Warmth,0.01,ultra,0.7,0.8,Alta (Estudo Clínico)
-Sandalore,210.36,3.6,CC(C)C1CCC(C(C1)O)CC(C)(C)O,Base,45.0,Sândalo doce sintético,Amadeirado,100.00%,False,1,Fixação / Estrutura,50.0,High,0.6,-0.7,Alta (Estudo Clínico)
-Sandela,236.39,4.6,CC1C2CC(C1(C)C)CC2C3CCCC(C3)O,Base,35.0,Sândalo cremoso quente,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG)
-Santalol (Alpha/Beta),220.35,3.8,CC1(C2CCC1(C2)CC(=CCO)C)C,Base,2200.0,Sândalo cremoso sagrado,Amadeirado,100.00%,False,1,Meditativo / Sedativo,10.0,Medium,0.5,-0.7,Alta (EEG)
-Sotolon,128.17,1.1,CC1C(=C(C(=O)O1)O)C,Base,2500.0,Maple curry feno-grego,Gourmand,100.00%,False,1,Salgado / Fome,0.001,Ultra,0.9,-0.2,Alta (Psicologia Evolutiva)
-Stemone,154.25,2.3,CC1=CC=CCC1=O,Top,45.0,Verde folhas esmagadas,Verde,1.0,False,1,Balancing,,High,0.5,0.0,Associação Cultural
-Strawberry Furanone,128.12,0.9,CC1=COC(=O)C=C1O,Top,80.0,Morango caramelado,Frutado Gourmand,1.0,False,1,Indulgence / Comfort,,weak,0.9,-0.2,Alta (Psicologia Evolutiva)
-Styrallyl Acetate,164.2,2.6,CC(C1=CC=CC=C1)OC(=O)C,Top,20.0,Gardenia ruibarbo verde,Verde Floral,100.00%,False,1,Nitidez / Foco,50.0,High,0.3,0.6,Média (Estudo Clínico)
-Suederal,236.39,4.1,CC1CCCCC(C1)C(C)(C)C=O,Base,85.0,Suede macio amadeirado,Couro,1.0,False,1,Confidence / Mystery,,low,0.7,0.5,Associação Cultural
-Sulfurol,143.2,1.3,CC1=C(SC=N1)CCO,Base,150.0,Leite carne noz,Gourmand,100.00%,False,1,Savoriness,50.0,High,0.9,-0.2,Alta (Psicologia Evolutiva)
-Tangerinal,192.3,3.6,CCCCCCCCC(C)=O,Top,60.0,Tangerina ceroso aldeídico,Cítrico,100.00%,False,1,Calma / Foco,15.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Terpineol Alpha,154.25,2.7,CC1=CCC(CC1)C(C)(C)O,Heart,12.0,Lilás pinho floral,Floral,100.00%,False,1,Limpeza / Relaxamento,300.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Terpinolene,136.23,2.8,CC1=CCC(=C(C)C)CC1,Top,8.0,Verde herbal pináceo,Aromático Verde,1.0,False,1,Refreshing / Clarity,,weak,0.3,0.6,Média (Estudo Clínico)
-Tetrahydrolinalool,158.28,3.3,CCC(C)(CCCC(C)C)O,Top,15.0,Cítrico limpo técnico,Cítrico,100.00%,False,1,Funcionalidade / Limpo,200.0,Weak,0.2,0.9,Alta (Resposta Trigeminal)
-Thymol,150.22,3.3,CC1=CC(=C(C=C1)C(C)C)O,Heart,25.0,Tomilho herbal medicinal,Aromático Herbal,1.0,False,1,Refreshing / Clarity,,medium,0.3,0.6,Média (Estudo Clínico)
-Timberol,226.4,5.2,CCCC(CCC1C(CCCC1(C)C)C)O,Base,60.0,Amadeirado seco intenso,Amadeirado Seco,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Tonalide,258.4,5.3,CC1CC(C2=C(C1(C)C)C=C(C(=C2)C(=O)C)C)(C)C,Base,35.0,Musk doce pesado,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Trimethyl Pyrazine,122.17,1.1,CC1=CN=C(C(=N1)C)C,Heart,600.0,Café cacau terra,Gourmand,100.00%,False,1,Estímulo / Café,2.0,Ultra,0.7,0.8,Alta (Estudo Clínico)
-Trimofix O,240.38,5.1,CC1(CCCC2(C1)C(=O)CCC2)C,Base,55.0,Amadeirado âmbar tabaco,Amadeirado,100.00%,False,1,Calor / Fixação,100.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva)
-Triplal,168.24,2.1,CC(CCC=C(C)C)C=O,Top,18.0,Verde aldeídico herbal,Verde,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural
-Triplal (Ligustral),138.21,2.4,C1=CC(C(C1)C=O)(C)C,Top,18.0,Verde folhoso herbáceo,Verde,1.30%,False,1,Vivacidade / Zest,10.0,High,0.4,0.7,Média (Estudo Clínico)
-Undecavertol,172.26,3.7,CCCCC=CC(C)CCC(=O),Heart,35.0,Folha de violeta verde aquoso,Verde,100.00%,False,1,Conexão Natural,20.0,Medium,0.7,-0.1,Média (Aromacologia)
-Undecavertol,198.35,3.9,CCCCCCCCCCCO,Heart,40.0,Verde folhas frescas,Verde,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural
-Valencene,204.35,6.4,CC1=CCC2C(CCC(=C)C2(C)C)C1,Top,300.0,Laranja amadeirado ervas,Cítrico,100.00%,False,1,Anti-inflamatório,50.0,Medium,0.5,-0.3,Média (Estudo Clínico)
-Vanillin,152.15,1.2,COC1=C(C=CC(=C1)C=O)O,Base,18.0,Baunilha doce,Gourmand Baunilha,1.0,False,1,Indulgence / Comfort,0.02,low,0.9,-0.2,Alta (Psicologia Evolutiva)
-Vanitrope,178.23,2.8,CCOC1=C(C=CC(=C1)C=CC)O,Base,120.0,Baunilha intensa cravo,Gourmand,100.00%,False,1,Doçura / Potência,50.0,High,0.9,-0.2,Alta (Psicologia Evolutiva)
-Velvione,236.39,5.6,C1CCCCCC(=O)CCCC=CCCCC1,Base,200.0,Musk oleoso animal,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia)
-Veramoss (Evernyl),196.24,3.2,COC1=CC(=CC(=C1)C)C(=O)OC,Base,60.0,Musgo doce terra,Chipre,100.00%,False,1,Floresta / Calma,10.0,High,0.4,-0.5,Média (Estudo Clínico)
-Verdox,198.3,3.6,CC(=O)OC1CCCCC1C(C)(C)C,Top,20.0,Verde maçã amadeirado,Verde Amadeirado,1.0,False,1,Grounding / Focus,,weak,0.4,-0.5,Média (Estudo Clínico)
-Verdyl Acetate,198.3,3.6,CC(=O)OC1CCC(CC1)C,Top,28.0,Verde floral limpo,Verde Floral,1.0,False,1,Mood Balance / Joy,,weak,0.8,0.2,Média (Aromacologia)
-Vertenex (PTBCHA),198.3,4.8,CC(C)(C)C1CCCCC1OC(=O)C,Heart,12.0,Amadeirado doce terroso,Amadeirado,100.00%,False,1,Aterramento / Estabilidade,200.0,Medium,0.4,-0.5,Média (Estudo Clínico)
-Vertofix,222.37,4.6,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,55.0,Amadeirado vetiver,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Vetiverol,220.35,3.0,CC1CC(C=C(C2C1CC(=C(C)C)C2)C)O,Base,150.0,Vetiver terroso seco,Amadeirado Vetiver,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Vetiveryl Acetate,262.4,3.6,CC1CC(C=C(C2C1CC(=C(C)C)C2)C)OC(=O)C,Base,180.0,Vetiver limpo elegante,Amadeirado Vetiver,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico)
-Vetiveryl Acetate,262.4,4.8,CC1(C2CCC1(C(C2)OC(=O)C)C)C,Base,180.0,Vetiver noz amadeirado,Amadeirado,100.00%,False,1,Elegância / Aterramento,50.0,Medium,0.6,-0.7,Alta (Estudo Clínico)
-Ylang Ylang Extra,222.37,3.6,CC(=CCCC(=CCCC(C)(C=C)O)C)C,Heart,60.0,Floral exótico doce,Floral Branco,1.0,False,3,Arousing / Sexy,,medium,0.8,-0.4,Média (Aromacologia)
+name,molecular_weight,polarity,smiles,category,price_per_kg,olfactive_notes,olfactive_family,ifra_limit,is_allergen,complexity_tier,traditional_use,odor_threshold_ppb,odor_potency,russell_valence,russell_arousal,evidence_level,biodegradability,renewable_source,carbon_footprint
+2-6-Nonadienal,138.21,2.8,CCC=CCC=CC=O,Top,350.0,Folha de violeta pepino,Verde,0.02%,False,1,Natureza / Água,0.01,Ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+2-6-Nonadienol,140.22,2.6,CCC=CCC=CCO,Top,380.0,Pepino melão violeta,Verde,100.00%,False,1,Relaxamento / Frescor,1.0,Ultra,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Acetyl Pyrazine,122.12,0.2,CC(=O)C1=CN=CC=N1,Heart,550.0,Pipoca noz pão,Gourmand,100.00%,False,1,Fome / Aconchego,1.0,Ultra,0.9,-0.2,Alta (Psicologia Evolutiva),True,False,10.0
+Aldehyde C-10,156.27,2.8,CCCCCCCCCC=O,Top,18.0,Aldeídico cítrico metálico,Aldeídico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural,True,True,1.0
+Aldehyde C-11 MOA,170.29,4.1,CC(CCCCCCCC)CC=O,Top,45.0,Cítrico coentro metálico,Aldeídico,1.50%,False,1,Clareza / Foco,0.8,High,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Aldehyde C-11 Undecylenic,168.28,3.9,C=CCCCCCCCCC=O,Top,25.0,Aldeídico cera rosa,Aldeídico,100.00%,False,1,Limpeza / Brilho,2.0,High,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Aldehyde C-11 Undecylenic,170.29,3.1,CCCCCCCCCCC=O,Top,22.0,Aldeídico verde potente,Aldeídico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural,True,True,1.0
+Aldehyde C-12 Lauric,184.32,3.4,CCCCCCCCCCCC=O,Top,25.0,Aldeídico ceroso limpo,Aldeídico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural,True,True,1.0
+Aldehyde C-12 MNA,184.32,4.7,CC(CCCCCCCCCC)C=O,Top,35.0,Metálico fresco incenso,Aldeídico,1.20%,False,1,Foco / Organização,0.02,Ultra,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Aldehyde C-6 (Hexanal),100.16,1.8,CCCCCC=O,Top,15.0,Verde grama frutado imaturo,Aldeídico Verde,5.00%,False,1,Alerta / Prontidão,4.5,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Aldehyde C-9 (Nonanal),142.24,3.4,CCCCCCCCC=O,Top,20.0,Ceroso floral rosa casca,Aldeídico,100.00%,False,1,Frescor / Limpeza,1.1,High,0.5,0.0,Associação Cultural,True,True,1.0
+Allyl Amyl Glycolate,186.25,2.3,CC(C)CCOCC(=O)OCC=C,Top,25.0,Abacaxi verde frutado,Frutado Verde,1.0,False,1,Balancing,,High,0.5,0.0,Associação Cultural,True,True,1.0
+Allyl Caproate,156.22,2.7,CCCCCC(=O)OCC=C,Top,18.0,Abacaxi frutado tropical,Frutado Tropical,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Allyl Cyclohexyl Propionate,196.29,4.1,C1CCCCC1CCC(=O)OCC=C,Heart,35.0,Abacaxi verde metálico,Frutado,100.00%,True,1,Energia / Tropical,20.0,High,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Allyl Heptanoate,170.25,3.2,CCCCCCC(=O)OCC=C,Top,18.0,Abacaxi frutado suculento,Frutado Tropical,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Alpha-Damascone,192.3,3.6,CC1=C(C(CCC1)C(=O)C=CC)C,Heart,240.0,Rosa maçã menta,Frutado Floral,0.02%,True,1,Frescor / Doçura,1.5,Ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Alpha-Isomethyl Ionone,206.32,3.3,CC1=CCCC(C1C=C(C)C(=O)C)(C)C,Heart,30.0,Violeta floral amadeirada,Floral Amadeirado,1.0,False,1,Grounding / Focus,,medium,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Alpha-Pinene,136.23,2.8,CC1=CCC2CC1C2(C)C,Top,7.0,Pinheiro resinoso seco,Amadeirado Resinoso,1.0,False,1,Grounding / Focus,,weak,0.4,-0.5,Média (Estudo Clínico),False,True,5.0
+Alpha-Sinensal,218.33,4.5,CC(=CCCC(=CC=O)C)CCC(=C)C=C,Heart,900.0,Laranja concentrada floral,Cítrico,100.00%,False,1,Alegria / Radiância,0.5,Ultra,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Amber Xtreme,250.42,5.8,CC1(CCCC2(C1)C3(CCCC3(C)C)O2)C,Base,900.0,Âmbar seco esteróide,Âmbar,100.00%,False,1,Potência / Radiância,0.05,Ultra,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Ambermax,238.4,5.0,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,180.0,Âmbar seco agressivo,Âmbar Potente,1.0,False,1,Balancing,,high,0.5,0.0,Associação Cultural,True,True,1.0
+Ambrettolide,252.39,5.5,C1CCCCOC(=O)CCCCCC=CCCC1,Base,250.0,Musk frutado natural,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Ambrettone,268.43,5.4,C1CCCCCCCC=CCCCCC(=O)O1,Base,350.0,Musk vegetal sensual,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Ambrinol,194.31,4.2,CC1(CCCC2(C1=CCC2)C)O,Base,180.0,Âmbar terroso animal,Âmbar,100.00%,False,1,Animalesco / Intimidade,2.0,High,0.7,0.3,Associação Cultural,True,True,1.0
+Ambrocenide,278.4,4.5,CC1CCC2C13CC(C2(C)C)C4(C(C3)OC(O4)(C)C)C,Base,1200.0,Âmbar ultra potente,Âmbar Potente,1.0,False,2,Balancing,,low,0.5,0.0,Associação Cultural,True,True,1.0
+Ambroxan,236.39,4.7,CC1(CCCC2(C1CCC3(C2CCO3)C)C)C,Base,500.0,Âmbar cinzento mineral,Âmbar,1.0,False,1,Attraction / Radiance,,high,0.7,0.3,Associação Cultural,True,True,1.0
+Amyl Cinnamic Aldehyde (ACA),202.3,4.7,CCCCCC=C(CC1=CC=CC=C1)C=O,Heart,10.0,Jasmim gorduroso floral,Floral,7.00%,True,1,Acolhimento / Suave,80.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Amyl Salicylate,208.25,4.5,CCCCCOC(=O)C1=CC=CC=C1O,Heart,14.0,Trevo orquídea herbal,Floral,100.00%,False,1,Foco / Natureza,300.0,Medium,0.5,0.0,Associação Cultural,True,True,1.0
+Amyl Vinyl Carbinol,128.21,2.6,C=CC(O)CCCCC,Top,40.0,Terroso cogumelo lavanda,Verde,100.00%,False,1,Natureza / Solo,50.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Anethole,148.2,3.3,CC=CC1=CC=C(C=C1)OC,Heart,18.0,Anis doce licoroso,Anisado Doce,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural,True,True,1.0
+Anisaldehyde,136.15,1.7,COC1=CC=C(C=C1)C=O,Heart,25.0,Anis doce mimosa,Floral Especiado,0.21%,True,1,Doçura / Atração,30.0,High,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Applelide,212.33,3.1,CCOC(=O)C1CCC(CC1)C,Top,35.0,Maçã verde fresca,Frutado Maçã,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Aurantione,260.37,3.8,CCOC1=CC=CC=C1C(C)(C)CC=O,Heart,45.0,Flor de laranjeira quente,Floral Branco,1.0,False,1,Mood Balance / Joy,,Ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Bacdanol,208.34,3.6,CCC(=CCC1CC=C(C1(C)C)C)CO,Base,40.0,Sândalo moderno doce,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG),True,True,1.0
+Benzyl Acetate,150.17,2.0,CC(=O)OCC1=CC=CC=C1,Top,5.0,Jasmim frutado doce,Floral Frutado,1.0,False,1,Mood Balance / Joy,,weak,0.8,0.2,Média (Aromacologia),True,True,1.0
+Benzyl Alcohol,108.14,1.1,OCC1=CC=CC=C1,Heart,4.0,Floral doce leve,Floral,0.025,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Benzyl Benzoate,212.24,4.0,C1=CC=C(C=C1)C(=O)OCC2=CC=CC=C2,Base,12.0,Balsâmico fraco doce,Floral,4.80%,True,1,Calmante / Fixador,5000.0,Weak,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Benzyl Cinnamate,238.28,4.2,C1=CC=C(C=C1)C=CC(=O)OCC2=CC=CC=C2,Base,55.0,Balsâmico doce especiado,Floral,0.50%,True,1,Calor / Conforto,2000.0,Low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Benzyl Propionate,164.2,2.4,CCC(=O)OCC1=CC=CC=C1,Heart,12.0,Floral frutado jasmim,Floral Frutado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Benzyl Salicylate,228.24,3.2,C1=CC=C(C=C1)COC(=O)C2=CC=CC=C2O,Base,10.0,Floral solar balsâmico,Floral Balsâmico,0.08,True,1,Mood Balance / Joy,,low,0.8,0.2,Média (Aromacologia),True,True,1.0
+Bergamot Oil FCF,168.23,3.1,CC1=CCC(CC1)C(=C)C,Top,18.0,Cítrico fresco verde,Cítrico,1.0,False,3,Uplifting / Joy,,weak,0.8,0.2,Média (Aromacologia),False,True,5.0
+Beta-Caryophyllene,204.36,6.3,CC1=CC2CC2CC1C(=C)C,Heart,60.0,Amadeirado pimenta cravo,Amadeirado,100.00%,False,1,Anti-ansiedade,150.0,Medium,0.5,-0.3,Média (Estudo Clínico),False,True,5.0
+Beta-Pinene,136.23,3.1,CC1(C2CCC(=C)C1C2)C,Top,8.0,Pinheiro verde amadeirado,Amadeirado Resinoso,1.0,False,1,Grounding / Focus,,weak,0.4,-0.5,Média (Estudo Clínico),False,True,5.0
+Blackcurrant Bud Absolute,250.0,4.5,C1=CC=C(C=C1)C(C)C,Heart,600.0,Cassis verde sulfuroso,Frutado Verde,1.0,False,3,Balancing,,medium,0.5,0.0,Associação Cultural,False,True,5.0
+Borneol,154.25,2.6,CC1(C2CCC1(C(C2)O)C)C,Top,45.0,Pinho cânfora balsâmico,Agreste,100.00%,False,1,Relaxamento / Respiração,150.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Bourgeonal,190.28,3.3,CC(C)C1=CC=C(C=C1)CCC=O,Heart,60.0,Muguet verde aquoso,Floral,100.00%,True,1,Atração / Potência,5.0,High,0.7,0.3,Associação Cultural,True,True,1.0
+Calone,190.24,2.5,CC1(C(=O)COC2=CC=CC=C2O1)C,Heart,85.0,Marinho melancia ostra,Aquático,100.00%,False,1,Liberdade / Espaço,0.05,Ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Camphene,136.23,4.2,CC1(C2CCC1(C2)C=C)C,Top,12.0,Cânfora madeira úmida,Terpeno,100.00%,False,1,Frescor / Limpeza,200.0,Medium,0.2,0.9,Alta (Resposta Trigeminal),False,True,5.0
+Camphor,152.23,2.2,CC1(C2CCC1(C(=O)C2)C)C,Top,10.0,Canforado medicinal fresco,Aromático Canforado,1.0,False,1,Refreshing / Clarity,,High,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Carvone,150.22,2.4,CC1=CCC(CC1=O)C(=C)C,Top,35.0,Hortelã cominho herbal,Aromático Herbal,1.0,False,1,Refreshing / Clarity,,weak,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Cashmeran,206.32,3.3,CC1C(C2=C(C1(C)C)C(=O)CCC2)(C)C,Base,85.0,Amadeirado quente almiscarado,Amadeirado Almiscarado,1.0,False,1,Grounding / Focus,,high,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Cashmeran,206.33,3.1,CC1C(C2=C(C1(C)C)C(=O)CCC2)C,Base,85.0,Musk amadeirado especiado,Musk Amadeirado,100.00%,False,1,Textura / Conforto,1000.0,High,0.5,0.0,Associação Cultural,True,True,1.0
+Cedramber,236.4,5.3,CC1(CCCC2(C1CCC2OC)C)C,Base,35.0,Cedro seco âmbar,Amadeirado,100.00%,False,1,Força / Estrutura,200.0,Weak,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Cedrol,222.37,3.9,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,40.0,Cedro seco amadeirado,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Cedryl Acetate,264.4,4.5,CC1CCC2C13CCC(C(C3)C2(C)C)(C)OC(=O)C,Base,35.0,Cedro cremoso elegante,Amadeirado Cremoso,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Cedryl Methyl Ether,236.4,5.4,CC1(CCCC2(C1CCC2OC)C)C,Base,45.0,Cedro seco ambarado,Amadeirado,100.00%,False,1,Estrutura,150.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Cetalox,236.39,4.7,CC1(CCCC2(C1CCC3(C2CCO3)C)C)C,Base,550.0,Âmbar cinzento seco,Âmbar,1.0,False,1,Balancing,,low,0.5,0.0,Associação Cultural,True,True,1.0
+Cinnamic Aldehyde,132.16,1.9,C1=CC=C(C=C1)C=CC=O,Heart,12.0,Canela quente especiada,Especiado,0.0025,True,1,Stimulating / Warmth,,medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Cinnamyl Acetate,176.21,2.8,CC(=O)OCC=CC1=CC=CC=C1,Heart,30.0,Canela balsâmico doce,Especiado,100.00%,False,1,Aconchego / Calor,100.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Cinnamyl Alcohol,134.17,1.9,C1=CC=C(C=C1)C=CCO,Heart,18.0,Canela suave balsâmica,Especiado Floral,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Cinnamyl Nitrile,129.16,2.4,C1=CC=C(C=C1)C=CC#N,Heart,65.0,Canela metálico seco,Especiado,100.00%,False,1,Estabilidade / Secura,80.0,High,0.3,0.6,Média (Estudo Clínico),False,False,10.0
+Cis-3-Hexenol,100.16,1.6,CCC=CCCO,Top,30.0,Grama cortada folhagem fresca,Verde,100.00%,False,1,Revigorante / Natural,70.0,High,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Cis-3-Hexenyl Acetate,142.2,2.6,CCC=CCCOC(=O)C,Top,25.0,Banana verde pera solvente,Verde Frutado,100.00%,False,1,Energia / Despertar,100.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Cis-3-Hexenyl Benzoate,204.27,4.2,C1=CC=C(C=C1)C(=O)OCC=CCC,Heart,55.0,Verde herbáceo lenhoso,Verde Balsâmico,100.00%,False,1,Estabilidade / Calma,150.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Cis-3-Hexenyl Salicylate,220.26,4.8,CCC=CCCOC(=O)C1=CC=CC=C1O,Heart,60.0,Verde floral metálico,Floral,100.00%,False,1,Revigorante,80.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Cis-Jasmone,164.25,2.8,CC1=C(CCC1=O)CC=CC,Heart,350.0,Jasmim especiado aipo,Floral,100.00%,False,1,Alerta / Foco,50.0,High,0.4,0.6,Alta (EEG),True,True,1.0
+Citral,152.23,3.0,CC(=CCCC(=CC=O)C)C,Top,18.0,Limão aldeídico verde,Cítrico Aldeídico,0.006,True,1,Uplifting / Energy,6.0,medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Citronellal,154.25,3.5,CC(CCC=C(C)C)CC=O,Top,15.0,Erva-cidreira verde metálico,Cítrico,0.40%,False,1,Repelente / Foco,40.0,Medium,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Citronellol,156.26,3.2,CC(CCC=C(C)C)CCO,Heart,16.0,Rosa fresca cítrica,Floral Rosado,0.12,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Citronellyl Nitrile,151.25,3.2,CC(CCC=C(C)C)CC#N,Heart,25.0,Verde cítrico seco,Verde Floral,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),False,False,10.0
+Civettone,250.42,6.8,C1=CCCCCCCCC(=O)CCCCCC1,Base,900.0,Animal quente pele,Musk,100.00%,False,1,Atração / Calor,0.5,Ultra,0.7,0.3,Associação Cultural,True,True,1.0
+Clearwood,238.4,4.5,C1CCCC2C(C1)CCCC2O,Base,75.0,Patchouli limpo moderno,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Cosmone,240.38,5.3,C1CCCCCCCCOC(=O)CCCC1,Base,90.0,Musk limpo aéreo,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Coumarin,146.14,1.4,C1=CC=C2C(=C1)C=CC(=O)O2,Base,22.0,Amêndoa feno tonka,Gourmand,0.016,True,1,Indulgence / Comfort,10.0,low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Cyclal C,138.21,2.6,C1CC(C=C1)C=O,Top,40.0,Verde hera potente,Verde,2.20%,True,1,Impacto / Choque,5.0,Ultra,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Cyclamen Aldehyde,190.28,3.3,CC(C)C1=CC=C(C=C1)CC(C)C=O,Heart,25.0,Floral aquático limpo,Floral Aquático,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Cyclogalbanate,196.24,2.9,C1CC(C1)COC(=O)CC2=CC=CC=C2,Top,55.0,Gálbano abacaxi verde,Verde,100.00%,False,1,Energia / Modernidade,15.0,High,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Cyclopentadecanolide,242.4,5.1,C1CCCCCCCCCCC(=O)O1,Base,180.0,Musk natural macio,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Damascenone,190.28,3.2,CC=CC(=O)C1=C(C=CCC1(C)C)C,Heart,1000.0,Rosa frutada tabaco,Floral Frutado,0.002,True,1,Mood Balance / Joy,0.002,ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Delta-Damascone,192.3,3.6,CC1=C(C(CCC1)(C)C)C(=O)C=CC,Heart,250.0,Rosa maçã groselha,Frutado Floral,0.02%,True,1,Alegria / Radiância,1.0,Ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Delta-Decalactone,170.25,2.5,CCCCCC1CCCC(=O)O1,Heart,25.0,Coco pêssego cremoso,Frutado,100.00%,False,1,Creme / Suavidade,20.0,Medium,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Delta-Dodecalactone,198.3,3.2,CCCCCCCC1CCCC(=O)O1,Heart,35.0,Pêssego leite quente,Lactônico,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural,True,True,1.0
+Dihydro Jasmone,166.26,2.9,CC1=C(CCC1=O)CCCCC,Heart,110.0,Jasmim frutado lactônico,Floral,100.00%,False,1,Relaxamento,100.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Dihydro Myrcenol,156.26,3.0,CCC(=C)CCCC(C)(C)O,Top,12.0,Fresco limpo cítrico,Fresco Cítrico,1.0,False,1,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Dimetol,158.28,2.6,CC(C)C(CC(C)(C)O)C,Top,18.0,Lavanda lima fresco,Cítrico,100.00%,False,1,Limpeza / Higiene,50.0,Medium,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Diphenyl Oxide,170.21,4.2,C1=CC=C(C=C1)OC2=CC=CC=C2,Top,12.0,Gerânio metálico químico,Floral Verde,100.00%,False,1,Frio / Distanciamento,100.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Ebanol,208.34,3.3,CC1=CCC(C1(C)C)C=CC(C)C(C)O,Base,45.0,Sândalo seco âmbar,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG),True,True,1.0
+Estragole,148.2,3.4,COC1=CC=C(C=C1)CC=C,Heart,20.0,Anis verde herbal,Anisado Verde,0.002,False,1,Balancing,,Ultra,0.5,0.0,Associação Cultural,True,True,1.0
+Ethyl 2-Methyl Butyrate,130.18,1.9,CCC(C)C(=O)OCC,Top,20.0,Maçã verde doce,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Ethyl Acetate,88.11,0.7,CCOC(=O)C,Top,2.0,Frutado leve solvente,Etéreo Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Ethyl Butyrate,116.16,1.3,CCCC(=O)OCC,Top,20.0,Abacaxi fruta tropical,Frutado Tropical,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Ethyl Heptanoate,158.24,2.4,CCC=CCC(=O)OCC,Top,25.0,Frutado uva conhaque,Frutado,100.00%,False,1,Indulgência,10.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Ethyl Linalool,168.28,3.3,CCC(C)(C=C)CCC=C(C)C,Heart,22.0,Bergamota floral suave,Floral,100.00%,False,1,Calma / Versatilidade,10.0,Medium,0.6,-0.7,Alta (Estudo Clínico),False,True,5.0
+Ethyl Maltol,140.14,0.8,CCC1=C(C(=O)C=CO1)O,Base,25.0,Açúcar queimado caramelo,Gourmand,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Ethyl Vanillin,166.17,1.6,CCOC1=C(C=CC(=C1)C=O)O,Base,22.0,Baunilha chocolate,Gourmand,100.00%,False,1,Aconchego / Doçura,0.02,Ultra,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Ethylene Brassylate,270.36,4.2,C1CCCCCC(=O)OCCOC(=O)CCCCC1,Base,12.0,Musk macio limpo,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Eugenol,164.2,2.5,COC1=C(C=CC(=C1)CC=C)O,Heart,20.0,Cravo especiado medicinal,Especiado,2.50%,True,1,Estimulante / Calor,10.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Evernyl,196.29,3.1,COC1=CC=C(C=C1)C(C)C,Base,18.0,Musgo limpo doce,Chipre,1.0,False,1,Balancing,,low,0.5,0.0,Associação Cultural,True,True,1.0
+Exaltolide,240.38,5.8,C1CCCCCCCOC(=O)CCCCCC1,Base,150.0,Musk pele macio,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Exaltone,224.38,5.9,C1CCCCCCC(=O)CCCCCCC1,Base,600.0,Animal pele fina,Musk,100.00%,False,1,Intimidade / Pele,1.0,High,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Farnesol,222.37,4.8,CC(=CCCC(=CCCC(=CCO)C)C)C,Base,250.0,Floral seco amadeirado,Floral Amadeirado,0.012,True,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Firsantol,222.37,4.0,CC1=CCC(C(C1)C=CC(C)C)C,Base,110.0,Sândalo natural macio,Amadeirado,100.00%,False,1,Meditação,5.0,High,0.5,-0.7,Alta (EEG),False,True,5.0
+Floralozone,190.28,3.5,CCC(C)(C=O)CC1=CC=C(C=C1)C,Heart,45.0,Floral ozônico ar,Aldeídico,100.00%,False,1,Leveza / Ar,20.0,High,0.8,0.2,Média (Aromacologia),True,True,1.0
+Florhydral,190.28,3.4,CC(C)C1=CC=C(C=C1)CC=O,Heart,50.0,Muguet marinho fresco,Floral,100.00%,False,1,Frescor / Abertura,5.0,High,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Florol,156.26,1.9,CC(C)(C)CCC(CCO)O,Heart,30.0,Lírio-do-vale limpo,Floral Aquático,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Florosa,202.3,2.6,CC1CCC(CC1O)C2=CC=CC=C2,Heart,20.0,Muguet rosa suave,Floral,100.00%,False,1,Maciez / Conforto,80.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Frambinone Methyl Ether,178.23,2.2,CC(=O)CCC1=CC=C(C=C1)OC,Base,110.0,Framboesa anis floral,Frutado,100.00%,False,1,Conforto / Doçura,300.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Fructone,174.19,0.2,CCOC(=O)CC1(OCCO1)C,Top,25.0,Maçã frutas vermelhas aquoso,Frutado Aquático,1.0,False,1,Clean / Focus,,weak,0.5,0.4,Associação Cultural,True,True,1.0
+Galaxolide,258.4,4.8,CC1COCC2=CC3=C(C=C12)C(C(C3(C)C)C)(C)C,Base,15.0,Musk limpo doce,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Gamma-Dodecalactone,198.3,4.1,CCCCCC1CCC(=O)O1,Heart,28.0,Pêssego manteiga,Frutado,100.00%,False,1,Saciedade / Calma,10.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Gamma-Nonalactone (Aldehyde C-18),156.22,2.2,CCCCCC1CCC(=O)O1,Heart,18.0,Coco leitoso,Lactônico,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural,True,True,1.0
+Gamma-Octalactone,142.2,2.1,CCCCCC1CCC(=O)O1,Heart,22.0,Coco cremoso,Lactônico,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural,True,True,1.0
+Gamma-Undecalactone (C14),184.28,3.6,CCCCC1CCC(=O)O1,Heart,18.0,Pêssego cremoso pele,Frutado,100.00%,False,1,Conforto / Nutrição,6.0,Medium,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Geraniol,154.25,2.9,CC(=CCCC(=CCO)C)C,Heart,18.0,Rosa floral doce,Floral Rosado,0.047,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Geranyl Acetate,196.29,3.5,CC(=CCCC(=CCOC(=O)C)C)C,Heart,20.0,Floral frutado rosa pera,Floral Frutado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Geranyl Formate,182.26,3.1,CC(=CCCC(=COC=O)C)C,Top,40.0,Rosa fresca verde,Floral,100.00%,False,1,Elevação / Crocância,100.0,Medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Globanone,266.42,5.2,C1CCCC(CCCC(=O)OCCCC1)C,Base,180.0,Almíscar volumoso limpo,Musk,100.00%,False,1,Conforto / Volume,10.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Guaiol,222.37,4.5,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,80.0,Amadeirado seco,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Habanolide,238.37,5.2,C1CCCCC=CCCCOC(=O)CCCC1,Base,60.0,Musk metálico moderno,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Hedione,226.31,2.7,O=C(OC)CC1C(C(=O)CC1)CCCCC,Heart,25.0,Jasmim transparente aéreo,Floral Jasmínico,1.0,False,1,Attraction / Radiance,,low,0.7,0.3,Associação Cultural,True,True,1.0
+Helional,156.18,1.7,CC1=CC=CC(C=C1)C=O,Heart,25.0,Verde aquático ozônico,Aquático,1.0,False,1,Clean / Focus,,medium,0.5,0.4,Associação Cultural,True,True,1.0
+Heliotropin,150.13,1.2,C1OC2=C(O1)C=C(C=C2)C=O,Base,50.0,Amêndoa cereja pó,Gourmand,Restricted,False,1,Conforto / Comida,200.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Helvetolide,284.4,4.5,CCC(=O)OCC(C)(C)OC(C)C1CCCC(C1)(C)C,Base,300.0,Musk pera limpo,Musk Frutado,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Hexyl Cinnamic Aldehyde,216.32,4.8,CCCCCCC(=CC1=CC=CC=C1)C=O,Base,12.0,Jasmim floral quente,Floral Branco,1.0,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Hexyl Salicylate,222.28,5.5,CCCCCCOC(=O)C1=CC=CC=C1O,Heart,15.0,Floral suave herbal,Floral,100.00%,False,1,Calma / Foco,250.0,Weak,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Hindinol,208.34,3.9,CC1=CCC(C(C1)C=C(C)C)O,Base,55.0,Sândalo cremoso cosmético,Amadeirado,100.00%,False,1,Suavidade / Cuidado,20.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Homofuraneol,142.15,0.5,CC1=C(C(=O)C(O1)C)O,Base,400.0,Caramelo açúcar queimado,Gourmand,100.00%,False,1,Apetite / Conforto,0.04,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Hydroxycitronellal,172.26,1.6,CC(CCCC(C)(C)O)CC=O,Heart,25.0,Lírio-do-vale aquoso,Floral Aquático,0.01,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Indole,117.15,2.1,C1=CC=C2C(=C1)C=CN2,Base,150.0,Animal floral narcótico,Animal Floral,1.0,False,1,Mood Balance / Joy,,low,0.8,0.2,Média (Aromacologia),False,False,10.0
+Iso E Super,234.38,3.6,CC1CC2=C(CC1(C)C(=O)C)C(CCC2)(C)C,Base,15.0,Amadeirado âmbar aveludado,Amadeirado Âmbar,0.214,True,1,Attraction / Radiance,,low,0.7,0.3,Associação Cultural,True,True,1.0
+Isoamyl Acetate,130.18,2.0,CC(C)CCOC(=O)C,Top,8.0,Banana doce frutada,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Isoamyl Butyrate,158.24,3.1,CC(C)CCOC(=O)CCC,Top,15.0,Banana pera doce,Frutado,100.00%,False,1,Diversão / Infantil,10.0,Medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Isobornyl Acetate,196.29,3.0,CC1(C2CCC1(C(=O)C2)C)OC(=O)C,Top,8.0,Pinho cânfora herbal,Amadeirado,100.00%,False,1,Refrescante / Foco,80.0,Medium,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Isobutyl Quinoline,173.26,3.4,CC(C)CC1=NC2=CC=CC=C2C=C1,Base,120.0,Couro verde seco,Couro,1.0,False,1,Confidence / Mystery,,Ultra,0.7,0.5,Associação Cultural,False,False,10.0
+Isocyclocitral,152.23,2.9,CC1=C(C(CC1)(C)C)C=O,Top,55.0,Verde herbal folhagem,Verde,100.00%,False,1,Alerta / Corte,5.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Isoeugenol,164.2,2.5,COC1=C(C=CC(=C1)C=CC)O,Heart,35.0,Cravo floral doce,Especiado,0.10%,True,1,Riqueza / Calor,5.0,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Javanol,252.4,4.8,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,400.0,Sândalo cremoso potente,Amadeirado Sândalo,1.0,False,2,Calming / Wellness,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Karanal,262.43,5.4,CC(C)C1=CC=C(C=C1)CC(C)O,Base,150.0,Âmbar seco radiante,Âmbar,0.00%,True,1,Força (Restrito EU),0.5,Ultra,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Kephalis,224.34,3.1,CCOC(=C)C1C(CC(=O)CC1(C)C)(C)C,Base,35.0,Âmbar tabaco amadeirado,Âmbar Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Kohinool,226.41,4.5,CC(C)C1CCC(C(C1)O)C(C)(C)C,Base,40.0,Amadeirado seco vetiver,Amadeirado,100.00%,False,1,Modernidade / Limpeza,50.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Labdanum Resinoid,250.0,4.8,C1=CC=C(C=C1)C(C)C,Base,60.0,Âmbar resinoso quente,Âmbar,1.0,False,3,Confidence / Mystery,,low,0.7,0.5,Associação Cultural,False,True,5.0
+Lavandin Oil,196.29,3.2,CC(=CCCC(C)(C=C)OC(=O)C)C,Heart,15.0,Lavanda herbal fresca,Floral Aromático,1.0,False,3,Calming / Relaxation,,medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Lemon Oil,136.23,3.3,CC1=CCC(CC1)C(=C)C,Top,7.0,Limão fresco vibrante,Cítrico,1.0,False,3,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico),False,True,5.0
+Lilial,204.31,2.4,CC(C)(C)CC1=CC=C(C=C1)C=O,Heart,20.0,Lírio-do-vale doce,Floral Aquático,0.0,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Lime Oxide,154.25,2.9,CC1(C2CCC(O1)CC2)C,Top,45.0,Cítrico fresco limpo,Cítrico,100.00%,False,1,Alerta / Limpeza,200.0,Weak,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Limonene,136.23,3.4,CC1=CCC(CC1)C(=C)C,Top,6.0,Cítrico laranja limão fresco,Cítrico,1.0,True,1,Uplifting / Energy,200.0,weak,0.7,0.8,Alta (Estudo Clínico),False,True,5.0
+Linalool,154.25,2.7,CC(=CCCC(C)(C=C)O)C,Heart,15.0,Floral lavanda cítrico suave,Floral,1.0,True,1,Calming / Relaxation,6.0,medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Linalyl Acetate,196.29,3.3,CC(=CCCC(C)(C=C)OC(=O)C)C,Heart,18.0,Lavanda floral doce fresco,Floral,1.0,False,1,Calming / Relaxation,,medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Lyral,210.31,1.7,CC(C)(CCCC1=CCC(CC1)C=O)O,Heart,45.0,Lírio-do-vale limpo,Floral Aquático,0.002,True,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Magnolan,196.24,2.7,C1CC2=C(C1)C(=CC(=C2)O)C,Heart,40.0,Magnólia lírio toranja,Floral,100.00%,False,1,Alegria / Exotismo,50.0,Medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Majantol,192.3,2.9,CC(C)C1=CC=C(C=C1)C(C)O,Heart,45.0,Muguet suave limpo,Floral,100.00%,False,1,Serenidade / Calma,15.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Maltol,126.11,0.4,CC1=C(C(=O)C=CO1)O,Base,20.0,Caramelo algodão-doce,Gourmand,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Mandarinal,190.28,3.5,C1=CC(=CC=C1C=O)C(C)C,Top,80.0,Mandarina aldeídico fresco,Cítrico,100.00%,False,1,Elevação / Humor,10.0,High,0.8,0.2,Média (Aromacologia),True,True,1.0
+Manzanate,144.21,2.4,CCCC(C)C(=O)OCC,Top,12.0,Maçã verde fresca,Frutado Maçã,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Massoia Lactone,170.25,3.2,CCCCCC1CC(=O)O1,Heart,1200.0,Coco cremoso figo,Gourmand,0.01%,True,1,Exotismo / Creme,10.0,Ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Melonal,140.22,2.5,CC(CCC=C(C)C)C=O,Top,40.0,Melancia aquosa verde,Aquático Verde,1.0,False,1,Clean / Focus,,weak,0.5,0.4,Associação Cultural,True,True,1.0
+Methyl Anthranilate,151.16,1.9,COC(=O)C1=CC=CC=C1N,Heart,12.0,Flor de laranjeira uva,Floral Doce,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,False,10.0
+Methyl Cinnamate,162.19,2.6,COC(=O)C=CC1=CC=CC=C1,Base,40.0,Morango balsâmico canela,Balsâmico,100.00%,True,1,Doçura / Conforto,50.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Methyl Diantilis,182.22,1.6,CCOC1=C(C=CC(=C1)COC)O,Base,60.0,Floral doce anisado,Floral Anisado,1.0,False,1,Mood Balance / Joy,,low,0.8,0.2,Média (Aromacologia),True,True,1.0
+Methyl Diantilis,224.25,3.2,COC1=C(C=CC(=C1)COC)OCC,Base,180.0,Cravo baunilha doce,Especiado,100.00%,False,1,Conforto / Doçura,50.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Methyl Pamplemousse,186.29,3.2,CC(=CCC(C)(C)C(OC)OC)C,Top,35.0,Toranja cítrico moderno,Cítrico Frutado,1.0,False,1,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Methyl Phenyl Acetate,150.18,2.1,COC(=O)CC1=CC=CC=C1,Heart,25.0,Mel floral doce,Floral,100.00%,False,1,Natureza / Mel,80.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Muscenone,238.37,5.4,C1CCCCCCCCOC(=O)CCCC1,Base,200.0,Musk natural animal,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Muscone,238.41,6.2,CC1CCCCCCCCCCCCC(=O)C1,Base,1100.0,Almíscar natural atalcado,Musk,100.00%,False,1,Sensualidade / Pele,0.5,Ultra,0.7,0.3,Associação Cultural,True,True,1.0
+Musk Ketone,294.3,3.7,CC1=C(C(=C(C(=C1[N+](=O)[O-])C(C)(C)C)[N+](=O)[O-])C)C(=O)C,Base,60.0,Musk doce clássico,Musk,0.014,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,False,10.0
+Musk T (Ethylene Brassylate),270.36,4.2,C1CCCCCC(=O)OCCOC(=O)CCCCC1,Base,12.0,Almíscar doce floral,Musk,100.00%,False,1,Conforto / Segurança,50.0,Low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Musk Xylol,297.26,3.8,CC1=C(C(=C(C(=C1[N+](=O)[O-])C(C)(C)C)[N+](=O)[O-])C)[N+](=O)[O-],Base,40.0,Musk em pó,Musk,0.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,False,10.0
+Myrcene,136.23,4.3,CC(=CCCC(=C)C=C)C,Top,10.0,Verde resinoso terpenado,Verde Terpenado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,False,True,5.0
+Neobutenone Alpha,192.3,3.3,CC1=C(C(CCC1)(C)C)C(=O)C,Top,120.0,Verde metálico gálbano,Verde,0.05%,False,1,Difusão / Potência,0.5,Ultra,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Nerol,154.25,2.9,CC(=CCCC(=CCO)C)C,Heart,25.0,Rosa fresca cítrica,Floral Rosado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Nerolidol,222.37,4.6,CC(=CCCC(=CCCC(C)(C=C)O)C)C,Heart,40.0,Floral amadeirado verde,Floral Amadeirado,1.0,False,1,Grounding / Focus,,medium,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Neryl Acetate,196.29,3.5,CC(=CCCC(=CCOC(=O)C)C)C,Top,35.0,Rosa framboesa doce,Floral Frutado,100.00%,False,1,Alegria / Doçura,100.0,Medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Nirvanolide,256.42,5.1,CC1(CCCC(=O)OCCCC=C1)C,Base,250.0,Atalcado frutado limpo,Musk,100.00%,False,1,Felicidade / Conforto,1.0,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Nootkatone,218.33,4.2,CC1=CC2C(CC1=O)C(=C)CCC2(C)C,Heart,450.0,Toranja amadeirado casca,Cítrico,100.00%,False,1,Energia / Metabolismo,170.0,Ultra,0.7,0.5,Alta (Estudo Clínico),True,True,1.0
+Norlimbanol,226.4,5.2,CCCC(CCC1C(CCCC1(C)C)C)O,Base,300.0,Amadeirado seco agressivo,Amadeirado Seco,1.0,False,1,Grounding / Focus,,high,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Oakmoss Absolute,254.4,4.9,C1=CC=C(C=C1)C(C)C,Base,120.0,Musgo úmido terroso,Chipre,0.001,True,3,Balancing,,low,0.5,0.0,Associação Cultural,False,True,5.0
+Octanal (Aldehyde C-8),128.21,2.7,CCCCCCCC=O,Top,15.0,Cítrico aldeídico casca,Aldeídico Cítrico,1.0,False,1,Uplifting / Energy,,medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Octyl Acetate,172.27,3.8,CCCCCCCCOC(=O)C,Top,20.0,Laranja ceroso verde,Cítrico,100.00%,False,1,Naturalidade / Casca,60.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Okoumal,288.4,5.1,CC1COC(O1)(C)C2=CC3=C(C=C2)C(CCC3(C)C)(C)C,Base,45.0,Âmbar amadeirado quente,Âmbar Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Olibanum Oil,222.37,4.0,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,90.0,Incenso cítrico resinoso,Resinoso,1.0,False,3,Confidence / Mystery,,low,0.7,0.5,Associação Cultural,True,True,1.0
+Orange Sweet Oil,136.23,3.4,CC1=CCC(CC1)C(=C)C,Top,6.0,Laranja doce suculenta,Cítrico,1.0,False,3,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico),False,True,5.0
+Para-Cymene,134.22,4.1,CC1=CC=C(C=C1)C(C)C,Top,10.0,Especiado seco terpenado,Aromático Especiado,1.0,False,1,Stimulating / Warmth,,High,0.7,0.8,Alta (Estudo Clínico),False,True,5.0
+Patchouli Oil,222.37,4.7,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,55.0,Terroso amadeirado,Amadeirado,1.0,False,3,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Patchoulol,222.37,4.8,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,70.0,Patchouli limpo seco,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Pear Ester,188.26,2.6,CCOC(=O)CC(C)C,Top,25.0,Pera suculenta doce,Frutado,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Peonile,204.26,3.2,CCC(C)C1=CC=C(C=C1)CC#N,Heart,85.0,Peônia gerânio pó,Floral,100.00%,False,1,Limpeza / Estabilidade,10.0,High,0.6,-0.6,Alta (Estudo Clínico),False,False,10.0
+Petalia,192.3,3.1,CC1=CC=C(C=C1)OCC(C)O,Heart,150.0,Rosa frutal lichia,Floral,100.00%,False,1,Suavidade / Feminilidade,50.0,High,0.8,0.2,Média (Aromacologia),True,True,1.0
+Petitgrain Oil,154.25,3.0,CC(=CCCC(C)(C=C)O)C,Top,22.0,Verde amargo floral,Cítrico Verde,1.0,False,3,Uplifting / Energy,,weak,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Phenyl Ethyl Alcohol,122.16,1.4,C1=CC=C(C=C1)CCO,Heart,8.0,Rosa natural mel,Floral Rosado,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Phenyl Propyl Alcohol,136.19,1.6,CCC1=CC=CC=C1O,Heart,10.0,Floral rosado suave,Floral,1.0,False,1,Mood Balance / Joy,,medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Phenylacetaldehyde,120.15,1.7,C1=CC=C(C=C1)CC=O,Heart,30.0,Jacinto verde mel,Verde Floral,0.03%,True,1,Primavera / Embriaguez,4.0,High,0.8,0.2,Média (Aromacologia),True,True,1.0
+Phenylethyl Acetate,164.2,2.3,CC(=O)OCCC1=CC=CC=C1,Heart,18.0,Rosa mel frutado,Floral,100.00%,False,1,Romance / Alegria,200.0,Medium,0.8,0.2,Média (Aromacologia),True,True,1.0
+Polysantol,234.38,4.6,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,90.0,Sândalo doce moderno,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG),True,True,1.0
+Prenyl Acetate,128.17,1.8,CC(=CCOC(=O)C)C,Top,18.0,Banana verde pera,Frutado,100.00%,False,1,Energia / Impacto,50.0,Medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Raspberry Ketone,164.2,1.5,CC(=O)CCC1=CC=C(C=C1)O,Base,40.0,Framboesa doce,Gourmand Frutado,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Rhubafuran,182.26,3.4,CC1(CO1)C2=CC=C(C=C2)C,Top,85.0,Ruibarbo toranja amargo,Verde,100.00%,False,1,Vigor / Amargor,2.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Romandolide,254.37,3.8,CC1(C(=O)OCCCCCOC(=O)C)C,Base,80.0,Almíscar frutado pera,Musk,100.00%,False,1,Suavidade / Limpeza,20.0,Medium,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Romandolide,254.4,5.5,C1CCCCCCCCOC(=O)CCCCC1,Base,120.0,Musk metálico moderno,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Rose Oxide,154.25,2.9,CC1CCOC(C1)C=C(C)C,Top,150.0,Rosa verde metálica,Floral Verde,0.002,False,1,Mood Balance / Joy,0.002,ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
+Safraleine,202.25,4.1,CC1=C(C=C(C=C1)C2=C(C=C(C=C2)C)O)C,Base,200.0,Açafrão couro tabaco,Especiado,100.00%,False,1,Mistério / Calor,5.0,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Safranal,150.22,2.1,CC1=C(C(CC=C1)(C)C)C=O,Heart,500.0,Açafrão couro mel,Especiado Couro,0.0003,True,1,Stimulating / Warmth,0.01,ultra,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
+Sandalore,210.36,3.6,CC(C)C1CCC(C(C1)O)CC(C)(C)O,Base,45.0,Sândalo doce sintético,Amadeirado,100.00%,False,1,Fixação / Estrutura,50.0,High,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Sandela,236.39,4.6,CC1C2CC(C1(C)C)CC2C3CCCC(C3)O,Base,35.0,Sândalo cremoso quente,Amadeirado Sândalo,1.0,False,1,Meditative / Grounding,,low,0.5,-0.7,Alta (EEG),True,True,1.0
+Santalol (Alpha/Beta),220.35,3.8,CC1(C2CCC1(C2)CC(=CCO)C)C,Base,2200.0,Sândalo cremoso sagrado,Amadeirado,100.00%,False,1,Meditativo / Sedativo,10.0,Medium,0.5,-0.7,Alta (EEG),True,True,1.0
+Sotolon,128.17,1.1,CC1C(=C(C(=O)O1)O)C,Base,2500.0,Maple curry feno-grego,Gourmand,100.00%,False,1,Salgado / Fome,0.001,Ultra,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Stemone,154.25,2.3,CC1=CC=CCC1=O,Top,45.0,Verde folhas esmagadas,Verde,1.0,False,1,Balancing,,High,0.5,0.0,Associação Cultural,True,True,1.0
+Strawberry Furanone,128.12,0.9,CC1=COC(=O)C=C1O,Top,80.0,Morango caramelado,Frutado Gourmand,1.0,False,1,Indulgence / Comfort,,weak,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Styrallyl Acetate,164.2,2.6,CC(C1=CC=CC=C1)OC(=O)C,Top,20.0,Gardenia ruibarbo verde,Verde Floral,100.00%,False,1,Nitidez / Foco,50.0,High,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Suederal,236.39,4.1,CC1CCCCC(C1)C(C)(C)C=O,Base,85.0,Suede macio amadeirado,Couro,1.0,False,1,Confidence / Mystery,,low,0.7,0.5,Associação Cultural,True,True,1.0
+Sulfurol,143.2,1.3,CC1=C(SC=N1)CCO,Base,150.0,Leite carne noz,Gourmand,100.00%,False,1,Savoriness,50.0,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,False,10.0
+Tangerinal,192.3,3.6,CCCCCCCCC(C)=O,Top,60.0,Tangerina ceroso aldeídico,Cítrico,100.00%,False,1,Calma / Foco,15.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Terpineol Alpha,154.25,2.7,CC1=CCC(CC1)C(C)(C)O,Heart,12.0,Lilás pinho floral,Floral,100.00%,False,1,Limpeza / Relaxamento,300.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Terpinolene,136.23,2.8,CC1=CCC(=C(C)C)CC1,Top,8.0,Verde herbal pináceo,Aromático Verde,1.0,False,1,Refreshing / Clarity,,weak,0.3,0.6,Média (Estudo Clínico),False,True,5.0
+Tetrahydrolinalool,158.28,3.3,CCC(C)(CCCC(C)C)O,Top,15.0,Cítrico limpo técnico,Cítrico,100.00%,False,1,Funcionalidade / Limpo,200.0,Weak,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
+Thymol,150.22,3.3,CC1=CC(=C(C=C1)C(C)C)O,Heart,25.0,Tomilho herbal medicinal,Aromático Herbal,1.0,False,1,Refreshing / Clarity,,medium,0.3,0.6,Média (Estudo Clínico),True,True,1.0
+Timberol,226.4,5.2,CCCC(CCC1C(CCCC1(C)C)C)O,Base,60.0,Amadeirado seco intenso,Amadeirado Seco,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Tonalide,258.4,5.3,CC1CC(C2=C(C1(C)C)C=C(C(=C2)C(=O)C)C)(C)C,Base,35.0,Musk doce pesado,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Trimethyl Pyrazine,122.17,1.1,CC1=CN=C(C(=N1)C)C,Heart,600.0,Café cacau terra,Gourmand,100.00%,False,1,Estímulo / Café,2.0,Ultra,0.7,0.8,Alta (Estudo Clínico),False,False,10.0
+Trimofix O,240.38,5.1,CC1(CCCC2(C1)C(=O)CCC2)C,Base,55.0,Amadeirado âmbar tabaco,Amadeirado,100.00%,False,1,Calor / Fixação,100.0,Medium,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Triplal,168.24,2.1,CC(CCC=C(C)C)C=O,Top,18.0,Verde aldeídico herbal,Verde,1.0,False,1,Balancing,,weak,0.5,0.0,Associação Cultural,True,True,1.0
+Triplal (Ligustral),138.21,2.4,C1=CC(C(C1)C=O)(C)C,Top,18.0,Verde folhoso herbáceo,Verde,1.30%,False,1,Vivacidade / Zest,10.0,High,0.4,0.7,Média (Estudo Clínico),True,True,1.0
+Undecavertol,172.26,3.7,CCCCC=CC(C)CCC(=O),Heart,35.0,Folha de violeta verde aquoso,Verde,100.00%,False,1,Conexão Natural,20.0,Medium,0.7,-0.1,Média (Aromacologia),True,True,1.0
+Undecavertol,198.35,3.9,CCCCCCCCCCCO,Heart,40.0,Verde folhas frescas,Verde,1.0,False,1,Balancing,,medium,0.5,0.0,Associação Cultural,True,True,1.0
+Valencene,204.35,6.4,CC1=CCC2C(CCC(=C)C2(C)C)C1,Top,300.0,Laranja amadeirado ervas,Cítrico,100.00%,False,1,Anti-inflamatório,50.0,Medium,0.5,-0.3,Média (Estudo Clínico),False,True,5.0
+Vanillin,152.15,1.2,COC1=C(C=CC(=C1)C=O)O,Base,18.0,Baunilha doce,Gourmand Baunilha,1.0,False,1,Indulgence / Comfort,0.02,low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Vanitrope,178.23,2.8,CCOC1=C(C=CC(=C1)C=CC)O,Base,120.0,Baunilha intensa cravo,Gourmand,100.00%,False,1,Doçura / Potência,50.0,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
+Velvione,236.39,5.6,C1CCCCCC(=O)CCCC=CCCCC1,Base,200.0,Musk oleoso animal,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Veramoss (Evernyl),196.24,3.2,COC1=CC(=CC(=C1)C)C(=O)OC,Base,60.0,Musgo doce terra,Chipre,100.00%,False,1,Floresta / Calma,10.0,High,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Verdox,198.3,3.6,CC(=O)OC1CCCCC1C(C)(C)C,Top,20.0,Verde maçã amadeirado,Verde Amadeirado,1.0,False,1,Grounding / Focus,,weak,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Verdyl Acetate,198.3,3.6,CC(=O)OC1CCC(CC1)C,Top,28.0,Verde floral limpo,Verde Floral,1.0,False,1,Mood Balance / Joy,,weak,0.8,0.2,Média (Aromacologia),True,True,1.0
+Vertenex (PTBCHA),198.3,4.8,CC(C)(C)C1CCCCC1OC(=O)C,Heart,12.0,Amadeirado doce terroso,Amadeirado,100.00%,False,1,Aterramento / Estabilidade,200.0,Medium,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Vertofix,222.37,4.6,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,55.0,Amadeirado vetiver,Amadeirado,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Vetiverol,220.35,3.0,CC1CC(C=C(C2C1CC(=C(C)C)C2)C)O,Base,150.0,Vetiver terroso seco,Amadeirado Vetiver,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Vetiveryl Acetate,262.4,3.6,CC1CC(C=C(C2C1CC(=C(C)C)C2)C)OC(=O)C,Base,180.0,Vetiver limpo elegante,Amadeirado Vetiver,1.0,False,1,Grounding / Focus,,low,0.4,-0.5,Média (Estudo Clínico),True,True,1.0
+Vetiveryl Acetate,262.4,4.8,CC1(C2CCC1(C(C2)OC(=O)C)C)C,Base,180.0,Vetiver noz amadeirado,Amadeirado,100.00%,False,1,Elegância / Aterramento,50.0,Medium,0.6,-0.7,Alta (Estudo Clínico),True,True,1.0
+Ylang Ylang Extra,222.37,3.6,CC(=CCCC(=CCCC(C)(C=C)O)C)C,Heart,60.0,Floral exótico doce,Floral Branco,1.0,False,3,Arousing / Sexy,,medium,0.8,-0.4,Média (Aromacologia),True,True,1.0

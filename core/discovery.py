@@ -350,19 +350,12 @@ class DiscoveryEngine:
     def evaluate(self, molecules):
         if not molecules or not isinstance(molecules, list):
             return self._invalid_result(molecules)
-            
         if not all("rdkit" in m for m in molecules):
             return self._invalid_result(molecules)
-
         if len(molecules) < 2:
             return self._invalid_result(molecules)
 
-        if self.anchors:
-            names_in_blend = [str(m.get('name', '')).strip().lower() for m in molecules]
-            for a in self.anchors:
-                clean_anchor = str(a).strip().lower()
-                if clean_anchor not in names_in_blend:
-                    return self._invalid_result(molecules)
+        eco_score, eco_stats = self.compliance.calculate_eco_score(molecules)
 
         ai_score = 0.5
         if self.model and DataLoader:
@@ -377,31 +370,26 @@ class DiscoveryEngine:
                     ai_score = 0.5
 
         chem = self.chemistry.evaluate_blend(molecules)
+        chem["eco_stats"] = eco_stats
+        
         is_safe, safety_logs, safety_stats = self.compliance.check_safety(molecules)
         safety_penalty = 1.0 if is_safe else 0.00001
-        chem["safety_logs"] = safety_logs
-        chem["safety_stats"] = safety_stats
+        
         tech_score = chem.get("complexity", 0.0)
         neuro_score = chem.get("neuro_score", 0.0)
         
-        market = business_evaluation(
-            molecules,
-            tech_score,
-            neuro_score
-        )
+        market = business_evaluation(molecules, tech_score, neuro_score)
         market["compliance"] = {"legal": is_safe, "logs": safety_logs}
 
         similarity = 0.0
-        fitness = 0.0
-        fitness = fitness * safety_penalty
-
         norm_proj = chem.get("projection", 0) / 10.0
         norm_long = chem.get("longevity", 0) / 10.0
         norm_stab = chem.get("stability", 0)
         norm_compl = min(tech_score / 10.0, 1.0)
-
+        
         financials = market.get("financials", {})
         margin_pct = financials.get("margin_pct", 0.0) / 100.0
+        cost_kg = financials.get("cost", 9999.0)
 
         if self.target_vector is not None:
             candidate_vector = FeatureEncoder.encode_blend(molecules)
@@ -412,44 +400,32 @@ class DiscoveryEngine:
             if na > 0 and nb > 0:
                 similarity = dot / (na * nb)
 
-            cost_kg = financials.get("cost", 9999.0)
             price_score = 1.0 if cost_kg <= self.target_price else (self.target_price / max(cost_kg, 1.0))
 
-            total_w = sum(m.get('weight_factor', 1.0) for m in molecules)
-            candidate_avg_tier = sum(
-                m.get('complexity_tier', 1) * m.get('weight_factor', 1.0)
-                for m in molecules
-            ) / total_w if total_w > 0 else 1.0
-
-            tier_diff = abs(candidate_avg_tier - self.target_complexity_score)
-            tier_match_score = max(0.0, 1.0 - (tier_diff / 2.0))
-
-            perf_score = (norm_proj + norm_long + norm_stab) / 3.0
-
-            if similarity < 0.01:
-                fitness = (perf_score * 0.5) + (price_score * 0.3) + (tier_match_score * 0.2)
-            else:
-                fitness = (
-                    (similarity * 0.4) +
-                    (price_score * 0.2) +
-                    (perf_score * 0.2) +
-                    (tier_match_score * 0.2)
-                )
+            fitness = (
+                (similarity * 0.50) +
+                (eco_score * 0.35) + 
+                (price_score * 0.15)
+            )
 
         else:
             perf_score = (norm_proj * 0.4) + (norm_long * 0.4) + (norm_stab * 0.2)
-
+            
             fitness = (
-                (0.35 * perf_score) +
-                (0.25 * margin_pct) +
-                (0.25 * norm_compl) +
-                (0.15 * ai_score)
+                (0.30 * perf_score) +
+                (0.20 * margin_pct) +
+                (0.20 * norm_compl) +
+                (0.15 * ai_score) +
+                (0.15 * eco_score)
             ) * self._diversity_penalty(molecules)
+
+        fitness = fitness * safety_penalty
 
         return {
             "id": str(uuid.uuid4()),
             "fitness": float(np.clip(fitness, 0, 1.5)),
             "ai_score": ai_score,
+            "eco_score": eco_score,
             "similarity_to_target": float(similarity),
             "chemistry": chem,
             "market": market, 
@@ -483,6 +459,9 @@ class DiscoveryEngine:
             "russell_arousal": row.get("russell_arousal", 0.0),
             "evidence_level": row.get("evidence_level", "None"),
             "odor_potency": str(row.get("odor_potency", "medium")).lower().strip(),
+            "biodegradability": str(row.get("biodegradability", "False")).lower() == "true",
+            "renewable_source": str(row.get("renewable_source", "False")).lower() == "true",
+            "carbon_footprint": float(row.get("carbon_footprint", 10.0)),
             "weight_factor": random.uniform(1.0, 5.0)
         }
 
@@ -606,6 +585,28 @@ class DiscoveryEngine:
         feature_vec = FeatureEncoder.encode_blend(discovery["molecules"])
         self.surrogate.add_observation(feature_vec, new_fitness)
         
+    def reformulate_green(self, target_molecules, rounds=50):
+        """
+        Substituição Inteligente: Tenta recriar a assinatura olfativa de 'target_molecules'
+        usando apenas ingredientes com melhor perfil ecológico.
+        """
+        if not target_molecules: return []
+        
+        self.target_vector = FeatureEncoder.encode_blend(target_molecules)
+        
+        original_eco, _ = self.compliance.calculate_eco_score(target_molecules)
+        print(f" [REFORMULADOR] Iniciando... Eco-Score Original: {original_eco:.2f}")
+
+        results = self.discover(rounds=rounds, goal="Green Reformulation")
+        
+        self.target_vector = None
+        
+        best = max(results, key=lambda x: x['fitness']) if results else None
+        if best:
+            print(f"✅ [SUCESSO] Melhor reformulação: Eco {best['eco_score']:.2f} (Era {original_eco:.2f})")
+            
+        return results
+    
     def save_results(self, folder="results", filename="discoveries.json"):
         def sanitize(obj):
             if isinstance(obj, dict):

@@ -29,6 +29,7 @@ LOREAL_BLACK = "#000000"
 LOREAL_GOLD = "#C5A059" 
 LOREAL_WHITE = "#FFFFFF"
 LOREAL_GREY = "#F2F2F2"
+LOREAL_GREEN = "#2D5A27" # Verde escuro elegante para o tema Green
 
 st.markdown(f"""
 <style>
@@ -98,6 +99,14 @@ st.markdown(f"""
         padding: 30px;
         border-radius: 0px;
     }}
+    
+    /* Container Green Chemistry */
+    .green-card {{
+        background-color: #F9FDF9;
+        border: 1px solid {LOREAL_GREEN};
+        padding: 20px;
+        margin-top: 20px;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -113,11 +122,45 @@ def load_model():
     except: pass
     return model
 
+def render_family_evolution(family_data):
+    """
+    Renderiza um gráfico de área empilhada (Streamgraph) mostrando a evolução das famílias.
+    """
+    if not family_data: return None
+    FAMILY_COLORS = {
+        "Cítrico": "#FFD700",       # Ouro Amarelo
+        "Verde": "#8FBC8F",         # Verde Sálvia
+        "Floral": "#FFB6C1",        # Rosa Pálido
+        "Floral Branco": "#FFFACD", # Creme
+        "Especiado": "#CD853F",     # Bronze
+        "Amadeirado": "#8B4513",    # Marrom Couro
+        "Musk": "#E6E6FA",          # Lavanda Pálido
+        "Âmbar": "#DAA520",         # Ouro Velho
+        "Gourmand": "#D2691E",      # Chocolate
+        "Aquático": "#ADD8E6",      # Azul Claro
+        "Aldeídico": "#F0F8FF"      # Alice Blue
+    }
+
+    df = pd.DataFrame(family_data)
+    chart = alt.Chart(df).mark_area(opacity=0.8).encode(
+        x=alt.X('Time', title='Horas após aplicação (Evolução Temporal)', 
+                scale=alt.Scale(domain=[0, 10])),
+        y=alt.Y('Intensity', stack='center', title='Dominância Olfativa (Relativa)', axis=None),
+        color=alt.Color('Family', scale=alt.Scale(
+            domain=list(FAMILY_COLORS.keys()),
+            range=list(FAMILY_COLORS.values())
+        ), legend=alt.Legend(title="Famílias", orient="bottom")),
+        tooltip=['Time', 'Family', 'Intensity']
+    ).properties(
+        height=300,
+        title="4D SCENT EVOLUTION • DOMINANCE OVER TIME"
+    ).interactive()
+    
+    return chart
+
 def render_olfactory_pyramid(formula):
     """
     Renderiza uma pirâmide olfativa 'High-End'.
-    - Estilo: Wireframe minimalista.
-    - Cores: Ouro, Rose Gold, Bronze Profundo.
     """
     if not formula: return None
 
@@ -230,7 +273,6 @@ def render_evaporation_curve(temporal_curve):
         tooltip=['Time', 'Projection']
     ).properties(height=250)
 
-    # Adicionando pontos para destacar os marcos
     points = line.mark_point(color=LOREAL_BLACK, size=50).encode(
         opacity=alt.value(1)
     )
@@ -242,6 +284,7 @@ def get_engine(model):
         llm_client = GeminiClient()
         strategy_agent = StrategyAgent(llm_client)
     except: strategy_agent = None
+    # Garante que o engine carregue os dados novos
     return DiscoveryEngine(model=model, strategy_agent=strategy_agent, csv_path="insumos.csv")
 
 model = load_model()
@@ -277,7 +320,27 @@ with st.sidebar:
         engine.anchors = anchors
         st.toast("Formula DNA Updated")
 
-    st.markdown("<br>"*10, unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # --- NOVO: CONTROLES DE REFORMULAÇÃO GREEN ---
+    if st.session_state.current_formula:
+        st.markdown(f"""<h1 style="color:{LOREAL_GREEN}; font-size:14px; letter-spacing:2px;">♻️ SUSTAINABILITY</h1>""", unsafe_allow_html=True)
+        if st.button("REFORMULATE GREEN", help="Substitui ingredientes mantendo o cheiro alvo"):
+            with st.spinner("SEARCHING FOR BIO-ALTERNATIVES..."):
+                current_mols = st.session_state.current_formula['molecules']
+                # Chama o novo método "Replacer"
+                results = engine.reformulate_green(current_mols, rounds=30)
+                
+                if results:
+                    best_green = max(results, key=lambda x: x['fitness'])
+                    st.session_state.current_formula = best_green
+                    st.session_state.round_count += 1
+                    st.toast("Formula Reformulated for Eco-Compliance!", icon="🌿")
+                    st.rerun()
+                else:
+                    st.error("Could not improve Eco-Score.")
+
+    st.markdown("<br>"*5, unsafe_allow_html=True)
     if st.button("RESET LABORATORY"):
         st.session_state.history = []
         st.session_state.round_count = 0
@@ -338,12 +401,28 @@ else:
     biz_engine = PerfumeBusinessEngine()
     market = biz_engine.calculate_global_fit(mols)
     finances = biz_engine.estimate_financials(mols, chem.get('complexity',0), chem.get('neuro_score',0))
+    
+    # Recupera Eco-Stats e Score
+    eco_score = data.get('eco_score', 0.0)
+    eco_stats = chem.get('eco_stats', {"biodegradable_pct": 0, "renewable_pct": 0, "avg_carbon_footprint": 10})
 
-    k1, k2, k3, k4 = st.columns(4)
-    for col, lab, val in zip([k1,k2,k3,k4], 
-                             ["Longevity", "Sillage", "Uniqueness", "Harmony"],
-                             [f"{chem.get('longevity',0):.1f}h", f"{chem.get('projection',0):.1f}/10", f"{chem.get('complexity',0):.1f}/10", f"{chem.get('evolution',0):.1f}/10"]):
-        col.markdown(f'<div class="kpi-card"><div class="kpi-lab">{lab}</div><div class="kpi-val">{val}</div></div>', unsafe_allow_html=True)
+    # [ATUALIZADO] 5 KPIs (incluindo Eco-Score)
+    k1, k2, k3, k4, k5 = st.columns(5)
+    
+    # Formata KPIs
+    metrics = [
+        ("Longevity", f"{chem.get('longevity',0):.1f}h"),
+        ("Sillage", f"{chem.get('projection',0):.1f}/10"),
+        ("Uniqueness", f"{chem.get('complexity',0):.1f}/10"),
+        ("Harmony", f"{chem.get('evolution',0):.1f}/10"),
+        ("Eco-Score", f"{eco_score:.2f}") # Novo KPI
+    ]
+    
+    cols = [k1, k2, k3, k4, k5]
+    for col, (lab, val) in zip(cols, metrics):
+        # Destaca o Eco-Score em Verde se for alto
+        color = LOREAL_GREEN if lab == "Eco-Score" and float(val) > 0.7 else LOREAL_BLACK
+        col.markdown(f'<div class="kpi-card"><div class="kpi-lab">{lab}</div><div class="kpi-val" style="color:{color}">{val}</div></div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -352,10 +431,17 @@ else:
     with col_left:
         st.markdown("### ⚗️ Formula Analysis")
         df_mols = pd.DataFrame(mols)
-        st.dataframe(df_mols[['name', 'category', 'weight_factor']], 
+        
+        if 'biodegradability' not in df_mols.columns: df_mols['biodegradability'] = False
+        if 'renewable_source' not in df_mols.columns: df_mols['renewable_source'] = False
+        
+        st.dataframe(df_mols[['name', 'category', 'weight_factor', 'biodegradability', 'renewable_source']], 
                      column_config={
-                         "weight_factor": st.column_config.ProgressColumn("Concentration", format="%.2f", min_value=0, max_value=1),
-                         "name": "Ingredient", "category": "Family"
+                         "weight_factor": st.column_config.ProgressColumn("Conc.", format="%.2f", min_value=0, max_value=5),
+                         "name": "Ingredient", 
+                         "category": "Family",
+                         "biodegradability": st.column_config.CheckboxColumn("Bio?", width="small"),
+                         "renewable_source": st.column_config.CheckboxColumn("Renew?", width="small")
                      }, use_container_width=True, hide_index=True)
 
         if st.session_state.current_formula:
@@ -370,21 +456,24 @@ else:
         if fig:
             st.plotly_chart(fig, use_container_width=True)
             
-    st.markdown("#### Evaporation Curve (Non-Linear)")
-    curve_data = chem.get('temporal_curve')
-    if curve_data:
-        chart = render_evaporation_curve(curve_data)
-        st.altair_chart(chart, use_container_width=True)
-    else:
-        st.info("Curva temporal não disponível para esta fórmula.")
-    with col_data:
-        st.markdown("**Composition Data**")
-        df_show = pd.DataFrame(formula)
-        st.dataframe(
-            df_show[['name', 'category', 'weight_factor']], 
-            hide_index=True,
-            use_container_width=True
-        )
+    st.markdown("#### ⏳ 4D Temporal Simulation")
+    
+    tab1, tab2 = st.tabs(["📉 Intensity Decay", "🌊 Family Dominance"])
+    
+    with tab1:
+        # Gráfico antigo de linha
+        curve_data = chem.get('temporal_curve')
+        if curve_data:
+            chart = render_evaporation_curve(curve_data)
+            st.altair_chart(chart, use_container_width=True)
+            
+    with tab2:
+        fam_data = chem.get('temporal_families')
+        if fam_data:
+            fam_chart = render_family_evolution(fam_data)
+            st.altair_chart(fam_chart, use_container_width=True)
+        else:
+            st.caption("Gere uma nova fórmula para visualizar a evolução por famílias.")
 
         st.markdown("### 🧠 Neuro-Olfactive Impact")
         vectors = chem.get('neuro_vectors', {'energy': 0.1, 'calm': 0.1, 'mood': 0.1})
@@ -414,20 +503,38 @@ else:
             </div>
         """, unsafe_allow_html=True)
         
+        # --- NOVO: PAINEL GREEN CHEMISTRY ---
+        st.markdown(f"""
+            <div class="green-card">
+                <h3 style="color:{LOREAL_GREEN}; font-size:16px; margin-top:0;">🌿 Green Chemistry</h3>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>Biodegradable</span>
+                    <b>{eco_stats.get('biodegradable_pct', 0)}%</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>Renewable Source</span>
+                    <b>{eco_stats.get('renewable_pct', 0)}%</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>Carbon Footprint</span>
+                    <b>{eco_stats.get('avg_carbon_footprint', 10):.1f}</b> <span style="font-size:10px">(Low=Good)</span>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        # -------------------------------------
+        
         is_safe, report, stats = comp_engine.check_safety(mols)
     
         if not is_safe:
             st.error("⚠️ IFRA COMPLIANCE VIOLATION")
             for r in report:
                 st.warning(r)
-            # Sugestão de correção
             fixes = comp_engine.suggest_fix(report, mols)
             for f in fixes:
                 st.info(f"💡 {f}")
         else:
             st.success("✨ IFRA COMPLIANT")
             
-
 
         st.markdown("---")
         st.markdown("### 🧠 Sensory Training Loop")

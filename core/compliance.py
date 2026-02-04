@@ -1,5 +1,5 @@
-# core/compliance.py
 import pandas as pd
+
 
 class ComplianceEngine:
     def __init__(self):
@@ -31,7 +31,7 @@ class ComplianceEngine:
             "Ylang Ylang Oil": {"Benzyl Benzoate": 0.08, "Isoeugenol": 0.01, "Geraniol": 0.02},
             "Clove Oil": {"Eugenol": 0.85, "Isoeugenol": 0.01},
             "Cinnamon Bark": {"Cinnamal": 0.70, "Eugenol": 0.05},
-            "Oakmoss Absolute": {"Atranol": 0.01, "Oakmoss Absolute": 1.0}, # O próprio material é restrito
+            "Oakmoss Absolute": {"Atranol": 0.01, "Oakmoss Absolute": 1.0},
             "Jasmine Absolute": {"Benzyl Benzoate": 0.15, "Indole": 0.02, "Eugenol": 0.01},
             "Tonka Bean Abs": {"Coumarin": 0.90}
         }
@@ -48,7 +48,6 @@ class ComplianceEngine:
         stats = {}
         is_safe = True
 
-        # --- 1. Verificação IFRA (Segurança Dermatológica) ---
         chemical_totals = {chem: 0.0 for chem in self.IFRA_LIMITS.keys()}
         
         for ingredient in formula_molecules:
@@ -75,14 +74,10 @@ class ComplianceEngine:
                     f"⛔ IFRA Violation - {chem}: Found {concentration_pct:.3f}% (Limit: {limit}%)"
                 )
 
-        # --- 2. Verificação de Potência (Equilíbrio Olfativo) ---
-        # [CORREÇÃO] Este bloco agora está FORA do loop da IFRA
         for m in formula_molecules:
-            # Garante que temos a potência; se não tiver, assume 'medium' para não bloquear
             potency = m.get('odor_potency', 'medium').lower() 
             limit_pct = self.POTENCY_MASS_LIMITS.get(potency, 1.0) * 100 # Convertendo para % (ex: 0.01 -> 1%)
             
-            # Cálculo da % real deste ingrediente na fórmula
             actual_pct = (m.get('weight_factor', 1.0) / total_weight) * 100
             
             if actual_pct > limit_pct:
@@ -96,6 +91,46 @@ class ComplianceEngine:
             return True, ["✅ Compliant & Balanced"], stats
         else:
             return False, violations, stats
+        
+    def calculate_eco_score(self, formula_molecules):
+        """
+        Calcula o Eco-Score (0.0 a 1.0) da fórmula completa.
+        Considera Biodegradabilidade (40%), Origem Renovável (30%) e Baixo Carbono (30%).
+        """
+        total_weight = sum(m.get('weight_factor', 1.0) for m in formula_molecules)
+        if total_weight == 0: return 0.0, {}
+
+        bio_mass = 0.0
+        renew_mass = 0.0
+        weighted_carbon = 0.0
+
+        for m in formula_molecules:
+            w = m.get('weight_factor', 1.0)
+            
+            is_bio = m.get('biodegradability', False)
+            is_renew = m.get('renewable_source', False)
+            carbon = m.get('carbon_footprint', 10.0) 
+
+            if is_bio: bio_mass += w
+            if is_renew: renew_mass += w
+            weighted_carbon += (w * carbon)
+
+        bio_pct = bio_mass / total_weight
+        renew_pct = renew_mass / total_weight
+        avg_carbon = weighted_carbon / total_weight
+
+        carbon_score = max(0.0, 1.0 - (avg_carbon / 10.0))
+
+        eco_score = (bio_pct * 0.40) + (renew_pct * 0.30) + (carbon_score * 0.30)
+
+        stats = {
+            "eco_score": round(eco_score, 3),
+            "biodegradable_pct": round(bio_pct * 100, 1),
+            "renewable_pct": round(renew_pct * 100, 1),
+            "avg_carbon_footprint": round(avg_carbon, 2)
+        }
+
+        return eco_score, stats
 
     def _find_natural_composition(self, ingredient_name):
         """Tenta encontrar a composição química buscando no dicionário."""
