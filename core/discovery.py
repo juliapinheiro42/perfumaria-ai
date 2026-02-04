@@ -4,6 +4,7 @@ import os
 import json
 import uuid
 import pandas as pd
+import copy
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
@@ -161,7 +162,7 @@ class DiscoveryEngine:
         # ... (lógica de warmup mantida simples) ...
 
     # ======================================================================
-    # DISCOVER (COM FALLBACK GARANTIDO)
+    # DISCOVER (CORE)
     # ======================================================================
 
     def discover(self, rounds=50, goal="Discover perfumes", threshold=0.1, initial_seed=None):
@@ -211,7 +212,7 @@ class DiscoveryEngine:
             if i % 10 == 0:
                 print(f"  > Gen {i}: Fitness {result['fitness']:.4f} | Eco {result['eco_score']:.2f} | Safe? {result['market']['compliance']['legal']}")
 
-            # Relaxamento do filtro: aceita fitness > 0.001 em vez de 0.01
+            # Relaxamento do filtro: aceita fitness > 0.001
             if result["fitness"] <= 0.001: 
                 continue
 
@@ -228,10 +229,8 @@ class DiscoveryEngine:
             self.discoveries.append(result)
 
         # === REDE DE SEGURANÇA (FALLBACK) ===
-        # Se após tudo isso a lista estiver vazia, geramos um na força bruta
         if not self.discoveries:
             print("⚠️ AVISO: Algoritmo Genético não encontrou candidatos perfeitos. Gerando fallback de emergência.")
-            # Tenta gerar 5 vezes até sair algo
             for _ in range(5):
                 fallback_mols = self._generate_molecules()
                 if fallback_mols:
@@ -244,7 +243,88 @@ class DiscoveryEngine:
         return self.discoveries
 
     # ======================================================================
-    # GERAÇÃO DE MOLÉCULAS (LEGADO / FALLBACK)
+    # FLANKERS (Variações)
+    # ======================================================================
+
+    def create_flanker(self, parent_formula, flanker_type="Intense"):
+        """Gera uma variação (flanker) mantendo o 'esqueleto' do original."""
+        if not parent_formula: return self._invalid_result([])
+        
+        # Pega a lista de moléculas do objeto pai
+        mols_source = parent_formula.get('molecules', parent_formula) if isinstance(parent_formula, dict) else parent_formula
+        flanker_molecules = copy.deepcopy(mols_source)
+        
+        target_families = []
+        forbidden_families = []
+        
+        if "Sport" in flanker_type or "Fresh" in flanker_type:
+            target_families = ["Citrus", "Green", "Aquatic", "Aromatic", "Herbal"]
+            forbidden_families = ["Gourmand", "Oriental", "Vanilla"]
+            mutation_intensity = 0.4
+            
+        elif "Intense" in flanker_type or "Night" in flanker_type:
+            target_families = ["Woody", "Spicy", "Amber", "Leather", "Musk"]
+            forbidden_families = ["Citrus", "Fruity", "Green"]
+            mutation_intensity = 0.3
+            
+        else: # Generic / Sweet
+            target_families = ["Gourmand", "Fruity", "Floral", "Vanilla"]
+            mutation_intensity = 0.25
+
+        dna_molecules = [m for m in flanker_molecules if m.get('category') == 'Heart']
+        mutable_molecules = [m for m in flanker_molecules if m.get('category') != 'Heart']
+        
+        if not mutable_molecules:
+            split_idx = int(len(flanker_molecules)*0.5)
+            mutable_molecules = flanker_molecules[:split_idx]
+            dna_molecules = flanker_molecules[split_idx:]
+
+        new_molecules = []
+        
+        # Boost no DNA para versões Intense
+        dna_boost = 1.3 if "Intense" in flanker_type else 0.9
+        for m in dna_molecules:
+            m['weight_factor'] *= dna_boost
+            new_molecules.append(m)
+            
+        # Busca substitutos
+        possible_replacements = self.df_insumos[
+            self.df_insumos['olfactive_family'].isin(target_families)
+        ].to_dict('records')
+        
+        for m in mutable_molecules:
+            fam = m.get('olfactive_family', '')
+            
+            # Se for proibida para este estilo, troca ou reduz drasticamente
+            if fam in forbidden_families:
+                if possible_replacements and random.random() < 0.8:
+                    new_mol = self._row_to_molecule(random.choice(possible_replacements))
+                    new_mol['weight_factor'] = m.get('weight_factor', 1.0)
+                    new_molecules.append(new_mol)
+                else:
+                    m['weight_factor'] *= 0.2 # Reduz muito
+                    new_molecules.append(m)
+            
+            # Mutação aleatória
+            elif random.random() < mutation_intensity and possible_replacements:
+                new_mol = self._row_to_molecule(random.choice(possible_replacements))
+                new_mol['weight_factor'] = m.get('weight_factor', 1.0) * random.uniform(0.9, 1.2)
+                new_molecules.append(new_mol)
+            
+            else:
+                # Rebalanceamento
+                if fam in target_families:
+                    m['weight_factor'] *= 1.4
+                new_molecules.append(m)
+
+        # Enriquece e avalia
+        final_mols = [self._enrich_with_rdkit(m) for m in new_molecules]
+        result = self.evaluate(final_mols)
+        result['market_tier'] = f"Flanker {flanker_type}"
+        return result
+
+    # ======================================================================
+    # GERAÇÃO DE MOLÉCULAS (LEGADO)
     # ======================================================================
 
     def _generate_molecules(self, strategy=None):
@@ -266,7 +346,6 @@ class DiscoveryEngine:
         attempts = 0
         while len(molecules) < target_size and attempts < 100:
             attempts += 1
-            # Tenta balancear categorias
             required = ["Top", "Heart", "Base"]
             cat = random.choices(required, weights=[0.3, 0.3, 0.4], k=1)[0]
             
@@ -355,8 +434,6 @@ class DiscoveryEngine:
         
         is_safe, safety_logs, safety_stats = self.compliance.check_safety(molecules)
         
-        # PENALIDADE SUAVE: Se não for seguro, não zera o fitness, apenas reduz.
-        # Isso permite que a IA veja "quase lá" e corrija na próxima geração.
         safety_penalty = 1.0 if is_safe else 0.4 
         
         tech_score = chem.get("complexity", 0.0)
@@ -384,7 +461,7 @@ class DiscoveryEngine:
                 (ai_score * 0.10)
             )
         else:
-            # Modo Descoberta: Performance + Eco + IA
+            # Modo Descoberta
             norm_proj = min(chem.get("projection", 0) / 10.0, 1.0)
             norm_long = min(chem.get("longevity", 0) / 10.0, 1.0)
             
@@ -442,46 +519,78 @@ class DiscoveryEngine:
         if "rdkit" in molecule or not isinstance(molecule.get("smiles"), str):
             return molecule
         
-        # Evita crash com SMILES vazios
         if not molecule["smiles"]: return molecule
 
-        mol = Chem.MolFromSmiles(molecule["smiles"])
-        if mol is None:
-            return molecule
+        try:
+            mol = Chem.MolFromSmiles(molecule["smiles"])
+            if mol is None:
+                return molecule
 
-        mw = Descriptors.MolWt(mol)
-        logp = Descriptors.MolLogP(mol)
-        tpsa = Descriptors.TPSA(mol)
+            mw = Descriptors.MolWt(mol)
+            logp = Descriptors.MolLogP(mol)
+            tpsa = Descriptors.TPSA(mol)
 
-        molecule["boiling_point"] = float(
-            np.clip(0.5 * mw + 20 * logp + 0.3 * tpsa + 50, 80, 450)
-        )
+            molecule["boiling_point"] = float(
+                np.clip(0.5 * mw + 20 * logp + 0.3 * tpsa + 50, 80, 450)
+            )
 
-        molecule["rdkit"] = {
-            "LogP": logp,
-            "TPSA": tpsa,
-            "MolMR": Descriptors.MolMR(mol),
-            "RotBonds": Descriptors.NumRotatableBonds(mol),
-            "HDonors": Descriptors.NumHDonors(mol),
-        }
+            molecule["rdkit"] = {
+                "LogP": logp,
+                "TPSA": tpsa,
+                "MolMR": Descriptors.MolMR(mol),
+                "RotBonds": Descriptors.NumRotatableBonds(mol),
+                "HDonors": Descriptors.NumHDonors(mol),
+            }
+        except Exception:
+            # Fallback seguro caso RDKit falhe em smiles estranhos
+            pass
 
         return molecule
 
     # ======================================================================
-    # FEEDBACK HUMANO
+    # HUMAN FEEDBACK & TOOLS
     # ======================================================================
 
     def register_human_feedback(self, discovery_id, feedback_data, custom_mols=None):
-        # ... (Manter código original de feedback se necessário) ...
-        pass
+        """Registra feedback humano para refinar o modelo GNN."""
+        rating = feedback_data.get('rating', 5.0)
+        # Normaliza 1-10 para 0-1
+        normalized_score = rating / 10.0
+        self.last_human_score = rating
+
+        print(f"[FEEDBACK] Nota recebida: {rating}/10. Atualizando memória...")
+
+        # Se o usuário passou moléculas customizadas (ex: alterou no slider), aprendemos com isso
+        mols_to_learn = custom_mols
+        
+        # Se não, tenta usar a última descoberta (fallback simplificado)
+        if not mols_to_learn and self.discoveries:
+            mols_to_learn = self.discoveries[-1].get('molecules', [])
+
+        if mols_to_learn:
+            # Adiciona ao Buffer de Replay
+            graphs = FeatureEncoder.encode_graphs(mols_to_learn)
+            if graphs:
+                # Peso 5.0 para feedback humano (muito mais importante que simulação)
+                self.buffer.add(graphs, normalized_score, weight=5.0)
+                
+            # Se a nota for muito alta ou muito baixa, força um re-treino rápido
+            if rating >= 8 or rating <= 2:
+                self.trainer.maybe_retrain(self.buffer, force=True)
 
     def reformulate_green(self, target_molecules, rounds=30):
         if not target_molecules: return []
+        
+        # Define o vetor alvo para a função de fitness focar em similaridade
         self.target_vector = FeatureEncoder.encode_blend(target_molecules)
+        
         original_eco, _ = self.compliance.calculate_eco_score(target_molecules)
-        print(f" [REFORMULADOR] Alvo definido. Eco inicial: {original_eco:.2f}")
+        print(f" [REFORMULADOR] Alvo definido. Eco inicial: {original_eco:.2f}. Otimizando para Eco Score...")
 
+        # Roda o discovery com o vetor alvo setado
         results = self.discover(rounds=rounds, goal="Green Reformulation", initial_seed=target_molecules)
+        
+        # Limpa o alvo para não atrapalhar buscas futuras
         self.target_vector = None
         return results
 
@@ -492,6 +601,7 @@ class DiscoveryEngine:
 
     def _invalid_result(self, molecules):
         return {
+            "id": str(uuid.uuid4()),
             "fitness": 0.0,
             "molecules": molecules,
             "eco_score": 0.0,

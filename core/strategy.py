@@ -1,3 +1,4 @@
+from email.mime import text
 import json
 import re
 import random
@@ -6,6 +7,8 @@ from core.presets import ACORDES_LIB, PERFUME_SKELETONS
 class StrategyAgent:
     def __init__(self, llm_client):
         self.llm = llm_client
+
+    
 
     def propose_strategy(self, discoveries, goal):
         try:
@@ -48,26 +51,17 @@ class StrategyAgent:
 
     def _parse_response(self, text):
         try:
-            match = re.search(r'(\{[\s\S]*\})', text)
-            if not match: 
-                raise ValueError("No JSON found in response")
-            
-            json_str = match.group(1)
-            data = json.loads(json_str)
-            
-            defaults = self._get_default_strategy()
-            
-            for key, default_val in defaults.items():
-                if key not in data:
-                    data[key] = default_val
-            
-            if not isinstance(data["num_molecules"], list): data["num_molecules"] = [3, 5]
-            if len(data["num_molecules"]) != 2: data["num_molecules"] = [3, 5]
-            
-            return data
+            import re
+            start_idx = text.find('{')
+            end_idx = text.rfind('}')
 
-        except json.JSONDecodeError:
-            raise ValueError("Invalid JSON format")
+            if start_idx == -1 or end_idx == -1:
+                raise ValueError("No JSON brackets found")
+
+            json_str = text[start_idx : end_idx + 1]
+            return json.loads(json_str)
+        except Exception:
+            pass
 
     def _get_default_strategy(self):
         return {

@@ -8,50 +8,57 @@ class ComplianceEngine:
             insumos_path = os.path.join(base_dir, 'insumos.csv')
 
         self.db = self._load_database(insumos_path)
-        
         self.dynamic_limits = {}
+
         if not self.db.empty:
             valid_limits = self.db[self.db['ifra_limit'].notna()].copy()
+
             def clean_limit(val):
                 try:
-                    if isinstance(val, (int, float)): return float(val)
+                    if isinstance(val, (int, float)):
+                        return float(val)
                     return float(str(val).replace('%', '').strip())
-                except:
+                except Exception:
                     return 100.0
 
             for _, row in valid_limits.iterrows():
                 limit_val = clean_limit(row['ifra_limit'])
                 if limit_val < 100.0:
-                    self.dynamic_limits[row['name']] = limit_val
+                    self.dynamic_limits[row['name'].strip()] = limit_val
+
+        # IFRA defaults (keys stored lowercase for consistent comparison)
         self.IFRA_LIMITS = {
-            "Citral": 0.6, "Isoeugenol": 0.11, "Eugenol": 2.5, "Cinnamal": 0.05,
-            "Coumarin": 1.6, "Geraniol": 4.7, "Benzyl Benzoate": 4.8, "Oakmoss Absolute": 0.1
+            "citral": 0.6, "isoeugenol": 0.11, "eugenol": 2.5, "cinnamal": 0.05,
+            "coumarin": 1.6, "geraniol": 4.7, "benzyl benzoate": 4.8, "oakmoss absolute": 0.1
         }
-        self.ALL_LIMITS = {**self.dynamic_limits, **self.IFRA_LIMITS}
-        
+
+        # unify all limits as lowercase keys
+        self.ALL_LIMITS = {**{k.lower(): v for k, v in self.IFRA_LIMITS.items()},
+                           **{k.strip().lower(): v for k, v in self.dynamic_limits.items()}}
+
         self.POTENCY_MASS_LIMITS = {
             "ultra": 0.01, "high": 0.10, "medium": 1.0, "low": 1.0, "weak": 1.0
         }
 
         self.NATURALS_COMPOSITION = {
-            "Lemon Oil": {"Citral": 0.03, "Limonene": 0.65, "Geraniol": 0.01},
-            "Bergamot Oil": {"Limonene": 0.40, "Linalyl Acetate": 0.30, "Citral": 0.01, "Bergapten": 0.005},
-            "Orange Sweet Oil": {"Limonene": 0.95, "Citral": 0.005},
-            "Lavender Oil": {"Linalool": 0.35, "Linalyl Acetate": 0.40, "Geraniol": 0.03, "Coumarin": 0.001},
-            "Rose Oil": {"Citronellol": 0.40, "Geraniol": 0.20, "Eugenol": 0.02, "Methyleugenol": 0.01},
-            "Ylang Ylang Oil": {"Benzyl Benzoate": 0.08, "Isoeugenol": 0.01, "Geraniol": 0.02},
-            "Clove Oil": {"Eugenol": 0.85, "Isoeugenol": 0.01},
-            "Cinnamon Bark": {"Cinnamal": 0.70, "Eugenol": 0.05},
-            "Oakmoss Absolute": {"Atranol": 0.01, "Oakmoss Absolute": 1.0},
-            "Jasmine Absolute": {"Benzyl Benzoate": 0.15, "Indole": 0.02, "Eugenol": 0.01},
-            "Tonka Bean Abs": {"Coumarin": 0.90}
+            "lemon oil": {"citral": 0.03, "limonene": 0.65, "geraniol": 0.01},
+            "bergamot oil": {"limonene": 0.40, "linalyl acetate": 0.30, "citral": 0.01, "bergapten": 0.005},
+            "orange sweet oil": {"limonene": 0.95, "citral": 0.005},
+            "lavender oil": {"linalool": 0.35, "linalyl acetate": 0.40, "geraniol": 0.03, "coumarin": 0.001},
+            "rose oil": {"citronellol": 0.40, "geraniol": 0.20, "eugenol": 0.02, "methyleugenol": 0.01},
+            "ylang ylang oil": {"benzyl benzoate": 0.08, "isoeugenol": 0.01, "geraniol": 0.02},
+            "clove oil": {"eugenol": 0.85, "isoeugenol": 0.01},
+            "cinnamon bark": {"cinnamal": 0.70, "eugenol": 0.05},
+            "oakmoss absolute": {"atranol": 0.01, "oakmoss absolute": 1.0},
+            "jasmine absolute": {"benzyl benzoate": 0.15, "indole": 0.02, "eugenol": 0.01},
+            "tonka bean abs": {"coumarin": 0.90}
         }
 
     def _load_database(self, path):
         """Carrega o CSV de insumos e prepara para busca."""
         try:
             if not os.path.exists(path):
-                print(f"⚠️ Aviso: Banco de insumos não encontrado em {path}")
+                print(f"Aviso: Banco de insumos não encontrado em {path}")
                 return pd.DataFrame()
             
             df = pd.read_csv(path)
@@ -74,17 +81,17 @@ class ComplianceEngine:
         violations = []
         stats = {}
         is_safe = True
-        
-        chemical_totals = {chem: 0.0 for chem in self.ALL_LIMITS.keys()}
+
+        chemical_totals = {chem: 0.0 for chem in self.ALL_LIMITS.keys()} 
         
         for ingredient in formula_molecules:
-            name = ingredient.get('name', '').strip()
+            name = ingredient.get('name', '').strip().lower()
             weight = ingredient.get('weight_factor', 1.0)
             
             if name in chemical_totals:
                 chemical_totals[name] += weight
 
-            matched_natural = self._find_natural_composition(name)
+            matched_natural = self._find_natural_composition(ingredient.get('name', ''))
             if matched_natural:
                 for chem_name, fraction in matched_natural.items():
                     if chem_name in chemical_totals:
@@ -98,15 +105,15 @@ class ComplianceEngine:
             
             if concentration_pct > limit:
                 is_safe = False
-                msg = f"⛔ IFRA Violation - {chem}: Found {concentration_pct:.3f}% (Limit: {limit}%)"
+                msg = f"IFRA Violation - {chem}: Found {concentration_pct:.3f}% (Limit: {limit}%)"
                 violations.append(msg)
                 
-                culprits = [m['name'] for m in formula_molecules if m['name'] == chem or (self._find_natural_composition(m['name']) and chem in self._find_natural_composition(m['name']))]
+                culprits = [m.get('name', '') for m in formula_molecules if m.get('name', '').strip().lower() == chem or (self._find_natural_composition(m.get('name', '')) and chem in self._find_natural_composition(m.get('name', '')))]
                 for culprit in culprits:
                     subs = self.find_substitutes(culprit)
                     if subs:
                         formatted_subs = "\n   ".join([f"-> {s['name']} (Score: {s['score']:.1f}) {s['tags']}" for s in subs])
-                        violations.append(f"   💡 Smart Swap for {culprit}:\n   {formatted_subs}")
+                        violations.append(f"   Smart Swap for {culprit}:\n   {formatted_subs}")
 
         for m in formula_molecules:
             potency = m.get('odor_potency', 'medium').lower() 
@@ -117,11 +124,11 @@ class ComplianceEngine:
             if actual_pct > limit_pct:
                 is_safe = False
                 violations.append(
-                    f"⛔ Potency Overdose: {m.get('name')} ({potency}) is {actual_pct:.2f}% (Max: {limit_pct:.2f}%)"
+                    f"Potency Overdose: {m.get('name')} ({potency}) is {actual_pct:.2f}% (Max: {limit_pct:.2f}%)"
                 )
 
         if is_safe:
-            return True, ["✅ Compliant & Balanced"], stats
+            return True, ["Compliant & Balanced"], stats
         else:
             return False, violations, stats
 
@@ -159,10 +166,10 @@ class ComplianceEngine:
             tags = ""
             if row.get('biodegradability') == True or str(row.get('biodegradability')).lower() == 'true':
                 green_bonus += 15
-                tags += "🌿"
+                tags += " [bio]"
             if row.get('renewable_source') == True or str(row.get('renewable_source')).lower() == 'true':
                 green_bonus += 10
-                tags += "♻️"
+                tags += " [renew]"
 
             final_score = similarity + green_bonus
             
@@ -178,11 +185,14 @@ class ComplianceEngine:
 
     def _find_natural_composition(self, ingredient_name):
         """Busca composição química de naturais."""
-        if ingredient_name in self.NATURALS_COMPOSITION:
-            return self.NATURALS_COMPOSITION[ingredient_name]
+        if not ingredient_name:
+            return None
+        name_lower = ingredient_name.strip().lower()
+        if name_lower in self.NATURALS_COMPOSITION:
+            return self.NATURALS_COMPOSITION[name_lower]
         
         for key, comp in self.NATURALS_COMPOSITION.items():
-            if key in ingredient_name:
+            if key in name_lower:
                 return comp
         return None
 

@@ -359,7 +359,7 @@ if st.session_state.current_formula is None:
         st.rerun()
 else:
     data = st.session_state.current_formula
-    chem = data.get('chemistry', {})
+    chem = data.get('chemistry', data)
     mols = data['molecules']
     
     biz_engine = PerfumeBusinessEngine()
