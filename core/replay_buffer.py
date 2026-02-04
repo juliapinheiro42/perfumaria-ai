@@ -76,23 +76,31 @@ class ReplayBuffer:
         return flat_data_list
     
     def generate_negative_examples(formula, compliance_engine, num_variants=3):
-
         negatives = []
     
-        restricted_chems = list(compliance_engine.IFRA_LIMITS.keys())
+        restricted = list(compliance_engine.IFRA_LIMITS.keys())
+    
+        high_impact = [
+            m['name'] for m in formula 
+            if m.get('odor_potency', 'medium').lower() in ['ultra', 'high']
+        ]
+    
+        targets = list(set(restricted + high_impact))
+    
+        if not targets: return []
 
         for _ in range(num_variants):
             corrupted_formula = [m.copy() for m in formula]
         
-            target_chem = random.choice(restricted_chems)
+            target_chem_name = random.choice(targets)
         
             for ingredient in corrupted_formula:
-                if target_chem in ingredient['name']:
+                if ingredient['name'] == target_chem_name:
                     ingredient['weight_factor'] *= random.uniform(10.0, 50.0)
         
             is_safe, _, _ = compliance_engine.check_safety(corrupted_formula)
         
             if not is_safe:
-                negatives.append((corrupted_formula, 0.05)) 
+                negatives.append((corrupted_formula, 0.00001))
             
         return negatives

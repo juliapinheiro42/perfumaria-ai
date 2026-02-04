@@ -518,7 +518,7 @@ class DiscoveryEngine:
     # ======================================================================
 
     def register_human_feedback(self, discovery_id, feedback_data, custom_mols=None):
-    
+        
         discovery = None
     
         if custom_mols:
@@ -568,21 +568,44 @@ class DiscoveryEngine:
 
         print(f"   >>> [RLHF] Feedback {'(SYNTHETIC)' if custom_mols else ''}: H{hedonic}/T{technical}/C{creative} -> Fitness: {new_fitness:.4f}")
 
-    # Treinamento da GNN e Surrogate
-    
+        # --- 1. Treinamento Positivo (O que o humano gostou) ---
         graphs = FeatureEncoder.encode_graphs(discovery["molecules"])
         if graphs:
-        # Aumentamos o peso para exemplos negativos se desejar que a rede aprenda mais rápido
             prio_weight = 10.0 if custom_mols else 5.0 
             self.buffer.add(graphs, new_fitness, weight=prio_weight)
 
+        # --- 2. [NOVO] Contrastive Learning Injection (Geração de Exemplos Negativos) ---
+        # Só geramos negativos se o feedback atual for BOM (ex: > 6.0). 
+        # Não adianta gerar "versão piorada" de algo que já é ruim.
+        if new_fitness > 0.6: 
+            try:
+                # Gera variantes 'estragadas' (overdoses) dessa fórmula boa
+                negatives = ReplayBuffer.generate_negative_examples(
+                    discovery["molecules"], 
+                    self.compliance
+                )
+                
+                count_neg = 0
+                for bad_formula, bad_fitness in negatives:
+                    bad_graphs = FeatureEncoder.encode_graphs(bad_formula)
+                    if bad_graphs:
+                        # Ensinamos: "Essa variação é PÉSSIMA (fitness ~0)"
+                        self.buffer.add(bad_graphs, bad_fitness, weight=2.0)
+                        count_neg += 1
+                
+                if count_neg > 0:
+                    print(f"   >>> [TEACHING] Gerados {count_neg} exemplos negativos para contraste.")
+            except Exception as e:
+                print(f"   >>> [WARNING] Falha ao gerar exemplos negativos: {e}")
+
+        # --- 3. Atualização dos Pesos (Backpropagation) ---
         if self.trainer:
             loss = self.trainer.train_step(self.buffer)
             print(f"   >>> [LEARNING] Pesos neurais ajustados. Loss: {loss:.4f}")
 
         feature_vec = FeatureEncoder.encode_blend(discovery["molecules"])
         self.surrogate.add_observation(feature_vec, new_fitness)
-    
+        
     def save_results(self, folder="results", filename="discoveries.json"):
         def sanitize(obj):
             if isinstance(obj, dict):
