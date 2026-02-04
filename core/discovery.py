@@ -7,9 +7,7 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
-
 from core.encoder import FeatureEncoder
-
 
 try:
     from torch_geometric.loader import DataLoader
@@ -18,7 +16,6 @@ except ImportError:
 
 from core.evolution import EvolutionEngine
 from core.surrogate import BayesianSurrogate
-from core.encoder import FeatureEncoder
 from core.chemistry import ChemistryEngine
 from core.market import business_evaluation
 from core.replay_buffer import ReplayBuffer
@@ -43,6 +40,9 @@ class DiscoveryEngine:
         self.target_vector = None
         self.target_price = 100.0
         self.target_complexity_score = 0.0
+        
+        # O ComplianceEngine carrega o CSV dele sozinho, mas o Discovery também precisa
+        # para gerar moléculas do zero.
         self.compliance = ComplianceEngine()
 
         self.last_human_score = 0.0
@@ -97,7 +97,7 @@ class DiscoveryEngine:
         skeleton_name = random.choice(list(PERFUME_SKELETONS.keys()))
         accord_names = PERFUME_SKELETONS[skeleton_name]
         
-        print(f"   >>> Construindo estrutura: {skeleton_name}")
+        # print(f"   >>> Construindo estrutura: {skeleton_name}")
 
         for acc_name in accord_names:
             accord_data = ACORDES_LIB.get(acc_name)
@@ -114,7 +114,6 @@ class DiscoveryEngine:
                     
                     base_weight = ratios[i] if i < len(ratios) else 1.0
                     mol_obj['weight_factor'] = base_weight * random.uniform(2.0, 4.0) 
-                    
                     mol_obj['accord_origin'] = acc_name 
                     
                     molecules.append(mol_obj)
@@ -355,8 +354,10 @@ class DiscoveryEngine:
         if len(molecules) < 2:
             return self._invalid_result(molecules)
 
+        # 1. Compliance Engine (Novo Retorno Tuple-Unpacking)
         eco_score, eco_stats = self.compliance.calculate_eco_score(molecules)
-
+        
+        # 2. AI Scoring
         ai_score = 0.5
         if self.model and DataLoader:
             graphs = FeatureEncoder.encode_graphs(molecules)
@@ -369,12 +370,15 @@ class DiscoveryEngine:
                 except:
                     ai_score = 0.5
 
+        # 3. Chemistry Engine
         chem = self.chemistry.evaluate_blend(molecules)
-        chem["eco_stats"] = eco_stats
+        chem["eco_stats"] = eco_stats  # Injeta os dados do compliance aqui
         
+        # 4. Safety Check (Novo Retorno Triplo)
         is_safe, safety_logs, safety_stats = self.compliance.check_safety(molecules)
         safety_penalty = 1.0 if is_safe else 0.00001
         
+        # 5. Market Calculation
         tech_score = chem.get("complexity", 0.0)
         neuro_score = chem.get("neuro_score", 0.0)
         
@@ -459,6 +463,7 @@ class DiscoveryEngine:
             "russell_arousal": row.get("russell_arousal", 0.0),
             "evidence_level": row.get("evidence_level", "None"),
             "odor_potency": str(row.get("odor_potency", "medium")).lower().strip(),
+            # Garante que Flags sejam lidos como booleanos (Compliance Engine espera isso)
             "biodegradability": str(row.get("biodegradability", "False")).lower() == "true",
             "renewable_source": str(row.get("renewable_source", "False")).lower() == "true",
             "carbon_footprint": float(row.get("carbon_footprint", 10.0)),
@@ -547,18 +552,15 @@ class DiscoveryEngine:
 
         print(f"   >>> [RLHF] Feedback {'(SYNTHETIC)' if custom_mols else ''}: H{hedonic}/T{technical}/C{creative} -> Fitness: {new_fitness:.4f}")
 
-        # --- 1. Treinamento Positivo (O que o humano gostou) ---
+        # --- 1. Treinamento Positivo ---
         graphs = FeatureEncoder.encode_graphs(discovery["molecules"])
         if graphs:
             prio_weight = 10.0 if custom_mols else 5.0 
             self.buffer.add(graphs, new_fitness, weight=prio_weight)
 
-        # --- 2. [NOVO] Contrastive Learning Injection (Geração de Exemplos Negativos) ---
-        # Só geramos negativos se o feedback atual for BOM (ex: > 6.0). 
-        # Não adianta gerar "versão piorada" de algo que já é ruim.
+        # --- 2. Geração de Negativos (Adversarial) ---
         if new_fitness > 0.6: 
             try:
-                # Gera variantes 'estragadas' (overdoses) dessa fórmula boa
                 negatives = ReplayBuffer.generate_negative_examples(
                     discovery["molecules"], 
                     self.compliance
@@ -568,7 +570,6 @@ class DiscoveryEngine:
                 for bad_formula, bad_fitness in negatives:
                     bad_graphs = FeatureEncoder.encode_graphs(bad_formula)
                     if bad_graphs:
-                        # Ensinamos: "Essa variação é PÉSSIMA (fitness ~0)"
                         self.buffer.add(bad_graphs, bad_fitness, weight=2.0)
                         count_neg += 1
                 
@@ -577,7 +578,7 @@ class DiscoveryEngine:
             except Exception as e:
                 print(f"   >>> [WARNING] Falha ao gerar exemplos negativos: {e}")
 
-        # --- 3. Atualização dos Pesos (Backpropagation) ---
+        # --- 3. Atualização dos Pesos ---
         if self.trainer:
             loss = self.trainer.train_step(self.buffer)
             print(f"   >>> [LEARNING] Pesos neurais ajustados. Loss: {loss:.4f}")
@@ -587,25 +588,48 @@ class DiscoveryEngine:
         
     def reformulate_green(self, target_molecules, rounds=50):
         """
-        Substituição Inteligente: Tenta recriar a assinatura olfativa de 'target_molecules'
-        usando apenas ingredientes com melhor perfil ecológico.
+        Substituição Inteligente: Usa o ComplianceEngine para trocar ingredientes.
+        (Sobrescrevemos o método antigo genético por este determinístico e rápido).
         """
         if not target_molecules: return []
         
-        self.target_vector = FeatureEncoder.encode_blend(target_molecules)
+        print(f" [REFORMULADOR] Iniciando Smart Swap (Green Strategy)...")
+        new_mols = []
+        changes = 0
         
-        original_eco, _ = self.compliance.calculate_eco_score(target_molecules)
-        print(f" [REFORMULADOR] Iniciando... Eco-Score Original: {original_eco:.2f}")
+        for m in target_molecules:
+            # Verifica se já é verde
+            is_bio = str(m.get('biodegradability', 'false')).lower() == 'true'
+            is_renew = str(m.get('renewable_source', 'false')).lower() == 'true'
 
-        results = self.discover(rounds=rounds, goal="Green Reformulation")
+            if is_bio and is_renew:
+                new_mols.append(m)
+            else:
+                # Pergunta ao Consultor (ComplianceEngine)
+                subs = self.compliance.find_substitutes(m['name'], top_n=1)
+                
+                if subs and subs[0]['score'] > 30: # Threshold de qualidade
+                    best = subs[0]
+                    # Busca os dados completos do substituto no banco
+                    row = self._fuzzy_find_ingredient(best['name'])
+                    
+                    if row is not None:
+                        new_mol = self._row_to_molecule(row)
+                        # Mantém a mesma proporção da molécula original
+                        new_mol['weight_factor'] = m.get('weight_factor', 1.0)
+                        new_mols.append(new_mol)
+                        changes += 1
+                        print(f"   ♻️ Swap: {m['name']} -> {best['name']}")
+                    else:
+                        new_mols.append(m)
+                else:
+                    new_mols.append(m)
+
+        # Avalia a nova fórmula reformulada
+        result = self.evaluate(new_mols)
+        print(f" [REFORMULADOR] Concluído. Alterações: {changes}. Novo Eco-Score: {result['eco_score']:.2f}")
         
-        self.target_vector = None
-        
-        best = max(results, key=lambda x: x['fitness']) if results else None
-        if best:
-            print(f"✅ [SUCESSO] Melhor reformulação: Eco {best['eco_score']:.2f} (Era {original_eco:.2f})")
-            
-        return results
+        return [result]
     
     def save_results(self, folder="results", filename="discoveries.json"):
         def sanitize(obj):
