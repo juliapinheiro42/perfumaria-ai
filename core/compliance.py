@@ -3,24 +3,36 @@ import os
 
 class ComplianceEngine:
     def __init__(self, insumos_path=None):
-        # Tenta localizar o CSV automaticamente se não for passado
         if insumos_path is None:
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             insumos_path = os.path.join(base_dir, 'insumos.csv')
 
         self.db = self._load_database(insumos_path)
         
-        # Limites Hard-Coded (Fallbacks críticos)
+        self.dynamic_limits = {}
+        if not self.db.empty:
+            valid_limits = self.db[self.db['ifra_limit'].notna()].copy()
+            def clean_limit(val):
+                try:
+                    if isinstance(val, (int, float)): return float(val)
+                    return float(str(val).replace('%', '').strip())
+                except:
+                    return 100.0
+
+            for _, row in valid_limits.iterrows():
+                limit_val = clean_limit(row['ifra_limit'])
+                if limit_val < 100.0:
+                    self.dynamic_limits[row['name']] = limit_val
         self.IFRA_LIMITS = {
             "Citral": 0.6, "Isoeugenol": 0.11, "Eugenol": 2.5, "Cinnamal": 0.05,
             "Coumarin": 1.6, "Geraniol": 4.7, "Benzyl Benzoate": 4.8, "Oakmoss Absolute": 0.1
         }
+        self.ALL_LIMITS = {**self.dynamic_limits, **self.IFRA_LIMITS}
         
         self.POTENCY_MASS_LIMITS = {
             "ultra": 0.01, "high": 0.10, "medium": 1.0, "low": 1.0, "weak": 1.0
         }
 
-        # Composição de Naturais para verificação profunda
         self.NATURALS_COMPOSITION = {
             "Lemon Oil": {"Citral": 0.03, "Limonene": 0.65, "Geraniol": 0.01},
             "Bergamot Oil": {"Limonene": 0.40, "Linalyl Acetate": 0.30, "Citral": 0.01, "Bergapten": 0.005},
@@ -43,7 +55,6 @@ class ComplianceEngine:
                 return pd.DataFrame()
             
             df = pd.read_csv(path)
-            # Normalização básica
             df['name'] = df['name'].astype(str).str.strip()
             df['olfactive_notes'] = df['olfactive_notes'].astype(str).str.lower()
             df['olfactive_family'] = df['olfactive_family'].astype(str).str.strip()
@@ -64,36 +75,32 @@ class ComplianceEngine:
         stats = {}
         is_safe = True
         
-        # 1. Acumulação Química (Explosão de Naturais)
-        chemical_totals = {chem: 0.0 for chem in self.IFRA_LIMITS.keys()}
+        chemical_totals = {chem: 0.0 for chem in self.ALL_LIMITS.keys()}
         
         for ingredient in formula_molecules:
             name = ingredient.get('name', '').strip()
             weight = ingredient.get('weight_factor', 1.0)
             
-            # Soma direta se for a molécula isolada
             if name in chemical_totals:
                 chemical_totals[name] += weight
 
-            # Soma indireta vinda de naturais
             matched_natural = self._find_natural_composition(name)
             if matched_natural:
                 for chem_name, fraction in matched_natural.items():
                     if chem_name in chemical_totals:
                         chemical_totals[chem_name] += weight * fraction
 
-        # 2. Verificação IFRA
         for chem, total_amount in chemical_totals.items():
+            if total_amount == 0:
+                continue
             concentration_pct = (total_amount / total_weight) * 100
-            limit = self.IFRA_LIMITS[chem]
-            stats[chem] = concentration_pct
+            limit = self.ALL_LIMITS[chem]
             
             if concentration_pct > limit:
                 is_safe = False
                 msg = f"⛔ IFRA Violation - {chem}: Found {concentration_pct:.3f}% (Limit: {limit}%)"
                 violations.append(msg)
                 
-                # Tenta encontrar quem está causando isso para sugerir troca
                 culprits = [m['name'] for m in formula_molecules if m['name'] == chem or (self._find_natural_composition(m['name']) and chem in self._find_natural_composition(m['name']))]
                 for culprit in culprits:
                     subs = self.find_substitutes(culprit)
@@ -101,7 +108,6 @@ class ComplianceEngine:
                         formatted_subs = "\n   ".join([f"-> {s['name']} (Score: {s['score']:.1f}) {s['tags']}" for s in subs])
                         violations.append(f"   💡 Smart Swap for {culprit}:\n   {formatted_subs}")
 
-        # 3. Verificação de Potência
         for m in formula_molecules:
             potency = m.get('odor_potency', 'medium').lower() 
             limit_pct = self.POTENCY_MASS_LIMITS.get(potency, 1.0) * 100 
@@ -127,7 +133,6 @@ class ComplianceEngine:
         if self.db.empty:
             return []
 
-        # Encontra o ingrediente alvo no DB
         target_row = self.db[self.db['name'].str.lower() == target_name.lower()]
         if target_row.empty:
             return []
@@ -135,7 +140,6 @@ class ComplianceEngine:
         target_family = target_row.iloc[0]['olfactive_family']
         target_notes = set(target_row.iloc[0]['olfactive_notes'].split())
         
-        # Filtra candidatos da mesma família (excluindo o próprio)
         candidates = self.db[
             (self.db['olfactive_family'] == target_family) & 
             (self.db['name'].str.lower() != target_name.lower())
@@ -146,13 +150,11 @@ class ComplianceEngine:
 
         results = []
         for _, row in candidates.iterrows():
-            # 1. Similaridade de Jaccard nas notas
             cand_notes = set(str(row['olfactive_notes']).split())
             intersection = len(target_notes.intersection(cand_notes))
             union = len(target_notes.union(cand_notes))
             similarity = (intersection / union) * 100 if union > 0 else 0
             
-            # 2. Bônus Green
             green_bonus = 0
             tags = ""
             if row.get('biodegradability') == True or str(row.get('biodegradability')).lower() == 'true':
@@ -162,7 +164,6 @@ class ComplianceEngine:
                 green_bonus += 10
                 tags += "♻️"
 
-            # 3. Score Final
             final_score = similarity + green_bonus
             
             results.append({
@@ -172,7 +173,6 @@ class ComplianceEngine:
                 'price': row.get('price_per_kg', 0)
             })
 
-        # Ordena por score e retorna os top N
         results.sort(key=lambda x: x['score'], reverse=True)
         return results[:top_n]
 
@@ -201,7 +201,6 @@ class ComplianceEngine:
         for m in formula_molecules:
             w = m.get('weight_factor', 1.0)
             
-            # Tenta pegar dados do DB se não estiverem na molécula
             db_data = self.db[self.db['name'].str.lower() == m.get('name', '').lower()]
             
             if not db_data.empty:
@@ -213,7 +212,6 @@ class ComplianceEngine:
                 is_renew = m.get('renewable_source', False)
                 carbon = m.get('carbon_footprint', 10.0)
 
-            # Converte strings "True"/"False" do CSV se necessário
             is_bio = str(is_bio).lower() == 'true' if isinstance(is_bio, str) else bool(is_bio)
             is_renew = str(is_renew).lower() == 'true' if isinstance(is_renew, str) else bool(is_renew)
 

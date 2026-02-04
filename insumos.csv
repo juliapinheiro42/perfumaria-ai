@@ -195,7 +195,7 @@ Polysantol,234.38,4.6,CC1CCC2C13CCC(C(C3)C2(C)C)(C)O,Base,90.0,Sândalo doce mod
 Prenyl Acetate,128.17,1.8,CC(=CCOC(=O)C)C,Top,18.0,Banana verde pera,Frutado,100.00%,False,1,Energia / Impacto,50.0,Medium,0.7,0.8,Alta (Estudo Clínico),True,True,1.0
 Raspberry Ketone,164.2,1.5,CC(=O)CCC1=CC=C(C=C1)O,Base,40.0,Framboesa doce,Gourmand Frutado,1.0,False,1,Indulgence / Comfort,,low,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0
 Rhubafuran,182.26,3.4,CC1(CO1)C2=CC=C(C=C2)C,Top,85.0,Ruibarbo toranja amargo,Verde,100.00%,False,1,Vigor / Amargor,2.0,High,0.2,0.9,Alta (Resposta Trigeminal),True,True,1.0
-Romandolide,254.37,3.8,CC1(C(=O)OCCCCCOC(=O)C)C,Base,80.0,Almíscar frutado pera,Musk,100.00%,False,1,Suavidade / Limpeza,20.0,Medium,0.8,-0.4,Média (Aromacologia),True,True,1.0
+Romandolide,254.37,3.8,CC1(C(=O)OCCCCCOC(=O)C1)C,Base,80.0,Almíscar frutado pera,Musk,100.00%,False,1,Suavidade / Limpeza,20.0,Medium,0.8,-0.4,Média (Aromacologia),True,True,1.0
 Romandolide,254.4,5.5,C1CCCCCCCCOC(=O)CCCCC1,Base,120.0,Musk metálico moderno,Musk,1.0,False,1,Comfort / Safety,,low,0.8,-0.4,Média (Aromacologia),True,True,1.0
 Rose Oxide,154.25,2.9,CC1CCOC(C1)C=C(C)C,Top,150.0,Rosa verde metálica,Floral Verde,0.002,False,1,Mood Balance / Joy,0.002,ultra,0.8,0.2,Média (Aromacologia),True,True,1.0
 Safraleine,202.25,4.1,CC1=C(C=C(C=C1)C2=C(C=C(C=C2)C)O)C,Base,200.0,Açafrão couro tabaco,Especiado,100.00%,False,1,Mistério / Calor,5.0,High,0.9,-0.2,Alta (Psicologia Evolutiva),True,True,1.0

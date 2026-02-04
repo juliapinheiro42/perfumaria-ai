@@ -8,8 +8,6 @@ import altair as alt
 import plotly.graph_objects as go
 import random
 
-# Importações dos módulos internos
-# Certifique-se de que os arquivos existem em core/ e infra/
 try:
     from infra.gemini_client import GeminiClient
     from core.strategy import StrategyAgent
@@ -22,7 +20,7 @@ except ImportError as e:
     st.stop()
 
 # =========================================================
-# CONFIGURAÇÃO VISUAL L'ORÉAL LUXE (DESIGN EDITORIAL)
+# CONFIGURAÇÃO VISUAL L'ORÉAL LUXE
 # =========================================================
 st.set_page_config(
     page_title="L'Oréal Luxe • AI Lab",
@@ -35,7 +33,7 @@ LOREAL_BLACK = "#000000"
 LOREAL_GOLD = "#C5A059" 
 LOREAL_WHITE = "#FFFFFF"
 LOREAL_GREY = "#F2F2F2"
-LOREAL_GREEN = "#2D5A27" # Verde escuro elegante para o tema Green
+LOREAL_GREEN = "#2D5A27"
 
 st.markdown(f"""
 <style>
@@ -202,56 +200,6 @@ def render_evaporation_curve(temporal_curve):
     return line + line.mark_point(color=LOREAL_BLACK)
 
 # =========================================================
-# LÓGICA DE REFORMULAÇÃO (Nova Função Local)
-# =========================================================
-def run_green_reformulation(current_formula_dict):
-    """
-    Usa o ComplianceEngine para encontrar substitutos 'Green'.
-    Substitui ingredientes não-verdes por alternativas biodegradáveis/renováveis.
-    """
-    mols = current_formula_dict['molecules']
-    new_mols = []
-    log = []
-    
-    for m in mols:
-        # Verifica se o ingrediente já é Green (Bio e Renovável)
-        is_bio = m.get('biodegradability') == True or str(m.get('biodegradability')).lower() == 'true'
-        is_renew = m.get('renewable_source') == True or str(m.get('renewable_source')).lower() == 'true'
-        
-        if is_bio and is_renew:
-            new_mols.append(m)
-        else:
-            # Tenta encontrar substituto
-            subs = st.session_state.compliance_engine.find_substitutes(m['name'], top_n=1)
-            if subs:
-                best = subs[0]
-                # Só troca se o score for decente (>30)
-                if best['score'] > 30:
-                    new_m = m.copy()
-                    new_m['name'] = best['name']
-                    # Atualiza flags para o novo ingrediente (assumindo que find_substitutes prioriza green)
-                    new_m['biodegradability'] = True 
-                    new_m['renewable_source'] = True
-                    new_mols.append(new_m)
-                    log.append(f"♻️ Swapped {m['name']} -> {best['name']} (Score: {best['score']:.1f})")
-                else:
-                    new_mols.append(m)
-            else:
-                new_mols.append(m)
-                
-    # Recalcula Eco-Score
-    new_formula = current_formula_dict.copy()
-    new_formula['molecules'] = new_mols
-    eco_score, stats = st.session_state.compliance_engine.calculate_eco_score(new_mols)
-    
-    # Atualiza estruturas
-    new_formula['eco_score'] = eco_score
-    if 'chemistry' not in new_formula: new_formula['chemistry'] = {}
-    new_formula['chemistry']['eco_stats'] = stats
-    
-    return new_formula, log
-
-# =========================================================
 # SISTEMA E CACHE
 # =========================================================
 @st.cache_resource
@@ -268,9 +216,15 @@ def get_engine(model):
         llm_client = GeminiClient()
         strategy_agent = StrategyAgent(llm_client)
     except: strategy_agent = None
-    return DiscoveryEngine(model=model, strategy_agent=strategy_agent, csv_path="insumos.csv")
+    
+    engine_instance = DiscoveryEngine(model=model, strategy_agent=strategy_agent, csv_path="insumos.csv")
+    
+    # Validação crítica
+    if engine_instance.df_insumos.empty:
+        st.error("ERRO CRÍTICO: insumos.csv está vazio ou não foi carregado. A IA não pode funcionar.")
+    
+    return engine_instance
 
-# Inicialização de Estado
 if 'compliance_engine' not in st.session_state:
     st.session_state.compliance_engine = ComplianceEngine() # Carrega o CSV automaticamente
 
@@ -300,6 +254,10 @@ with st.sidebar:
     st.markdown(f"""<h1 style="color:{LOREAL_GOLD}; font-size:16px; letter-spacing:2px;">🧬 PARAMETERS</h1>""", unsafe_allow_html=True)
     
     all_ingredients = sorted(engine.insumos_dict.keys()) if hasattr(engine, 'insumos_dict') else []
+    
+    if not all_ingredients:
+        st.error("No ingredients loaded.")
+    
     anchors = st.multiselect("MANDATORY NOTES", options=all_ingredients)
     
     if hasattr(engine, 'anchors') and anchors != engine.anchors:
@@ -308,31 +266,41 @@ with st.sidebar:
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # --- CONTROLES DE REFORMULAÇÃO GREEN ---
     if st.session_state.current_formula:
         st.markdown(f"""<h1 style="color:{LOREAL_GREEN}; font-size:14px; letter-spacing:2px;">♻️ SUSTAINABILITY</h1>""", unsafe_allow_html=True)
         
-        if st.button("REFORMULATE GREEN", help="Substitui ingredientes por alternativas bio"):
-            with st.spinner("SEARCHING FOR BIO-ALTERNATIVES..."):
-                # Executa a lógica local de reformulação
-                new_formula, logs = run_green_reformulation(st.session_state.current_formula)
+        # --- AQUI ESTÁ A CORREÇÃO: CONEXÃO COM O BACKEND ROBUSTO ---
+        if st.button("REFORMULATE GREEN", help="Substitui ingredientes mantendo o cheiro alvo"):
+            with st.spinner("EVOLVING BIO-ALTERNATIVES (GENETIC ALGORITHM)..."):
                 
-                if logs:
-                    st.session_state.current_formula = new_formula
-                    st.session_state.round_count += 1
+                # 1. Pega moléculas atuais
+                target_molecules = st.session_state.current_formula['molecules']
+                
+                # 2. Chama o motor de descoberta corrigido (Backend)
+                # rounds=20 é suficiente para a mutação convergir
+                try:
+                    results = engine.reformulate_green(target_molecules, rounds=30)
                     
-                    # Salva no histórico
-                    st.session_state.history.insert(0, {
-                        "GEN": f"#{st.session_state.round_count} (GREEN)",
-                        "SCORE": "N/A",
-                        "COMPLEXITY": "REF",
-                        "NOTES": len(new_formula['molecules'])
-                    })
-                    
-                    st.toast(f"Reformulated! {len(logs)} changes made.", icon="🌿")
-                    st.rerun()
-                else:
-                    st.toast("Formula is already optimal or no substitutes found.", icon="✅")
+                    if results:
+                        # Pega o melhor resultado do Algoritmo Genético
+                        best_green = max(results, key=lambda x: x['fitness'])
+                        
+                        st.session_state.current_formula = best_green
+                        st.session_state.round_count += 1
+                        
+                        st.session_state.history.insert(0, {
+                            "GEN": f"#{st.session_state.round_count} (GREEN)",
+                            "SCORE": f"{best_green['fitness']:.2f}",
+                            "COMPLEXITY": f"{best_green['eco_score']:.2f} (Eco)",
+                            "NOTES": len(best_green['molecules'])
+                        })
+                        
+                        st.toast(f"Success! Eco-Score: {best_green['eco_score']:.2f}", icon="🌿")
+                        st.rerun()
+                    else:
+                        st.warning("Genetic Algorithm converged but found no better Green alternatives.")
+                except Exception as e:
+                    st.error(f"Erro na reformulação: {e}")
 
     st.markdown("<br>"*5, unsafe_allow_html=True)
     if st.button("RESET LABORATORY"):
@@ -346,17 +314,22 @@ with st.sidebar:
 # =========================================================
 def generate_next():
     with st.spinner("SYNTHESIZING..."):
-        discoveries = engine.discover(rounds=1)
-        if discoveries:
-            new_f = discoveries[-1]
-            # Calcula Eco Score na geração também
-            eco, stats = comp_engine.calculate_eco_score(new_f['molecules'])
-            new_f['eco_score'] = eco
-            if 'chemistry' not in new_f: new_f['chemistry'] = {}
-            new_f['chemistry']['eco_stats'] = stats
+        try:
+            discoveries = engine.discover(rounds=20) # Aumentei os rounds para garantir resultado
             
-            st.session_state.current_formula = new_f
-            st.session_state.round_count += 1
+            if discoveries:
+                new_f = discoveries[-1] # Pega o último (que deve ser o melhor ou mais recente)
+                eco, stats = comp_engine.calculate_eco_score(new_f['molecules'])
+                new_f['eco_score'] = eco
+                if 'chemistry' not in new_f: new_f['chemistry'] = {}
+                new_f['chemistry']['eco_stats'] = stats
+                
+                st.session_state.current_formula = new_f
+                st.session_state.round_count += 1
+            else:
+                st.error("Synthesis failed: Genetic Algorithm produced no valid formulas.")
+        except Exception as e:
+            st.error(f"Synthesis Error: {e}")
 
 # =========================================================
 # UI PRINCIPAL
@@ -378,7 +351,6 @@ with col_h2:
 
 st.markdown("<hr style='border-color:#EEE;'>", unsafe_allow_html=True)
 
-# --- ESTADO VAZIO OU CONTEÚDO ---
 if st.session_state.current_formula is None:
     st.markdown("<div style='height:200px;'></div>", unsafe_allow_html=True)
     col_btn, _ = st.columns([1, 2])
@@ -390,16 +362,13 @@ else:
     chem = data.get('chemistry', {})
     mols = data['molecules']
     
-    # Simulação de Business (se disponível)
     biz_engine = PerfumeBusinessEngine()
     market = biz_engine.calculate_global_fit(mols)
     finances = biz_engine.estimate_financials(mols, chem.get('complexity',0), chem.get('neuro_score',0))
     
-    # Recupera Eco-Stats e Score
     eco_score = data.get('eco_score', 0.0)
     eco_stats = chem.get('eco_stats', {"biodegradable_pct": 0, "renewable_pct": 0, "avg_carbon_footprint": 10})
 
-    # KPIs
     k1, k2, k3, k4, k5 = st.columns(5)
     metrics = [
         ("Longevity", f"{chem.get('longevity',0):.1f}h"),
@@ -422,7 +391,6 @@ else:
         st.markdown("### ⚗️ Formula Analysis")
         df_mols = pd.DataFrame(mols)
         
-        # Garante colunas booleanas
         if 'biodegradability' not in df_mols.columns: df_mols['biodegradability'] = False
         if 'renewable_source' not in df_mols.columns: df_mols['renewable_source'] = False
         
@@ -461,6 +429,14 @@ else:
                 st.altair_chart(fam_chart, use_container_width=True)
             else:
                 st.caption("No evolution data available.")
+        
+        # --- AQUI ESTÁ A CORREÇÃO DE VISIBILIDADE ---
+        chem_risks = chem.get('chemical_risks', [])
+        if chem_risks:
+            st.markdown("---")
+            st.error("🧪 CHEMICAL STABILITY ALERTS")
+            for risk in chem_risks:
+                st.warning(risk)
 
     with col_right:
         st.markdown("### 💼 Business Strategy")
@@ -478,7 +454,6 @@ else:
             </div>
         """, unsafe_allow_html=True)
         
-        # --- PAINEL GREEN CHEMISTRY ---
         st.markdown(f"""
             <div class="green-card">
                 <h3 style="color:{LOREAL_GREEN}; font-size:16px; margin-top:0;">🌿 Green Chemistry</h3>
@@ -493,11 +468,9 @@ else:
                 </div>
             </div>
         """, unsafe_allow_html=True)
-        
-        # --- COMPLIANCE CHECK ---
-        # Chamada corrigida ao novo ComplianceEngine
+
         is_safe, report, stats = comp_engine.check_safety(mols)
-    
+
         if not is_safe:
             st.error("⚠️ IFRA COMPLIANCE VIOLATION")
             for r in report:
@@ -507,7 +480,7 @@ else:
 
         st.markdown("---")
         st.markdown("### 🧠 Sensory Training")
-        
+
         c1, c2, c3 = st.columns(3)
         with c1: f_hedonic = st.slider("💖 Hedonic", 0, 10, 5)
         with c2: f_tech = st.slider("🛠️ Technical", 0, 10, 5)
@@ -517,27 +490,22 @@ else:
             if st.session_state.current_formula:
                 current_data = st.session_state.current_formula
                 feedback_vector = {"hedonic": f_hedonic, "technical": f_tech, "creative": f_creative}
-                
-                # 1. Registra feedback humano real
+
                 engine.register_human_feedback(current_data.get("id"), feedback_vector)
-        
-                # 2. Gera exemplos negativos artificiais (Adversarial Training)
-                # Tenta corromper a fórmula com ingredientes proibidos para ensinar a IA o que "NÃO FAZER"
+
                 restricted_chems = list(comp_engine.IFRA_LIMITS.keys())
                 corrupted_mols = [m.copy() for m in current_data['molecules']]
-                
-                # Adiciona intencionalmente uma overdose de um químico restrito
-                target_bad_chem = random.choice(restricted_chems)
-                corrupted_mols.append({'name': target_bad_chem, 'weight_factor': 10.0, 'category': 'Base'}) # Overdose massiva
 
-                # Registra como feedback negativo (Score baixo)
+                if restricted_chems:
+                    target_bad_chem = random.choice(restricted_chems)
+                    corrupted_mols.append({'name': target_bad_chem, 'weight_factor': 10.0, 'category': 'Base'}) # Overdose massiva
+
                 engine.register_human_feedback(
                     None,
                     {"hedonic": 0.1, "technical": 0.0, "creative": 0.0}, 
                     custom_mols=corrupted_mols 
                 )
 
-                # Executa passo de treino
                 if hasattr(engine, 'trainer') and engine.trainer:
                     engine.trainer.train_step(engine.buffer)
                     st.success("Neuro-weights updated with Adversarial Examples!")
