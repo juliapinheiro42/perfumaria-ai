@@ -23,13 +23,13 @@ except Exception as e_db:
     print(f" [MARKET] Falha no Banco de Dados ({e_db}). Tentando CSV local...")
 
     try:
-        df_insumos = pd.read_csv("insumos.csv")
+        df_insumos = pd.read_csv("data/insumos.csv")
         df_insumos = df_insumos.drop_duplicates(subset=['name'])
         df_insumos = df_insumos.set_index("name")
         DADOS_INSUMOS = df_insumos.to_dict('index')
         print(f"✅ {len(DADOS_INSUMOS)} insumos carregados do CSV.")
     except Exception as e_csv:
-        print(f"❌ [MARKET] Erro crítico: Nem DB nem CSV disponíveis. {e_csv}")
+        print(f" [MARKET] Erro crítico: Nem DB nem CSV disponíveis. {e_csv}")
         DADOS_INSUMOS = {}
 
 

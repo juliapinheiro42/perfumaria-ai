@@ -9,3 +9,7 @@ rdkit
 optuna
 sqlalchemy
 psycopg2-binary
+streamlit
+altair
+plotly
+torch_geometric

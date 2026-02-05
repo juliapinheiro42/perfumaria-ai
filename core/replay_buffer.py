@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import random
 
+
 class ReplayBuffer:
     def __init__(self, max_size=2000):
         self.max_size = max_size
@@ -20,7 +21,7 @@ class ReplayBuffer:
             self.storage.pop(0)
             self.targets.pop(0)
             self.weights.pop(0)
-        
+
         self.storage.append(graphs)
         self.targets.append(float(fitness))
         self.weights.append(float(weight))
@@ -37,23 +38,24 @@ class ReplayBuffer:
         if current_size == 0:
             return []
 
-        indices = np.random.choice(current_size, min(current_size, batch_size), replace=False)
-        
+        indices = np.random.choice(current_size, min(
+            current_size, batch_size), replace=False)
+
         flat_data_list = []
-        
+
         for i in indices:
             graphs_list = self.storage[i]
             target_val = self.targets[i]
             weight_val = self.weights[i]
-            
+
             for graph in graphs_list:
                 g = graph.clone()
-                
+
                 g.y = torch.tensor([target_val], dtype=torch.float)
                 g.weight = torch.tensor([weight_val], dtype=torch.float)
-                
+
                 flat_data_list.append(g)
-                
+
         return flat_data_list
 
     def get_all(self):
@@ -62,45 +64,47 @@ class ReplayBuffer:
         Usado para retreino completo (Warmup ou Checkpoints).
         """
         flat_data_list = []
-        
+
         for i, graphs_list in enumerate(self.storage):
             target_val = self.targets[i]
             weight_val = self.weights[i]
-            
+
             for graph in graphs_list:
                 g = graph.clone()
                 g.y = torch.tensor([target_val], dtype=torch.float)
                 g.weight = torch.tensor([weight_val], dtype=torch.float)
                 flat_data_list.append(g)
-                
+
         return flat_data_list
-    
+
+    @staticmethod
     def generate_negative_examples(formula, compliance_engine, num_variants=3):
         negatives = []
-    
+
         restricted = list(compliance_engine.IFRA_LIMITS.keys())
-    
+
         high_impact = [
-            m['name'] for m in formula 
+            m['name'] for m in formula
             if m.get('odor_potency', 'medium').lower() in ['ultra', 'high']
         ]
-    
+
         targets = list(set(restricted + high_impact))
-    
-        if not targets: return []
+
+        if not targets:
+            return []
 
         for _ in range(num_variants):
             corrupted_formula = [m.copy() for m in formula]
-        
+
             target_chem_name = random.choice(targets)
-        
+
             for ingredient in corrupted_formula:
                 if ingredient['name'] == target_chem_name:
                     ingredient['weight_factor'] *= random.uniform(10.0, 50.0)
-        
+
             is_safe, _, _ = compliance_engine.check_safety(corrupted_formula)
-        
+
             if not is_safe:
                 negatives.append((corrupted_formula, 0.00001))
-            
+
         return negatives

@@ -1,90 +1,116 @@
+import pandas as pd
 import numpy as np
+from sqlalchemy.orm import Session
+from infra.models import Ingredient, Molecule, Composition
 import torch
 from torch_geometric.data import Data
-from rdkit import Chem, DataStructs
-from rdkit.Chem.rdFingerprintGenerator import GetMorganGenerator
+
 
 class FeatureEncoder:
-    FP_BITS = 256
-    INPUT_SIZE = 15 + FP_BITS 
-    
-    NODE_FEATURES = 5 
+    def __init__(self, session: Session = None):
+        self.char_to_int = {}
+        self.int_to_char = {}
+        self.vocab_size = 0
+        self.max_length = 0
+        self.data = None
+        self.vectors = None
+
+        if session:
+            self.load_from_db(session)
+
+    def load_from_db(self, session: Session):
+        """
+        Carrega dados do PostgreSQL e prepara os vetores para a IA.
+        Recria a estrutura 'flat' que existia no CSV para facilitar o uso nos modelos.
+        """
+        print(" Conectando ao Banco de Dados para carregar Encoder...")
+
+        results = session.query(
+            Ingredient.name,
+            Ingredient.category,
+            Ingredient.price,
+            Molecule.smiles,
+            Molecule.molecular_weight,
+            Molecule.log_p
+        ).join(Composition, Ingredient.id == Composition.ingredient_id)\
+         .join(Molecule, Composition.molecule_id == Molecule.id)\
+         .all()
+
+        if not results:
+            raise ValueError(
+                " O banco de dados está vazio! Rode o 'migrate_db.py' primeiro.")
+
+        self.data = pd.DataFrame(results, columns=[
+            'name', 'category', 'price', 'smiles', 'molecular_weight', 'log_p'
+        ])
+
+        self.names = self.data['name'].tolist()
+        self.name_to_idx = {name: i for i, name in enumerate(self.names)}
+        self.idx_to_name = {i: name for i, name in enumerate(self.names)}
+
+        features = self.data[['molecular_weight', 'log_p', 'price']].fillna(0)
+
+        features = self.data[['molecular_weight', 'log_p', 'price']].fillna(0)
+
+        denominator = features.max() - features.min()
+        denominator = denominator.replace(0, 1.0)
+        self.vectors = (features - features.min()) / denominator
+        self.vectors = self.vectors.values.astype(np.float32)
+
+        print(
+            f" Encoder carregado com {len(self.data)} ingredientes do Banco de Dados.")
 
     @staticmethod
-    def smiles_to_graph(smiles):
-        """Converte um SMILES num objeto Data do PyTorch Geometric."""
-        if not isinstance(smiles, str): return None
-        mol = Chem.MolFromSmiles(smiles)
-        if not mol: return None
+    def encode_blend(molecules):
+        """
+        Converte uma lista de moléculas em um vetor numérico único (média das features).
+        Usado para comparar similaridade entre perfumes.
+        """
+        if not molecules:
+            # Retorna vetor zerado de 5 posições (ajuste conforme seu modelo)
+            return np.zeros(5, dtype=np.float32)
 
-        nodes = []
-        for atom in mol.GetAtoms():
-            nodes.append([
-                float(atom.GetAtomicNum()),
-                float(atom.GetDegree()),
-                float(atom.GetFormalCharge()),
-                float(atom.GetIsAromatic()),
-                float(atom.GetMass() / 100.0)
-            ])
-        x = torch.tensor(nodes, dtype=torch.float)
+        vectors = []
+        for m in molecules:
+            # Extrai propriedades numéricas básicas
+            v = [
+                float(m.get('molecular_weight', 0)),
+                float(m.get('polarity', 0)),  # LogP
+                float(m.get('russell_valence', 0)),
+                float(m.get('russell_arousal', 0)),
+                float(m.get('weight_factor', 1.0))
+            ]
+            vectors.append(v)
 
-        edge_index = []
-        for bond in mol.GetBonds():
-            i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-            edge_index.append([i, j])
-            edge_index.append([j, i])
-        
-        edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
-        return Data(x=x, edge_index=edge_index)
+        # Retorna a média para representar o "perfil" do perfume inteiro
+        return np.mean(vectors, axis=0).astype(np.float32)
 
     @staticmethod
     def encode_graphs(molecules):
-        """Retorna uma lista de grafos para processamento na GNN."""
+        """
+        Converte moléculas em grafos para a Rede Neural (GNN).
+        """
         graphs = []
         for m in molecules:
-            graph = FeatureEncoder.smiles_to_graph(m.get("smiles"))
-            if graph:
-                graphs.append(graph)
+
+            node_features = [
+                float(m.get('molecular_weight', 0)),
+                float(m.get('polarity', 0)),
+                float(m.get('russell_valence', 0)),
+                float(m.get('russell_arousal', 0)),
+                1.0
+            ]
+
+            x = torch.tensor([node_features], dtype=torch.float)
+            edge_index = torch.tensor([[0], [0]], dtype=torch.long)
+
+            data = Data(x=x, edge_index=edge_index)
+            graphs.append(data)
+
         return graphs
 
-    @staticmethod
-    def encode_blend(molecules, fp_bits: int = None) -> np.ndarray:
-        """Gera o vetor fixo para o BayesianSurrogate, evitando erros de forma."""
-        if fp_bits is None:
-            fp_bits = FeatureEncoder.FP_BITS
-
-        mw, pol, bp, mol_mr, rot_bonds, h_donors = [], [], [], [], [], []
-        fingerprints = []
-
-        for m in molecules:
-            mw.append(m.get("molecular_weight", 150.0))
-            pol.append(m.get("polarity", 2.0))
-            bp.append(m.get("boiling_point", 200.0))
-            
-            rd = m.get("rdkit", {})
-            mol_mr.append(rd.get("MolMR", 0.0))
-            rot_bonds.append(rd.get("RotBonds", 0.0))
-            h_donors.append(rd.get("HDonors", 0.0))
-
-            smiles = m.get("smiles")
-            mol = Chem.MolFromSmiles(smiles) if isinstance(smiles, str) else None
-            
-            if mol:
-                gen = GetMorganGenerator(radius=2, fpSize=fp_bits)
-                fp = gen.GetFingerprint(mol)
-                arr = np.zeros(fp_bits, dtype=np.float32)
-                DataStructs.ConvertToNumpyArray(fp, arr)
-                fingerprints.append(arr)
-            else:
-                fingerprints.append(np.zeros(fp_bits, dtype=np.float32))
-
-        numeric_features = np.array([
-            np.mean(mw), np.std(mw), np.min(mw), np.max(mw),
-            np.mean(pol), np.std(pol),
-            np.mean(bp), np.std(bp), np.min(bp), np.max(bp),
-            float(len(molecules)),
-            np.mean(np.array(mw) / (np.array(bp) + 1.0)),
-            np.mean(mol_mr), np.mean(rot_bonds), np.mean(h_donors)
-        ], dtype=np.float32)
-
-        return np.concatenate([numeric_features, np.mean(fingerprints, axis=0)])
+    def get_closest(self, target_vector, n=5):
+        """Encontra os N ingredientes mais parecidos quimicamente."""
+        dists = np.linalg.norm(self.vectors - target_vector, axis=1)
+        nearest_indices = dists.argsort()[:n]
+        return self.data.iloc[nearest_indices]

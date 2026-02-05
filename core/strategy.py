@@ -4,16 +4,15 @@ import re
 import random
 from core.presets import ACORDES_LIB, PERFUME_SKELETONS
 
+
 class StrategyAgent:
     def __init__(self, llm_client):
         self.llm = llm_client
 
-    
-
     def propose_strategy(self, discoveries, goal):
         try:
-            history = sorted(discoveries, key=lambda d: d['fitness'], reverse=True)[:5]
-
+            history = sorted(
+                discoveries, key=lambda d: d['fitness'], reverse=True)[:5]
 
             prompt = (
                 f"You are a Master Perfumer AI. Goal: {goal}.\n\n"
@@ -31,11 +30,16 @@ class StrategyAgent:
                 f"}}\n\n"
                 f"Recent Best Discoveries:\n{json.dumps(history, indent=2)}"
             )
-            
+
             response = self.llm.generate(prompt)
             strategy = self._parse_response(response)
-            
-            print(f" [IA] Estratégia gerada. Acorde sugerido: {strategy.get('recommended_accord')}")
+
+            if strategy is None:
+                print(" [IA] Failed to parse strategy JSON. Using default.")
+                return self._get_default_strategy()
+
+            print(
+                f" [IA] Estratégia gerada. Acorde sugerido: {strategy.get('recommended_accord')}")
 
             if random.random() < strategy.get("exploration_bias", 0.3):
                 print(" [EPSILON-GREEDY] Forçando exploração de novas moléculas!")
@@ -58,7 +62,7 @@ class StrategyAgent:
             if start_idx == -1 or end_idx == -1:
                 raise ValueError("No JSON brackets found")
 
-            json_str = text[start_idx : end_idx + 1]
+            json_str = text[start_idx: end_idx + 1]
             return json.loads(json_str)
         except Exception:
             pass
@@ -66,8 +70,55 @@ class StrategyAgent:
     def _get_default_strategy(self):
         return {
             "recommended_accord": None,
-            "num_molecules": [3, 5], 
-            "volatility_range": [0.2, 0.8], 
-            "molecular_weight_range": [150, 350], 
+            "num_molecules": [3, 5],
+            "volatility_range": [0.2, 0.8],
+            "molecular_weight_range": [150, 350],
             "exploration_bias": 0.3
         }
+
+    def mutate(self, molecules):
+        # Verifica se estamos no modo "Reformulate Green"
+        # (Sabemos disso se existir um target_vector definido no discovery)
+        is_green_mode = getattr(
+            self.discovery, 'target_vector', None) is not None
+
+        for i, m in enumerate(molecules):
+            if random.random() < self.mutation_rate:
+
+                # Protege (pula) acordes importantes se não formos forçados a mudar
+                if m.get("accord_id") and random.random() < 0.5:
+                    continue
+
+                # === LÓGICA DE TROCA (SWAP) ===
+
+                # Se for Green Mode, aumentamos a chance de troca para acelerar a reformulação (60%)
+                # Se for modo normal, mantém 30%
+                swap_chance = 0.6 if is_green_mode else 0.3
+
+                if random.random() < swap_chance:
+                    if is_green_mode:
+                        # [NOVO] Força a busca por um ingrediente ecológico
+                        print(
+                            f" [EVO] Buscando alternativa GREEN para {m.get('name')}...")
+                        new_mol = self.discovery.get_green_replacement(m)
+
+                        # Mantém o peso original para não estragar o balanço da fórmula
+                        new_mol['weight_factor'] = m.get('weight_factor', 1.0)
+                        molecules[i] = new_mol
+                    else:
+                        # Comportamento padrão (aleatório)
+                        molecules[i] = self.discovery._random_molecule()
+                    continue
+
+                # === FIM DA LÓGICA DE TROCA ===
+
+                # Mutações numéricas (Peso e Polaridade) - Mantém igual
+                mw = m.get("molecular_weight", 150.0)
+                mw *= random.uniform(1 - self.mutation_strength,
+                                     1 + self.mutation_strength)
+                m["molecular_weight"] = float(np.clip(mw, 80, 600))
+
+                pol = m.get("polarity", 2.0)
+                pol *= random.uniform(1 - self.mutation_strength,
+                                      1 + self.mutation_strength)
+                m["polarity"] = float(np.clip(pol, 0.1, 6.0))

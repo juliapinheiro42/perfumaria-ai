@@ -1,83 +1,67 @@
-import streamlit as st
-import pandas as pd
-from sqlalchemy import create_engine, text
 import os
 from dotenv import load_dotenv
-from urllib.parse import quote_plus
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import pandas as pd
+
+from infra.models import Ingredient, Psychophysics
 
 load_dotenv()
 
 
 def get_db_engine():
-    """Cria a conexão com o banco usando variáveis de ambiente (.env)."""
     try:
-        user = os.getenv("DB_USER")
-        password = os.getenv("DB_PASSWORD")
-        host = os.getenv("DB_HOST")
-        port = os.getenv("DB_PORT")
-        dbname = os.getenv("DB_NAME")
+        db_user = os.getenv('DB_USER')
+        db_pass = os.getenv('DB_PASSWORD')
+        db_host = os.getenv('DB_HOST')
+        db_name = os.getenv('DB_NAME')
+        db_port = os.getenv('DB_PORT', '5432')
 
-        if not all([user, password, host, port, dbname]):
-            # Usando st.warning para não quebrar a UI se faltar config
-            print("⚠️ Configuração de Banco de Dados incompleta no .env")
-            return None
-
-        # Codifica a senha para evitar erro com caracteres especiais
-        encoded_password = quote_plus(password)
-
-        # --- MUDANÇA PRINCIPAL AQUI ---
-        # Adicionamos ?client_encoding=utf8 no final da URL
-        url = f"postgresql+psycopg2://{user}:{encoded_password}@{host}:{port}/{dbname}?client_encoding=utf8"
-
-        engine = create_engine(url)
-        return engine
+        DB_URI = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+        return create_engine(DB_URI)
     except Exception as e:
-        # Usamos repr(e) para evitar erro de decodificação na hora de printar o erro
-        print(f"❌ Erro de configuração do Banco de Dados: {repr(e)}")
+        print(f" Erro ao criar engine: {e}")
         return None
 
 
-@st.cache_data(ttl=3600)
 def load_insumos_from_db():
     """
-    Carrega os dados do PostgreSQL.
+    Carrega um dicionário otimizado para o Business Engine.
+    Retorna: Dict[nome_ingrediente, {dados}]
     """
     engine = get_db_engine()
     if not engine:
         return {}
 
-    query = """
-    SELECT 
-        i.name as name,
-        m.molecular_weight,
-        m.log_p as polarity,
-        m.smiles,
-        i.category,
-        i.price as price_per_kg,
-        m.description as olfactive_notes,
-        i.olfactive_family,
-        i.ifra_limit,
-        m.vapor_pressure
-    FROM ingredients i
-    LEFT JOIN composition c ON i.id = c.ingredient_id
-    LEFT JOIN molecules m ON c.molecule_id = m.id
-    WHERE m.smiles IS NOT NULL
-    """
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
     try:
-        with engine.connect() as conn:
-            df = pd.read_sql(text(query), conn)
+        query = session.query(
+            Ingredient.name,
+            Ingredient.price,
+            Ingredient.ifra_limit,
+            Ingredient.traditional_use,
+            Psychophysics.russell_valence,
+            Psychophysics.russell_arousal
+        ).outerjoin(Psychophysics, Ingredient.id == Psychophysics.ingredient_id)
 
-        if df.empty:
-            print("⚠️ [DB] Query executada com sucesso, mas retornou 0 linhas.")
-            return {}
+        results = query.all()
 
-        df = df.drop_duplicates(subset=['name'])
-        df = df.set_index("name")
+        dados = {}
+        for row in results:
+            dados[row.name] = {
+                "price_per_kg": float(row.price) if row.price else 100.0,
+                "ifra_limit": float(row.ifra_limit) if row.ifra_limit else 1.0,
+                "traditional_use": row.traditional_use or "",
+                "russell_valence": float(row.russell_valence) if row.russell_valence else 0.0,
+                "russell_arousal": float(row.russell_arousal) if row.russell_arousal else 0.0
+            }
 
-        return df.to_dict('index')
+        return dados
 
     except Exception as e:
-        # MUDANÇA AQUI TAMBÉM: repr(e) evita o crash do 'ç'
-        print(f"⚠️ [DB] Erro ao carregar dados do SQL: {repr(e)}")
+        print(f" Erro ao ler dados do SQL: {e}")
         return {}
+    finally:
+        session.close()
