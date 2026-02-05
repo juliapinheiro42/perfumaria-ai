@@ -8,21 +8,16 @@ import altair as alt
 import plotly.graph_objects as go
 import random
 
-# Tenta importar o backend (Mantido igual)
-try:
-    from infra.gemini_client import GeminiClient
-    from core.strategy import StrategyAgent
-    from core.discovery import DiscoveryEngine
-    from core.model import MoleculeGNN
-    from core.market import PerfumeBusinessEngine
-    from core.compliance import ComplianceEngine
-except ImportError as e:
-    # Mock para rodar visualmente caso falte o backend, remova em produção
-    st.warning(f"Modo de Visualização (Backend não encontrado: {e})")
+# Tenta importar o backend
+from infra.gemini_client import GeminiClient
+from core.strategy import StrategyAgent
+from core.discovery import DiscoveryEngine
+from core.model import MoleculeGNN
+from core.market import PerfumeBusinessEngine
+from core.compliance import ComplianceEngine
 
-    class MockEngine:
-        pass
-    engine = MockEngine()
+# Inicialização do backend
+# (Se necessário, inicialize o engine aqui ou dentro da lógica principal)
 
 # =========================================================
 # CONFIGURAÇÃO VISUAL & CSS AVANÇADO

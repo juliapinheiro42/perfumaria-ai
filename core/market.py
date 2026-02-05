@@ -3,10 +3,7 @@ from typing import List, Dict, Any
 import numpy as np
 
 
-try:
-    from infra.database import load_insumos_from_db
-except ImportError:
-    def load_insumos_from_db(): return {}
+from infra.database import load_insumos_from_db
 
 DADOS_INSUMOS = {}
 

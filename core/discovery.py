@@ -10,10 +10,7 @@ from rdkit.Chem import Descriptors
 
 from core.encoder import FeatureEncoder
 
-try:
-    from torch_geometric.loader import DataLoader
-except ImportError:
-    DataLoader = None
+from torch_geometric.loader import DataLoader
 
 from core.evolution import EvolutionEngine
 from core.surrogate import BayesianSurrogate
