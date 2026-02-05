@@ -7,3 +7,5 @@ groq
 python-dotenv
 rdkit
 optuna
+sqlalchemy
+psycopg2-binary
