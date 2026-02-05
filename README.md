@@ -70,8 +70,8 @@ O sistema opera em um ciclo contínuo de aprendizado e descoberta, dividido em q
 Para iniciar a simulação de descoberta de perfumes, primeiro execute o turning, após isso execute o arquivo principal:
 
 ```bash
-python experiments.turning
-python main.py
+python -m experiments.tuning
+streamlit run main.py
 ```
 
 ### O que acontece durante a execução?

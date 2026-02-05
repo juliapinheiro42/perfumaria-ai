@@ -7,8 +7,17 @@ import numpy as np
 import pandas as pd
 
 from core.discovery import DiscoveryEngine
-from core.model import PerfumeTechModel
 from core.encoder import FeatureEncoder
+
+class PerfumeTechModel(nn.Module):
+    def __init__(self, input_size):
+        super(PerfumeTechModel, self).__init__()
+        self.network = nn.Identity()
+        # Dummy layer to ensure model.parameters() is not empty for ModelTrainer
+        self.dummy = nn.Linear(1, 1)
+
+    def forward(self, x):
+        return self.network(x)
 
 def load_data(n_samples=500):
     """
