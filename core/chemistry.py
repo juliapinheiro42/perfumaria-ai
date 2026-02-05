@@ -130,18 +130,18 @@ class ChemistryEngine:
             raw_threshold = m.get("odor_threshold_ppb")
             threshold = 50.0
 
-            try:
-                if raw_threshold not in (None, ""):
+            if raw_threshold not in (None, ""):
+                try:
                     threshold = float(raw_threshold)
-                else:
-                    potency_class = str(
-                        m.get("odor_potency", "medium")
-                    ).lower().strip()
-                    threshold = self.POTENCY_MAP.get(
-                        potency_class, 50.0
-                    )
-            except Exception:
-                threshold = 50.0
+                except ValueError:
+                    threshold = 50.0
+            else:
+                potency_class = str(
+                    m.get("odor_potency", "medium")
+                ).lower().strip()
+                threshold = self.POTENCY_MAP.get(
+                    potency_class, 50.0
+                )
 
             threshold = max(threshold, 1e-6)
 
