@@ -1,5 +1,9 @@
 import sys
+import os
 from unittest.mock import MagicMock
+
+# Add root directory to sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Mock dependencies BEFORE imports
 # rdkit

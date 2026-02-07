@@ -13,3 +13,4 @@ streamlit
 altair
 plotly
 torch_geometric
+pytest
