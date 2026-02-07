@@ -28,13 +28,11 @@ class ComplianceEngine:
                 if limit_val < 100.0:
                     self.dynamic_limits[row['name'].strip()] = limit_val
 
-        # IFRA defaults (keys stored lowercase for consistent comparison)
         self.IFRA_LIMITS = {
             "citral": 0.6, "isoeugenol": 0.11, "eugenol": 2.5, "cinnamal": 0.05,
             "coumarin": 1.6, "geraniol": 4.7, "benzyl benzoate": 4.8, "oakmoss absolute": 0.1
         }
 
-        # unify all limits as lowercase keys
         self.ALL_LIMITS = {**{k.lower(): v for k, v in self.IFRA_LIMITS.items()},
                            **{k.strip().lower(): v for k, v in self.dynamic_limits.items()}}
 

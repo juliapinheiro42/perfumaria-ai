@@ -13,7 +13,7 @@ class Molecule(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     smiles: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     molecular_weight: Mapped[float] = mapped_column(Float, nullable=True)
-    log_p: Mapped[float] = mapped_column(Float, nullable=True)  # Polarity
+    log_p: Mapped[float] = mapped_column(Float, nullable=True)
 
     ingredients_composition = relationship(
         "Composition", back_populates="molecule")

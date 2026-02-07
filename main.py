@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Carrega variáveis de ambiente (.env)
 load_dotenv()
 
 try:
@@ -148,20 +147,17 @@ def render_sensory_radar(chemistry_data, finances):
     if not chemistry_data:
         return None
 
-    # Normalizando dados para escala 0-10
     categories = ['Longevidade', 'Projeção',
                   'Complexidade', 'Evolução', 'Custo-Benefício']
 
-    # Tratando valores seguros
     longevity = min(chemistry_data.get('longevity', 0) /
                     1.2, 10)  # Assumindo 12h como max
     projection = chemistry_data.get('projection', 0)
     complexity = chemistry_data.get('complexity', 0)
     evolution = chemistry_data.get('evolution', 0)
 
-    # Custo inverso (quanto menor o custo, maior a nota de benefício)
     cost = finances.get('cost', 100)
-    cost_score = max(0, 10 - (cost / 50))  # Exemplo de normalização
+    cost_score = max(0, 10 - (cost / 50))
 
     values = [longevity, projection, complexity, evolution, cost_score]
 
@@ -171,7 +167,7 @@ def render_sensory_radar(chemistry_data, finances):
         theta=categories,
         fill='toself',
         name='Fórmula Atual',
-        line_color='#C5A059',  # L'Oréal Gold
+        line_color='#C5A059',
         fillcolor='rgba(197, 160, 89, 0.2)'
     ))
 
@@ -214,7 +210,6 @@ def get_engine(_model):
     except:
         strategy_agent = None
 
-    # Conexão com o Banco de Dados
     try:
         db_user = os.getenv('DB_USER')
         db_pass = os.getenv('DB_PASSWORD')
@@ -231,7 +226,6 @@ def get_engine(_model):
         st.error(f"Erro ao conectar no Banco de Dados: {e}")
         return None
 
-    # Inicializa engine passando a sessão do banco
     engine_instance = DiscoveryEngine(
         model=_model,
         strategy_agent=strategy_agent,
@@ -256,7 +250,6 @@ if 'engine' not in st.session_state:
 
 engine = st.session_state.engine
 
-# Se falhou a conexão, para a execução
 if engine is None:
     st.stop()
 
@@ -374,7 +367,6 @@ else:
     chem = data.get('chemistry', data)
     mols = data['molecules']
 
-    # Criação segura dos objetos de negócio
     biz_engine = PerfumeBusinessEngine()
     market = biz_engine.calculate_global_fit(mols)
     finances = biz_engine.estimate_financials(
@@ -429,7 +421,6 @@ else:
     with col_right:
         st.markdown("### 💼 Business Strategy")
 
-        # --- UPDATE: Radar Chart Visualization ---
         st.markdown(f"""<div class="biz-card"><p style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:2px; margin-bottom:5px;">MARKET POSITION</p><h2 style="color:white; margin-bottom:20px;">{finances.get('market_tier', 'Prestige').upper()}</h2><div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;"><span>Target Price</span><span style="color:{LOREAL_GOLD}; font-weight:bold;">${finances.get('price', 0):.2f}</span></div>""", unsafe_allow_html=True)
 
         radar = render_sensory_radar(chem, finances)
@@ -439,7 +430,6 @@ else:
 
         st.markdown(
             f"""<div style="margin-top:20px; color:white;"><p style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:2px; margin-bottom:5px;">PRIMARY MARKET</p><p style="font-size:18px;">{market.get('best', 'Global')}</p></div></div>""", unsafe_allow_html=True)
-        # ------------------------------------------
 
         st.markdown(f"""<div class="green-card"><h3 style="color:{LOREAL_GREEN}; font-size:16px; margin-top:0;">🌿 Green Chemistry</h3><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Biodegradable</span><b>{eco_stats.get('biodegradable_pct', 0)}%</b></div><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Renewable</span><b>{eco_stats.get('renewable_pct', 0)}%</b></div><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Carbon Footprint</span><b>{eco_stats.get('avg_carbon_footprint', 10):.1f}</b></div></div>""", unsafe_allow_html=True)
         is_safe, report, stats = comp_engine.check_safety(mols)

@@ -77,42 +77,29 @@ class StrategyAgent:
         }
 
     def mutate(self, molecules):
-        # Verifica se estamos no modo "Reformulate Green"
-        # (Sabemos disso se existir um target_vector definido no discovery)
         is_green_mode = getattr(
             self.discovery, 'target_vector', None) is not None
 
         for i, m in enumerate(molecules):
             if random.random() < self.mutation_rate:
 
-                # Protege (pula) acordes importantes se não formos forçados a mudar
                 if m.get("accord_id") and random.random() < 0.5:
                     continue
 
-                # === LÓGICA DE TROCA (SWAP) ===
-
-                # Se for Green Mode, aumentamos a chance de troca para acelerar a reformulação (60%)
-                # Se for modo normal, mantém 30%
                 swap_chance = 0.6 if is_green_mode else 0.3
 
                 if random.random() < swap_chance:
                     if is_green_mode:
-                        # [NOVO] Força a busca por um ingrediente ecológico
                         print(
                             f" [EVO] Buscando alternativa GREEN para {m.get('name')}...")
                         new_mol = self.discovery.get_green_replacement(m)
 
-                        # Mantém o peso original para não estragar o balanço da fórmula
                         new_mol['weight_factor'] = m.get('weight_factor', 1.0)
                         molecules[i] = new_mol
                     else:
-                        # Comportamento padrão (aleatório)
                         molecules[i] = self.discovery._random_molecule()
                     continue
 
-                # === FIM DA LÓGICA DE TROCA ===
-
-                # Mutações numéricas (Peso e Polaridade) - Mantém igual
                 mw = m.get("molecular_weight", 150.0)
                 mw *= random.uniform(1 - self.mutation_strength,
                                      1 + self.mutation_strength)

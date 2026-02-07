@@ -7,7 +7,6 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors
 from sqlalchemy.orm import Session
 
-# Imports do seu projeto
 from core.encoder import FeatureEncoder
 from core.evolution import EvolutionEngine
 from core.surrogate import BayesianSurrogate
@@ -34,7 +33,7 @@ class DiscoveryEngine:
         """
         self.model = model
         self.strategy_agent = strategy_agent
-        self.session = session  # Sessão do Banco de Dados
+        self.session = session
 
         self.chemistry = ChemistryEngine()
         self.buffer = ReplayBuffer()
@@ -51,7 +50,6 @@ class DiscoveryEngine:
         self.compliance = ComplianceEngine()
         self.last_human_score = 0.0
 
-        # Carregamento de Dados (DB -> DataFrame)
         self.df_insumos = pd.DataFrame()
         self.insumos_dict = {}
 
@@ -70,7 +68,6 @@ class DiscoveryEngine:
         """
         print(f"[INIT] Carregando insumos do Banco de Dados...")
         try:
-            # Query que une todas as tabelas para ter todos os atributos
             query = self.session.query(
                 Ingredient.name,
                 Ingredient.category,
@@ -96,11 +93,8 @@ class DiscoveryEngine:
              .outerjoin(Sustainability, Ingredient.id == Sustainability.ingredient_id)\
              .outerjoin(Psychophysics, Ingredient.id == Psychophysics.ingredient_id)
 
-            # Executa a query e converte para DataFrame Pandas
-            # Isso mantém a compatibilidade com todo o resto do seu código
             self.df_insumos = pd.read_sql(query.statement, self.session.bind)
 
-            # Limpeza e Indexação
             self.df_insumos.columns = self.df_insumos.columns.str.strip()
             self.df_insumos['name'] = self.df_insumos['name'].astype(
                 str).str.strip()
@@ -116,7 +110,6 @@ class DiscoveryEngine:
                     self.df_insumos[col] = self.df_insumos[col].fillna(
                         False).astype(bool)
 
-            # Preenche valores nulos para evitar erros nos cálculos
             self.df_insumos.fillna({
                 'price_per_kg': 100.0,
                 'molecular_weight': 150.0,
@@ -129,7 +122,6 @@ class DiscoveryEngine:
             self.insumos_dict = self.df_insumos.set_index(
                 "name").to_dict("index")
 
-            # Validação
             self._validate_and_clean_dataset()
             print(
                 f"[INIT] {len(self.df_insumos)} insumos carregados do PostgreSQL.")
@@ -151,7 +143,6 @@ class DiscoveryEngine:
                 if not isinstance(row["smiles"], str) or len(row["smiles"]) < 2:
                     valid_mask.append(False)
                     continue
-                # Validação RDKit rápida
                 mol = Chem.MolFromSmiles(row["smiles"])
                 valid_mask.append(mol is not None)
             except:
@@ -172,7 +163,6 @@ class DiscoveryEngine:
         molecules = []
         added_names = set()
 
-        # Tenta usar esqueletos pré-definidos se existirem
         if PERFUME_SKELETONS:
             skeleton_name = random.choice(list(PERFUME_SKELETONS.keys()))
             accord_names = PERFUME_SKELETONS[skeleton_name]
@@ -196,7 +186,6 @@ class DiscoveryEngine:
                         molecules.append(mol_obj)
                         added_names.add(found_row['name'])
 
-        # Preencher volume se necessário
         target_size = random.randint(8, 14)
         attempts = 0
         while len(molecules) < target_size and attempts < 50:
@@ -255,7 +244,6 @@ class DiscoveryEngine:
                     self.discoveries.sort(
                         key=lambda x: x['fitness'], reverse=True)
 
-                # Proteção para caso a lista esteja vazia
                 if self.discoveries:
                     last_best = self.discoveries[0]["molecules"]
                     raw_mols = self._mutate_formula(last_best)
@@ -282,7 +270,6 @@ class DiscoveryEngine:
 
             self.surrogate.add_observation(feature_vec, result["fitness"])
 
-            # GNN Training Step
             graphs = FeatureEncoder.encode_graphs(molecules)
             if graphs:
                 self.buffer.add(graphs, result["fitness"], weight=1.0)
@@ -293,7 +280,6 @@ class DiscoveryEngine:
             best_fitness = max(best_fitness, result["fitness"])
             self.discoveries.append(result)
 
-        # Fallback de Segurança
         if not self.discoveries:
             print("⚠️ AVISO: Fallback ativado.")
             for _ in range(5):
@@ -351,7 +337,6 @@ class DiscoveryEngine:
             m['weight_factor'] *= dna_boost
             new_molecules.append(m)
 
-        # Busca substitutos no DataFrame carregado do BD
         possible_replacements = self.df_insumos[
             self.df_insumos['olfactive_family'].isin(target_families)
         ].to_dict('records')
@@ -487,10 +472,8 @@ class DiscoveryEngine:
         if not molecules:
             return self._invalid_result(molecules)
 
-        # 1. Eco Score
         eco_score, eco_stats = self.compliance.calculate_eco_score(molecules)
 
-        # 2. IA Score
         ai_score = 0.5
         if self.model and DataLoader:
             graphs = FeatureEncoder.encode_graphs(molecules)
@@ -503,7 +486,6 @@ class DiscoveryEngine:
                 except:
                     pass
 
-        # 3. Química e Mercado
         chem = self.chemistry.evaluate_blend(molecules)
         chem["eco_stats"] = eco_stats
 
@@ -517,7 +499,6 @@ class DiscoveryEngine:
         market = business_evaluation(molecules, tech_score, neuro_score)
         market["compliance"] = {"legal": is_safe, "logs": safety_logs}
 
-        # 4. Fitness
         similarity = 0.0
         if self.target_vector is not None:
             candidate_vector = FeatureEncoder.encode_blend(molecules)
@@ -550,8 +531,7 @@ class DiscoveryEngine:
         }
 
     def _row_to_molecule(self, row):
-        """Converte a linha do DataFrame (vinda do BD) para objeto de molécula."""
-        # Convertendo strings "True"/"False" se necessário
+        """Converte a linha do DataFrame para objeto de molécula."""
         is_bio = row.get("biodegradability")
         if isinstance(is_bio, str):
             is_bio = is_bio.lower() == 'true'
@@ -651,28 +631,22 @@ class DiscoveryEngine:
 
         print("\n [REFORMULADOR] 🧹 Higienizando fórmula ANTES da evolução...")
 
-        # --- LIMPEZA PRÉVIA OBRIGATÓRIA (NUCLEAR) ---
         clean_seed = []
         df = self.df_insumos
 
         for m in target_molecules:
-            # 1. Verifica se o ingrediente atual é verde
-            # (Converte para string e lower para garantir que pega 'True', 'true', '1')
             bio_val = str(m.get('biodegradability', False)).lower()
             renew_val = str(m.get('renewable_source', False)).lower()
             is_green = (bio_val in ['true', '1', 't', 'yes']) or (
                 renew_val in ['true', '1', 't', 'yes'])
 
             if is_green:
-                # Se já é verde, mantém
                 clean_seed.append(m)
             else:
-                # 2. É POLUENTE! TROCA AGORA!
                 cat = m.get('category', 'Heart')
                 print(
                     f" [REFORMULADOR] 🚫 Removendo Poluente: {m['name']} ({cat})")
 
-                # 3. Busca substitutos verdes na mesma categoria
                 candidates = df[
                     (df['category'] == cat) &
                     (
@@ -682,7 +656,6 @@ class DiscoveryEngine:
                     )
                 ]
 
-                # Exceção específica para Galaxolide (Forçar Base se necessário)
                 if 'galaxolide' in m['name'].lower() and candidates.empty:
                     candidates = df[
                         (df['category'] == 'Base') &
@@ -691,11 +664,9 @@ class DiscoveryEngine:
                     ]
 
                 if not candidates.empty:
-                    # Pega um substituto aleatório
                     new_row = candidates.sample(1).iloc[0]
                     new_mol = self._row_to_molecule(new_row)
 
-                    # Mantém o peso original para preservar a estrutura
                     new_mol['weight_factor'] = m.get('weight_factor', 1.0)
 
                     print(
@@ -705,19 +676,14 @@ class DiscoveryEngine:
                     print(
                         f" [REFORMULADOR] ⚠️ Sem substituto verde para {m['name']}. Mantendo original.")
                     clean_seed.append(m)
-        # ----------------------------------
 
-        # Define o alvo olfativo com base na fórmula original (cheiro antigo)
         self.target_vector = FeatureEncoder.encode_blend(target_molecules)
 
-        # Compara EcoScores
         original_eco, _ = self.compliance.calculate_eco_score(target_molecules)
         new_eco, _ = self.compliance.calculate_eco_score(clean_seed)
         print(
             f" [REFORMULADOR] Eco Inicial: {original_eco:.2f} -> Eco da Semente Limpa: {new_eco:.2f}")
 
-        # Roda a evolução usando a semente JÁ LIMPA!
-        # A IA agora só precisa ajustar as quantidades para acertar o cheiro
         results = self.discover(
             rounds=rounds, goal="Green Reformulation", initial_seed=clean_seed)
 

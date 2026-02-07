@@ -67,22 +67,19 @@ class FeatureEncoder:
         Usado para comparar similaridade entre perfumes.
         """
         if not molecules:
-            # Retorna vetor zerado de 5 posições (ajuste conforme seu modelo)
             return np.zeros(5, dtype=np.float32)
 
         vectors = []
         for m in molecules:
-            # Extrai propriedades numéricas básicas
             v = [
                 float(m.get('molecular_weight', 0)),
-                float(m.get('polarity', 0)),  # LogP
+                float(m.get('polarity', 0)),
                 float(m.get('russell_valence', 0)),
                 float(m.get('russell_arousal', 0)),
                 float(m.get('weight_factor', 1.0))
             ]
             vectors.append(v)
 
-        # Retorna a média para representar o "perfil" do perfume inteiro
         return np.mean(vectors, axis=0).astype(np.float32)
 
     @staticmethod
