@@ -93,6 +93,29 @@ streamlit run main.py
 
 ---
 
+## Testes e Qualidade de Código
+
+O projeto conta com uma suíte de testes unitários robusta para garantir a confiabilidade dos módulos principais. Os testes utilizam `pytest` e uma estratégia de mocking avançada para simular dependências pesadas (RDKit, PyTorch, Banco de Dados) e focar na lógica de negócio.
+
+### Como Rodar os Testes
+
+Para executar todos os testes:
+
+```bash
+python -m pytest
+```
+
+Isso validará:
+- **Codificação de Features (`encoder.py`)**: Transformação de moléculas em vetores.
+- **Simulação Química (`chemistry.py`)**: Cálculo de longevidade, projeção e riscos.
+- **Motor de Descoberta (`discovery.py`)**: Ciclo de geração e avaliação de fórmulas.
+- **Análise de Mercado (`market.py`)**: Viabilidade econômica e compliance (IFRA).
+- **Modelo GNN (`model.py`)**: Estrutura e inferência da rede neural.
+
+Para mais detalhes sobre a estratégia de testes, consulte o arquivo [TESTING.md](TESTING.md).
+
+---
+
 ## 📂 Estrutura do Projeto
 
 ```
@@ -111,7 +134,9 @@ streamlit run main.py
 ├── infra/                  # Infraestrutura e integrações externas
 │   └── llm_client.py       # Cliente para API de LLMs (Groq)
 ├── results/                # Saída dos dados gerados
-├── tests/                  # Testes automatizados (estrutura prevista)
+├── tests/                  # Testes automatizados
+│   ├── core/               # Testes unitários dos módulos core
+│   └── conftest.py         # Configuração de fixtures e mocks
 ├── insumos.csv             # Base de dados de matérias-primas
 ├── main.py                 # Ponto de entrada da aplicação
 ├── requirements.txt        # Dependências do projeto

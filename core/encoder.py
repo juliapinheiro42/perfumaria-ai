@@ -49,8 +49,7 @@ class FeatureEncoder:
         self.idx_to_name = {i: name for i, name in enumerate(self.names)}
 
         features = self.data[['molecular_weight', 'log_p', 'price']].fillna(0)
-
-        features = self.data[['molecular_weight', 'log_p', 'price']].fillna(0)
+        features = features.astype(float)
 
         denominator = features.max() - features.min()
         denominator = denominator.replace(0, 1.0)
