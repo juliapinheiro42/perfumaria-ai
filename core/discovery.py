@@ -602,18 +602,6 @@ class DiscoveryEngine:
                 except Exception as e:
                     print(f"⚠️ ERRO AO TREINAR IA: {e}")
 
-    def reformulate_green(self, target_molecules, rounds=30):
-        if not target_molecules:
-            return []
-        self.target_vector = FeatureEncoder.encode_blend(target_molecules)
-        original_eco, _ = self.compliance.calculate_eco_score(target_molecules)
-        print(
-            f" [REFORMULADOR] Alvo Green definido. Eco inicial: {original_eco:.2f}")
-        results = self.discover(
-            rounds=rounds, goal="Green Reformulation", initial_seed=target_molecules)
-        self.target_vector = None
-        return results
-
     def _diversity_penalty(self, molecules):
         names = [m.get("name", "UNK") for m in molecules]
         ratio = len(set(names)) / max(len(names), 1)

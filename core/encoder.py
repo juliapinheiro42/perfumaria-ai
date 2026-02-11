@@ -50,8 +50,6 @@ class FeatureEncoder:
 
         features = self.data[['molecular_weight', 'log_p', 'price']].fillna(0)
 
-        features = self.data[['molecular_weight', 'log_p', 'price']].fillna(0)
-
         denominator = features.max() - features.min()
         denominator = denominator.replace(0, 1.0)
         self.vectors = (features - features.min()) / denominator
