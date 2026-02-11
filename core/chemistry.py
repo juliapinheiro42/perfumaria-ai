@@ -148,9 +148,10 @@ class ChemistryEngine:
             concentration_in_air = mol_fraction * vp
             oav = concentration_in_air / threshold
 
-            m["vp"] = vp
-            m["logp"] = logps[i]
-            m["oav"] = oav
+            # Side effects removed: do not modify 'm'
+            # m["vp"] = vp
+            # m["logp"] = logps[i]
+            # m["oav"] = oav
 
             total_oav += math.pow(oav, stevens_exponent)
 
@@ -368,22 +369,33 @@ class ChemistryEngine:
                     -(effective_vp * 0.05) * t
                 )
 
-                threshold = self.POTENCY_MAP.get(
-                    str(m.get("odor_potency", "medium")).lower(),
-                    50.0
-                )
+                raw_threshold = m.get("odor_threshold_ppb")
+                threshold = 50.0
+
+                try:
+                    if raw_threshold not in (None, ""):
+                        threshold = float(raw_threshold)
+                    else:
+                        potency_class = str(
+                            m.get("odor_potency", "medium")
+                        ).lower().strip()
+                        threshold = self.POTENCY_MAP.get(
+                            potency_class, 50.0
+                        )
+                except Exception:
+                    threshold = 50.0
 
                 conc_t = m.get("weight_factor", 1.0) * remaining_pct
                 oav_t = (conc_t * effective_vp) / max(threshold, 1e-6)
 
-                intensity = math.log10(oav_t + 1.0)
                 family_oavs[family] = (
-                    family_oavs.get(family, 0.0) + intensity
+                    family_oavs.get(family, 0.0) + oav_t
                 )
 
                 total_oav_at_t += oav_t
 
-            for fam, intensity in family_oavs.items():
+            for fam, total_fam_oav in family_oavs.items():
+                intensity = math.log10(total_fam_oav + 1.0)
                 if intensity > 0.1:
                     family_evolution_data.append({
                         "Time": t,
