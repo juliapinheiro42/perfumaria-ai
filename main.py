@@ -58,7 +58,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =========================================================
-# HELPER FUNCTIONS (GRÁFICOS)
+# HELPER FUNCTIONS (GRÁFICOS GERAIS)
 # =========================================================
 
 
@@ -146,50 +146,151 @@ def render_evaporation_curve(temporal_curve):
 def render_sensory_radar(chemistry_data, finances):
     if not chemistry_data:
         return None
-
     categories = ['Longevidade', 'Projeção',
                   'Complexidade', 'Evolução', 'Custo-Benefício']
-
-    longevity = min(chemistry_data.get('longevity', 0) /
-                    1.2, 10)  # Assumindo 12h como max
+    longevity = min(chemistry_data.get('longevity', 0) / 1.2, 10)
     projection = chemistry_data.get('projection', 0)
     complexity = chemistry_data.get('complexity', 0)
     evolution = chemistry_data.get('evolution', 0)
-
     cost = finances.get('cost', 100)
     cost_score = max(0, 10 - (cost / 50))
-
     values = [longevity, projection, complexity, evolution, cost_score]
 
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
-        r=values,
-        theta=categories,
-        fill='toself',
-        name='Fórmula Atual',
-        line_color='#C5A059',
-        fillcolor='rgba(197, 160, 89, 0.2)'
+        r=values, theta=categories, fill='toself', name='Fórmula Atual',
+        line_color='#C5A059', fillcolor='rgba(197, 160, 89, 0.2)'
     ))
-
     fig.update_layout(
         polar=dict(
             radialaxis=dict(visible=True, range=[
                             0, 10], color='#ccc', tickfont=dict(size=8)),
             bgcolor='rgba(0,0,0,0)'
         ),
-        paper_bgcolor='rgba(0,0,0,0)',
-        showlegend=False,
-        height=300,
-        margin=dict(l=40, r=40, t=20, b=20),
-        # Adapting text to dark bg
-        font=dict(family="Inter, sans-serif", color="white")
+        paper_bgcolor='rgba(0,0,0,0)', showlegend=False, height=300,
+        margin=dict(l=40, r=40, t=20, b=20), font=dict(family="Inter, sans-serif", color="white")
     )
     return fig
 
+# =========================================================
+# NOVAS FUNÇÕES DE RENDERIZAÇÃO (PÁGINAS)
+# =========================================================
+
+
+def render_chemical_page(data):
+    st.header("🔬 Dados Químicos Detalhados")
+    chem = data.get('chemistry', {})
+    mols = data.get('molecules', [])
+
+    # 1. KPIs Físico-Químicos
+    st.subheader("Propriedades Físicas & Estabilidade")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Longevidade Estimada", f"{chem.get('longevity', 0):.1f}h")
+    c2.metric("Projeção (Sillage)", f"{chem.get('projection', 0):.1f}/10")
+    stability = 1.0 - (sum(m.get('vapor_pressure', 0.5)
+                       for m in mols) / len(mols) / 10)
+    c3.metric("Estabilidade Química", f"{max(0, min(stability, 1))*100:.0f}%")
+    c4.metric("Complexidade", f"{chem.get('complexity', 0):.1f}/10")
+
+    st.markdown("---")
+
+    # 2. Análise Molecular
+    st.subheader("Espectro Molecular")
+    mol_table_data = []
+    for m in mols:
+        mol_table_data.append({
+            "Ingrediente": m.get('name', 'N/A'),
+            "Família": m.get('olfactive_family', 'N/A'),
+            "Conc. (%)": m.get('weight_factor', 0) * 10,
+            "MW (g/mol)": m.get('molecular_weight', 0),
+            "LogP": m.get('polarity', 0),
+            "Ponto Ebulição": m.get('boiling_point', 0),
+            "H-Donors": m.get('h_donors', 0)
+        })
+    df_chem = pd.DataFrame(mol_table_data)
+    st.dataframe(
+        df_chem, use_container_width=True,
+        column_config={
+            "Conc. (%)": st.column_config.ProgressColumn(format="%.1f%%", min_value=0, max_value=50),
+            "MW (g/mol)": st.column_config.NumberColumn(format="%.1f"),
+            "LogP": st.column_config.NumberColumn(format="%.2f"),
+        }
+    )
+
+    # 3. Gráficos
+    c_graph1, c_graph2 = st.columns(2)
+    with c_graph1:
+        st.markdown("#### 🧠 Vetores Neurológicos")
+        neuro = chem.get('neuro_vectors', {})
+        if neuro:
+            categories = list(neuro.keys())
+            values = list(neuro.values())
+            fig = go.Figure(data=go.Scatterpolar(
+                r=values, theta=categories, fill='toself', line_color='#C5A059'))
+            fig.update_layout(polar=dict(radialaxis=dict(visible=True)), showlegend=False, height=300,
+                              paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Dados neurológicos não disponíveis.")
+
+    with c_graph2:
+        st.markdown("#### ⏳ Curva de Volatilidade")
+        curve_data = chem.get('temporal_curve')
+        if curve_data:
+            chart = render_evaporation_curve(curve_data)
+            st.altair_chart(chart, use_container_width=True)
+
+
+def render_market_page(data, biz_engine, comp_engine):
+    st.header("💼 Dados de Mercado & Estratégia")
+    mols = data.get('molecules', [])
+    chem = data.get('chemistry', {})
+
+    market = biz_engine.calculate_global_fit(mols)
+    finances = biz_engine.estimate_financials(
+        mols, chem.get('complexity', 0), chem.get('neuro_score', 0))
+    is_safe, compliance_report, _ = comp_engine.check_safety(mols)
+
+    # 1. Financials
+    st.subheader("Financial Breakdown")
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Custo Fabril (Kg)", f"${finances.get('cost', 0):.2f}")
+    k2.metric("Preço Sugerido", f"${finances.get('price', 0):.2f}")
+    k3.metric("Margem Bruta", f"{finances.get('margin_pct', 0):.1f}%")
+    k4.metric("Tier", finances.get('market_tier', 'N/A'))
+
+    # 2. Market Fit
+    st.subheader("🎯 Aderência Regional")
+    regional_data = market.get('rankings', {})
+    if regional_data:
+        df_reg = pd.DataFrame(list(regional_data.items()),
+                              columns=['Região', 'Score'])
+        st.bar_chart(df_reg.set_index('Região'), color="#C5A059")
+
+    # 3. Compliance & ESG
+    c_iso, c_eco = st.columns(2)
+    with c_iso:
+        st.subheader("🛡️ Compliance")
+        if is_safe:
+            st.success("✅ **APROVADO IFRA 51**")
+        else:
+            st.error("❌ **RESTRIÇÃO DETECTADA**")
+            for warning in compliance_report:
+                st.warning(warning)
+
+    with c_eco:
+        st.subheader("🌿 Pegada Ecológica")
+        eco_stats = chem.get('eco_stats', {})
+        st.write(f"**Eco-Score Geral:** {data.get('eco_score', 0):.2f}")
+        st.progress(eco_stats.get('biodegradable_pct', 0)/100,
+                    text=f"Biodegradabilidade: {eco_stats.get('biodegradable_pct')}%")
+        st.progress(eco_stats.get('renewable_pct', 0)/100,
+                    text=f"Renovabilidade: {eco_stats.get('renewable_pct')}%")
 
 # =========================================================
-# SISTEMA E CACHE (COM CONEXÃO DB)
+# SISTEMA E CACHE
 # =========================================================
+
 
 @st.cache_resource
 def load_model():
@@ -231,11 +332,9 @@ def get_engine(_model):
         strategy_agent=strategy_agent,
         session=session
     )
-
     if engine_instance.df_insumos is None or engine_instance.df_insumos.empty:
         st.error(
             "ERRO: O Banco de Dados parece estar vazio. Rode 'migrate_db.py' primeiro.")
-
     return engine_instance
 
 
@@ -247,7 +346,6 @@ model = load_model()
 
 if 'engine' not in st.session_state:
     st.session_state.engine = get_engine(model)
-
 engine = st.session_state.engine
 
 if engine is None:
@@ -261,18 +359,52 @@ if 'round_count' not in st.session_state:
     st.session_state.round_count = 0
 
 # =========================================================
-# SIDEBAR
+# FUNÇÃO DE GERAÇÃO (DEFINIDA ANTES DO USO)
+# =========================================================
+
+
+def generate_next():
+    with st.spinner("SYNTHESIZING..."):
+        try:
+            discoveries = engine.discover(rounds=20)
+            if discoveries:
+                new_f = discoveries[-1]
+                eco, stats = comp_engine.calculate_eco_score(
+                    new_f['molecules'])
+                new_f['eco_score'] = eco
+                if 'chemistry' not in new_f:
+                    new_f['chemistry'] = {}
+                new_f['chemistry']['eco_stats'] = stats
+                st.session_state.current_formula = new_f
+                st.session_state.round_count += 1
+            else:
+                st.error(
+                    "Synthesis failed: Genetic Algorithm produced no valid formulas.")
+        except Exception as e:
+            st.error(f"Synthesis Error: {e}")
+
+
+# =========================================================
+# SIDEBAR (COM NAVEGAÇÃO)
 # =========================================================
 with st.sidebar:
     st.markdown(f"""
         <div style="text-align: center; padding: 20px 0;">
             <h2 style="color:white; margin:0;">L'ORÉAL</h2>
-            <p style="color:{LOREAL_GOLD}; font-size:9px; letter-spacing:4px;">LUXE R&D AI</p>
+            <p style="color:#C5A059; font-size:9px; letter-spacing:4px;">LUXE R&D AI</p>
         </div>
     """, unsafe_allow_html=True)
+
     st.markdown("---")
-    st.markdown(
-        f"""<h1 style="color:{LOREAL_GOLD}; font-size:16px; letter-spacing:2px;">🧬 PARAMETERS</h1>""", unsafe_allow_html=True)
+    page_view = st.radio(
+        "VISUALIZAÇÃO",
+        ["Dashboard Principal", "Dados Químicos", "Dados de Mercado"],
+        label_visibility="collapsed"
+    )
+    st.markdown("---")
+
+    st.markdown(f"""<h1 style="color:#C5A059; font-size:16px; letter-spacing:2px;">🧬 PARAMETERS</h1>""",
+                unsafe_allow_html=True)
 
     all_ingredients = sorted(engine.insumos_dict.keys()) if hasattr(
         engine, 'insumos_dict') else []
@@ -286,7 +418,7 @@ with st.sidebar:
 
     if st.session_state.current_formula:
         st.markdown(
-            f"""<h1 style="color:{LOREAL_GREEN}; font-size:14px; letter-spacing:2px;">♻️ SUSTAINABILITY</h1>""", unsafe_allow_html=True)
+            f"""<h1 style="color:#2D5A27; font-size:14px; letter-spacing:2px;">♻️ SUSTAINABILITY</h1>""", unsafe_allow_html=True)
         if st.button("REFORMULATE GREEN", help="Substitui ingredientes mantendo o cheiro alvo"):
             with st.spinner("EVOLVING BIO-ALTERNATIVES..."):
                 target_molecules = st.session_state.current_formula['molecules']
@@ -316,33 +448,7 @@ with st.sidebar:
         st.rerun()
 
 # =========================================================
-# LÓGICA DE GERAÇÃO
-# =========================================================
-
-
-def generate_next():
-    with st.spinner("SYNTHESIZING..."):
-        try:
-            discoveries = engine.discover(rounds=20)
-            if discoveries:
-                new_f = discoveries[-1]
-                eco, stats = comp_engine.calculate_eco_score(
-                    new_f['molecules'])
-                new_f['eco_score'] = eco
-                if 'chemistry' not in new_f:
-                    new_f['chemistry'] = {}
-                new_f['chemistry']['eco_stats'] = stats
-                st.session_state.current_formula = new_f
-                st.session_state.round_count += 1
-            else:
-                st.error(
-                    "Synthesis failed: Genetic Algorithm produced no valid formulas.")
-        except Exception as e:
-            st.error(f"Synthesis Error: {e}")
-
-
-# =========================================================
-# UI PRINCIPAL
+# UI PRINCIPAL (ROTEADA)
 # =========================================================
 col_h1, col_h2 = st.columns([2, 1])
 with col_h1:
@@ -352,7 +458,7 @@ with col_h1:
 with col_h2:
     if st.session_state.current_formula:
         st.markdown(
-            f"""<div style="text-align:right;"><span style="font-size:10px; color:{LOREAL_GOLD}; letter-spacing:3px;">BATCH ID</span><h1 style="margin:0;">#{st.session_state.round_count:02d}</h1></div>""", unsafe_allow_html=True)
+            f"""<div style="text-align:right;"><span style="font-size:10px; color:#C5A059; letter-spacing:3px;">BATCH ID</span><h1 style="margin:0;">#{st.session_state.round_count:02d}</h1></div>""", unsafe_allow_html=True)
 
 st.markdown("<hr style='border-color:#EEE;'>", unsafe_allow_html=True)
 
@@ -363,110 +469,111 @@ if st.session_state.current_formula is None:
         generate_next()
         st.rerun()
 else:
-    data = st.session_state.current_formula
-    chem = data.get('chemistry', data)
-    mols = data['molecules']
+    # ROTEAMENTO
+    current_data = st.session_state.current_formula
 
-    biz_engine = PerfumeBusinessEngine()
-    market = biz_engine.calculate_global_fit(mols)
-    finances = biz_engine.estimate_financials(
-        mols, chem.get('complexity', 0), chem.get('neuro_score', 0))
-    eco_score = data.get('eco_score', 0.0)
-    eco_stats = chem.get('eco_stats', {
-                         "biodegradable_pct": 0, "renewable_pct": 0, "avg_carbon_footprint": 10})
+    if page_view == "Dashboard Principal":
+        data = current_data
+        chem = data.get('chemistry', data)
+        mols = data['molecules']
 
-    k1, k2, k3, k4, k5 = st.columns(5)
-    metrics = [("Longevity", f"{chem.get('longevity', 0):.1f}h"), ("Sillage", f"{chem.get('projection', 0):.1f}/10"), ("Uniqueness",
-                                                                                                                       f"{chem.get('complexity', 0):.1f}/10"), ("Harmony", f"{chem.get('evolution', 0):.1f}/10"), ("Eco-Score", f"{eco_score:.2f}")]
-    cols = [k1, k2, k3, k4, k5]
-    for col, (lab, val) in zip(cols, metrics):
-        color = LOREAL_GREEN if lab == "Eco-Score" and float(
-            val) > 0.7 else LOREAL_BLACK
-        col.markdown(
-            f'<div class="kpi-card"><div class="kpi-lab">{lab}</div><div class="kpi-val" style="color:{color}">{val}</div></div>', unsafe_allow_html=True)
+        biz_engine = PerfumeBusinessEngine()
+        market = biz_engine.calculate_global_fit(mols)
+        finances = biz_engine.estimate_financials(
+            mols, chem.get('complexity', 0), chem.get('neuro_score', 0))
+        eco_score = data.get('eco_score', 0.0)
+        eco_stats = chem.get('eco_stats', {
+                             "biodegradable_pct": 0, "renewable_pct": 0, "avg_carbon_footprint": 10})
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    col_left, col_right = st.columns([1.8, 1], gap="large")
+        k1, k2, k3, k4, k5 = st.columns(5)
+        metrics = [
+            ("Longevity", f"{chem.get('longevity', 0):.1f}h"),
+            ("Sillage", f"{chem.get('projection', 0):.1f}/10"),
+            ("Uniqueness", f"{chem.get('complexity', 0):.1f}/10"),
+            ("Harmony", f"{chem.get('evolution', 0):.1f}/10"),
+            ("Eco-Score", f"{eco_score:.2f}")
+        ]
+        cols = [k1, k2, k3, k4, k5]
+        for col, (lab, val) in zip(cols, metrics):
+            color = "#2D5A27" if lab == "Eco-Score" and float(
+                val) > 0.7 else "#000000"
+            col.markdown(
+                f'<div class="kpi-card"><div class="kpi-lab">{lab}</div><div class="kpi-val" style="color:{color}">{val}</div></div>', unsafe_allow_html=True)
 
-    with col_left:
-        st.markdown("### ⚗️ Formula Analysis")
-        df_mols = pd.DataFrame(mols)
-        if 'biodegradability' not in df_mols.columns:
-            df_mols['biodegradability'] = False
-        if 'renewable_source' not in df_mols.columns:
-            df_mols['renewable_source'] = False
-        st.dataframe(df_mols[['name', 'category', 'weight_factor', 'biodegradability', 'renewable_source']], column_config={"weight_factor": st.column_config.ProgressColumn(
-            "Conc.", format="%.2f", min_value=0, max_value=5), "name": "Ingredient", "category": "Family", "biodegradability": st.column_config.CheckboxColumn("Bio?", width="small"), "renewable_source": st.column_config.CheckboxColumn("Renew?", width="small")}, use_container_width=True, hide_index=True)
-        st.markdown("### 👃 Olfactory Structure")
-        col_graph, col_data = st.columns([2, 1])
-        with col_graph:
-            fig = render_olfactory_pyramid(mols)
-            if fig:
-                st.plotly_chart(fig, use_container_width=True)
-        st.markdown("#### ⏳ 4D Temporal Simulation")
-        tab1, tab2 = st.tabs(["📉 Intensity Decay", "🌊 Family Dominance"])
-        with tab1:
-            curve_data = chem.get('temporal_curve')
-            if curve_data:
-                chart = render_evaporation_curve(curve_data)
-                st.altair_chart(chart, use_container_width=True)
-        with tab2:
-            fam_data = chem.get('temporal_families')
-            if fam_data:
-                fam_chart = render_family_evolution(fam_data)
-                st.altair_chart(fam_chart, use_container_width=True)
-            else:
-                st.caption("No evolution data available.")
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_left, col_right = st.columns([1.8, 1], gap="large")
 
-    with col_right:
-        st.markdown("### 💼 Business Strategy")
+        with col_left:
+            st.markdown("### ⚗️ Formula Analysis")
+            df_mols = pd.DataFrame(mols)
+            if 'biodegradability' not in df_mols.columns:
+                df_mols['biodegradability'] = False
+            if 'renewable_source' not in df_mols.columns:
+                df_mols['renewable_source'] = False
+            st.dataframe(df_mols[['name', 'category', 'weight_factor', 'biodegradability', 'renewable_source']], column_config={"weight_factor": st.column_config.ProgressColumn(
+                "Conc.", format="%.2f", min_value=0, max_value=5), "name": "Ingredient", "category": "Family", "biodegradability": st.column_config.CheckboxColumn("Bio?", width="small"), "renewable_source": st.column_config.CheckboxColumn("Renew?", width="small")}, use_container_width=True, hide_index=True)
 
-        st.markdown(f"""<div class="biz-card"><p style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:2px; margin-bottom:5px;">MARKET POSITION</p><h2 style="color:white; margin-bottom:20px;">{finances.get('market_tier', 'Prestige').upper()}</h2><div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;"><span>Target Price</span><span style="color:{LOREAL_GOLD}; font-weight:bold;">${finances.get('price', 0):.2f}</span></div>""", unsafe_allow_html=True)
+            st.markdown("### 👃 Olfactory Structure")
+            col_graph, _ = st.columns([2, 1])
+            with col_graph:
+                fig = render_olfactory_pyramid(mols)
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
 
-        radar = render_sensory_radar(chem, finances)
-        if radar:
-            st.plotly_chart(radar, use_container_width=True,
-                            config={'displayModeBar': False})
+            st.markdown("#### ⏳ 4D Temporal Simulation")
+            tab1, tab2 = st.tabs(["📉 Intensity Decay", "🌊 Family Dominance"])
+            with tab1:
+                curve_data = chem.get('temporal_curve')
+                if curve_data:
+                    chart = render_evaporation_curve(curve_data)
+                    st.altair_chart(chart, use_container_width=True)
+            with tab2:
+                fam_data = chem.get('temporal_families')
+                if fam_data:
+                    fam_chart = render_family_evolution(fam_data)
+                    st.altair_chart(fam_chart, use_container_width=True)
 
-        st.markdown(
-            f"""<div style="margin-top:20px; color:white;"><p style="color:{LOREAL_GOLD}; font-size:10px; letter-spacing:2px; margin-bottom:5px;">PRIMARY MARKET</p><p style="font-size:18px;">{market.get('best', 'Global')}</p></div></div>""", unsafe_allow_html=True)
+        with col_right:
+            st.markdown("### 💼 Business Strategy")
+            st.markdown(
+                f"""<div class="biz-card"><p style="color:#C5A059; font-size:10px; letter-spacing:2px; margin-bottom:5px;">MARKET POSITION</p><h2 style="color:white; margin-bottom:20px;">{finances.get('market_tier', 'Prestige').upper()}</h2><div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;"><span>Target Price</span><span style="color:#C5A059; font-weight:bold;">${finances.get('price', 0):.2f}</span></div>""", unsafe_allow_html=True)
 
-        st.markdown(f"""<div class="green-card"><h3 style="color:{LOREAL_GREEN}; font-size:16px; margin-top:0;">🌿 Green Chemistry</h3><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Biodegradable</span><b>{eco_stats.get('biodegradable_pct', 0)}%</b></div><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Renewable</span><b>{eco_stats.get('renewable_pct', 0)}%</b></div><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Carbon Footprint</span><b>{eco_stats.get('avg_carbon_footprint', 10):.1f}</b></div></div>""", unsafe_allow_html=True)
-        is_safe, report, stats = comp_engine.check_safety(mols)
-        if not is_safe:
-            st.error("⚠️ IFRA COMPLIANCE VIOLATION")
-            for r in report:
-                st.warning(r)
-        else:
-            st.success("✨ IFRA COMPLIANT")
-        st.markdown("---")
-        st.markdown("### 🧠 Sensory Training")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            f_hedonic = st.slider("💖 Hedonic", 0, 10, 5)
-        with c2:
-            f_tech = st.slider("🛠️ Technical", 0, 10, 5)
-        with c3:
-            f_creative = st.slider("🎨 Creative", 0, 10, 5)
-        if st.button("🧬 TRAIN NEURAL NETWORK", type="primary", use_container_width=True):
-            if st.session_state.current_formula:
-                current_data = st.session_state.current_formula
+            radar = render_sensory_radar(chem, finances)
+            if radar:
+                st.plotly_chart(radar, use_container_width=True,
+                                config={'displayModeBar': False})
+
+            st.markdown(
+                f"""<div style="margin-top:20px; color:white;"><p style="color:#C5A059; font-size:10px; letter-spacing:2px; margin-bottom:5px;">PRIMARY MARKET</p><p style="font-size:18px;">{market.get('best', 'Global')}</p></div></div>""", unsafe_allow_html=True)
+
+            st.markdown("---")
+            st.markdown("### 🧠 Sensory Training")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                f_hedonic = st.slider("💖 Hedonic", 0, 10, 5)
+            with c2:
+                f_tech = st.slider("🛠️ Technical", 0, 10, 5)
+            with c3:
+                f_creative = st.slider("🎨 Creative", 0, 10, 5)
+            if st.button("🧬 TRAIN NEURAL NETWORK", type="primary", use_container_width=True):
                 avg_rating = (f_hedonic + f_tech + f_creative) / 3.0
-
-                feedback_vector = {
-                    "rating": avg_rating,
-                    "hedonic": f_hedonic,
-                    "technical": f_tech,
-                    "creative": f_creative
-                }
+                feedback_vector = {"rating": avg_rating, "hedonic": f_hedonic,
+                                   "technical": f_tech, "creative": f_creative}
                 engine.register_human_feedback(
                     current_data.get("id"), feedback_vector)
-                st.success("Neuro-weights updated with Adversarial Examples!")
+                st.success("Neuro-weights updated!")
                 time.sleep(0.5)
                 generate_next()
                 st.rerun()
 
-if st.session_state.history:
+    elif page_view == "Dados Químicos":
+        render_chemical_page(current_data)
+
+    elif page_view == "Dados de Mercado":
+        biz_engine = PerfumeBusinessEngine()
+        render_market_page(current_data, biz_engine, comp_engine)
+
+if st.session_state.history and page_view == "Dashboard Principal":
     st.markdown("---")
     with st.expander("VIEW PREVIOUS ITERATIONS"):
         st.table(pd.DataFrame(st.session_state.history))

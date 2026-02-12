@@ -163,6 +163,13 @@ class DiscoveryEngine:
         molecules = []
         added_names = set()
 
+        if self.anchors:
+            for anchor_name in self.anchors:
+                found = self._fuzzy_find_ingredient(anchor_name)
+                if found is not None and found['name'] not in added_names:
+                    molecules.append(self._row_to_molecule(found))
+                    added_names.add(found['name'])
+
         if PERFUME_SKELETONS:
             skeleton_name = random.choice(list(PERFUME_SKELETONS.keys()))
             accord_names = PERFUME_SKELETONS[skeleton_name]
@@ -595,12 +602,16 @@ class DiscoveryEngine:
             graphs = FeatureEncoder.encode_graphs(mols_to_learn)
             if graphs:
                 self.buffer.add(graphs, normalized_score, weight=5.0)
-            if rating >= 8 or rating <= 2:
-                try:
-                    print(" [TREINO] Iniciando re-treino da IA...")
+
+            try:
+                print(" [TREINO] Aplicando Gradient Descent imediato...")
+                loss = self.trainer.train_step(self.buffer)
+
+                if rating >= 8 or rating <= 2:
                     self.trainer.maybe_retrain(self.buffer, force=True)
-                except Exception as e:
-                    print(f"⚠️ ERRO AO TREINAR IA: {e}")
+
+            except Exception as e:
+                print(f"⚠️ ERRO AO TREINAR IA: {e}")
 
     def _diversity_penalty(self, molecules):
         names = [m.get("name", "UNK") for m in molecules]
