@@ -68,6 +68,7 @@ O **Perfumaria AI** é uma plataforma "End-to-End" que simula o papel de um Perf
 ├── main.py                 # Aplicação Frontend (Streamlit)
 ├── migrate_db.py           # Script de inicialização do Banco de Dados
 └── experiments/            # Scripts de tuning de hiperparâmetros
+´´´
 
 ---
 
