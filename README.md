@@ -1,143 +1,300 @@
-# Perfumaria AI 🧪✨
+# 🧪✨ Perfumaria AI
 
-**Sistema de Inteligência Artificial para Design Molecular e Otimização de Fragrâncias**
+### Artificial Intelligence for Molecular Design and Fragrance Optimization
 
-O **Perfumaria AI** é uma plataforma "End-to-End" que simula o papel de um Perfumista Master e de um Painel de Avaliação Sensorial. O sistema combina **Algoritmos Genéticos**, **Redes Neurais em Grafos (GNNs)**, **Otimização Bayesiana** e **LLMs** para descobrir, avaliar e refinar fórmulas de perfumes, equilibrando criatividade olfativa, viabilidade comercial e sustentabilidade. A plataforma conta com 200 insumos de origem Amazônica, 100% sustentável e renovável.
-
----
-
-## 🚀 Funcionalidades Principais
-
-### 🧠 Inteligência Híbrida
-
-- **Geração Evolutiva:** Utiliza Algoritmos Genéticos para evoluir fórmulas através de cruzamento (crossover) e mutação, imitando a seleção natural de acordes bem-sucedidos (`core/evolution.py`).
-- **Graph Neural Networks (GNN):** Uma rede neural baseada em PyTorch Geometric (`core/model.py`) que analisa a estrutura molecular (grafos) para prever a performance olfativa.
-- **Estratégia via LLM:** Um agente cognitivo (Llama 3 via Groq) analisa o histórico de descobertas e sugere estratégias de alto nível (ex: "Aumentar volatilidade no topo") (`core/strategy.py`).
-- **Otimização Bayesiana:** Utiliza Processos Gaussianos (`core/surrogate.py`) para guiar a exploração do espaço químico de forma eficiente.
-
-### ⚗️ Simulação Físico-Química (`core/chemistry.py`)
-
-- **Curva de Evaporação 4D:** Simula a volatilidade dos ingredientes ao longo do tempo (0h a 10h), calculando a evolução da fragrância.
-- **Cálculo de Projeção (Sillage):** Estima a potência de difusão baseada em Pressão de Vapor e OAV (Odor Activity Value).
-- **Neuro-Impacto:** Mapeia a fórmula em coordenadas de Valence/Arousal (Modelo de Russell) para prever efeitos emocionais (ex: Relaxamento, Energia).
-
-### 🌍 Sustentabilidade e Compliance (`core/compliance.py`)
-
-- **Verificação IFRA:** Checagem automática de limites de segurança regulatória.
-- **Eco-Score:** Cálculo dinâmico de pegada de carbono, biodegradabilidade e renovabilidade.
-- **Reformulação Verde:** Algoritmo capaz de substituir ingredientes sintéticos ou poluentes por alternativas "bio" sem alterar o perfil olfativo (`reformulate_green`).
-
-### 💼 Inteligência de Mercado (`core/market.py`)
-
-- **Fit Regional:** Avalia a adequação da fórmula para mercados específicos (Ásia, LatAm, Oriente Médio, EUA) baseando-se em preferências culturais.
-- **Precificação Dinâmica:** Estimativa de custo fabril (Juice Cost), margem bruta e sugestão de tier de mercado (Mass, Prestige, Luxury).
+> An **End-to-End platform** that simulates a Master Perfumer and a
+> Sensory Evaluation Panel using Genetic Algorithms, Graph Neural
+> Networks (GNNs), Bayesian Optimization, and LLMs to create innovative,
+> sustainable, and commercially viable fragrances.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🌿 Vision
 
-- **Linguagem:** Python 3.14
-- **Interface:** Streamlit (Dashboard interativo estilo "L'Oréal Luxe AI Lab")
-- **Machine Learning:** PyTorch, PyTorch Geometric, Scikit-Learn, Optuna
-- **Química Computacional:** RDKit
-- **Banco de Dados:** PostgreSQL (SQLAlchemy ORM)
-- **LLM API:** Groq (Llama 3.3)
+**Perfumaria AI** is a virtual olfactory discovery lab that combines:
+
+- 🧬 Evolutionary formula generation\
+- 🧠 Molecular modeling with GNNs\
+- 📈 Intelligent chemical space optimization\
+- 🌍 Automated sustainability and compliance\
+- 💼 Integrated market intelligence
+
+The platform operates with **200 Amazonian-origin ingredients**, 100%
+sustainable and renewable.
 
 ---
 
-## 📂 Estrutura do Projeto
+# 🚀 Core Capabilities
+
+## 🧠 Hybrid Intelligence Architecture
+
+### 🔬 Genetic Algorithms
+
+Formula evolution through: - Crossover\
+
+- Mutation\
+- Multi-objective selection
+
+📂 `core/evolution.py`
+
+---
+
+### 🧠 Graph Neural Network (GNN)
+
+Built with **PyTorch Geometric**, the model: - Represents molecules as
+graphs\
+
+- Learns structural patterns\
+- Predicts olfactory performance\
+- Continuously adapts via human feedback
+
+📂 `core/model.py`
+
+---
+
+### 🤖 LLM Strategic Agent (Groq + Llama 3)
+
+A cognitive agent that: - Analyzes evolutionary history\
+
+- Identifies successful patterns\
+- Suggests high-level strategy shifts (e.g., increase top-note
+  volatility)
+
+📂 `core/strategy.py`
+
+---
+
+### 📊 Bayesian Optimization
+
+Surrogate modeling using **Gaussian Processes** to: - Efficiently
+explore chemical space\
+
+- Reduce redundant experimentation\
+- Maximize multi-objective performance
+
+📂 `core/surrogate.py`
+
+---
+
+# ⚗️ Physicochemical Simulation
+
+📂 `core/chemistry.py`
+
+### 🌫 4D Evaporation Curve
+
+Simulates volatility from 0h to 10h: - Fragrance evolution\
+
+- Pyramid transition over time
+
+### 🌬 Projection (Sillage)
+
+Estimated from: - Vapor pressure\
+
+- Odor Activity Value (OAV)
+
+### 🧠 Neuro-Impact (Russell Model)
+
+Maps formula into: - Valence\
+
+- Arousal
+
+Predicts emotional states such as relaxation, energy, and
+sophistication.
+
+---
+
+# 🌍 Sustainability & Compliance
+
+📂 `core/compliance.py`
+
+### ✔ IFRA Verification
+
+- Automatic regulatory limit checking
+
+### ♻ Dynamic Eco-Score
+
+Calculates: - Carbon footprint\
+
+- Biodegradability\
+- Renewability
+
+### 🌱 Green Reformulation
+
+Automatically replaces non-sustainable ingredients with biodegradable
+alternatives while preserving the olfactory profile.
+
+Function: `reformulate_green()`
+
+---
+
+# 💼 Market Intelligence
+
+📂 `core/market.py`
+
+### 🌎 Regional Fit Analysis
+
+Cultural suitability assessment for: - Asia\
+
+- Latin America\
+- Middle East\
+- United States
+
+### 💰 Dynamic Pricing
+
+- Juice cost estimation\
+- Gross margin projection\
+- Suggested tier: Mass \| Prestige \| Luxury
+
+---
+
+# 🛠 Tech Stack
+
+Layer Technology
+
+---
+
+Language Python 3.10+
+Interface Streamlit
+ML PyTorch, PyTorch Geometric, Scikit-Learn, Optuna
+Computational Chemistry RDKit
+Database PostgreSQL + SQLAlchemy
+LLM Groq (Llama 3.x)
+
+---
+
+# 📂 Project Structure
 
 ```text
 /
-├── core/                   # Cérebro da Aplicação
-│   ├── chemistry.py        # Motor de física e química (volatilidade, OAV)
-│   ├── compliance.py       # Regulação (IFRA) e Sustentabilidade (Eco-Score)
-│   ├── discovery.py        # Orquestrador do ciclo de descoberta
-│   ├── encoder.py          # Vetorização de moléculas e Grafos
-│   ├── evolution.py        # Lógica do Algoritmo Genético
-│   ├── market.py           # Análise financeira e fit de mercado
-│   ├── model.py            # GNN (Graph Neural Network) em PyTorch
-│   ├── strategy.py         # Agente LLM (Groq)
-│   └── surrogate.py        # Modelo Substituto Bayesiano
+├── core/
+│   ├── chemistry.py
+│   ├── compliance.py
+│   ├── discovery.py
+│   ├── encoder.py
+│   ├── evolution.py
+│   ├── market.py
+│   ├── model.py
+│   ├── strategy.py
+│   └── surrogate.py
+│
 ├── data/
-│   └── insumos.csv         # Dados brutos para seed do banco de dados
-├── infra/                  # Camada de Infraestrutura
-│   ├── database.py         # Conexão PostgreSQL
-│   ├── models.py           # Modelos ORM (SQLAlchemy)
-│   └── gemini_client.py    # Cliente API Groq
-├── main.py                 # Aplicação Frontend (Streamlit)
-├── migrate_db.py           # Script de inicialização do Banco de Dados
-└── experiments/            # Scripts de tuning de hiperparâmetros
-´´´
+│   └── insumos.csv
+│
+├── infra/
+│   ├── database.py
+│   ├── models.py
+│   └── gemini_client.py
+│
+├── experiments/
+├── tests/
+├── migrate_db.py
+└── main.py
+```
 
 ---
 
-## ⚙️ Instalação e Configuração
+# ⚙️ Installation
 
-### 1. Pré-requisitos
+## 1. Requirements
 
 - Python 3.10+
+- PostgreSQL
+- Groq Cloud account
 
-- PostgreSQL instalado e rodando.
+---
 
-- Conta na Groq Cloud para chave de API.
+## 2. Setup
 
-### 2. Setup do Ambiente
+```bash
+git clone https://github.com/your-username/perfumaria-ai.git
+cd perfumaria-ai
 
-* git clone [https://github.com/seu-usuario/perfumaria-ai.git](https://github.com/seu-usuario/perfumaria-ai.git)
-* cd perfumaria-ai
+python -m venv venv
 
-# Crie o ambiente virtual
-* python -m venv venv
-# Windows:
-* venv\Scripts\activate
-# Linux/Mac:
-* source venv/bin/activate
+# Windows
+venv\Scripts\activate
 
-# Instale as dependências
-* pip install -r requirements.txt
+# Linux/Mac
+source venv/bin/activate
 
-### 3. Configuração (.env)
-* Crie um arquivo .env na raiz com as seguintes variáveis:
+pip install -r requirements.txt
+```
 
-Snippet de código
-# API Keys
-GROQ_API_KEY=sua_chave_groq_aqui
+---
 
-# Configuração do Banco de Dados (PostgreSQL)
-DB_USER=seu_usuario
-DB_PASSWORD=sua_senha
+## 3. Environment Configuration
+
+Create a `.env` file in the project root:
+
+```env
+# API
+GROQ_API_KEY=your_groq_key_here
+
+# Database
+DB_USER=your_user
+DB_PASSWORD=your_password
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=perfumaria_db
-
 ```
 
-4. Inicialização do Banco de Dados
-   Antes de rodar a aplicação, é necessário migrar os dados do CSV para o PostgreSQL:
+---
 
-Bash
+## 4. Initialize Database
+
+```bash
 python migrate_db.py
+```
 
-## ▶️ Como Usar
+---
 
-Executando o Laboratório Virtual
-Inicie a interface do Streamlit:
+# ▶️ Running the Application
 
-Bash
+```bash
 streamlit run main.py
-Fluxo de Trabalho na Interface:
-Start Synthesis: Clique para iniciar o ciclo de descoberta genética.
+```
 
-Dashboard: Visualize a Pirâmide Olfativa, Curva de Evaporação e Radar Sensorial.
+---
 
-Human-in-the-Loop: Use os sliders "Sensory Training" para dar notas (Hedônica, Técnica, Criativa) à fórmula gerada. O sistema re-treina a GNN em tempo real com seu feedback.
+# 🖥 Usage Flow
 
-Green Reformulation: Se a fórmula não for sustentável, clique em "Reformulate Green" para que a IA busque substitutos biodegradáveis automaticamente.
+### 🔹 Start Synthesis
 
-## 🧪 Testes
+Launches the evolutionary discovery cycle.
 
-O projeto conta com uma suíte de testes automatizados:
+### 🔹 Dashboard
 
-Bash
+Visualize: - Olfactory Pyramid\
+
+- Evaporation Curve\
+- Sensory Radar\
+- Projection & Longevity
+
+### 🔹 Human-in-the-Loop
+
+Evaluate generated formulas via sliders: - Hedonic\
+
+- Technical\
+- Creative
+
+The GNN is retrained dynamically based on feedback.
+
+### 🔹 Green Reformulation
+
+Automatically reformulates non-sustainable compositions.
+
+---
+
+# 🧪 Testing
+
+```bash
 pytest tests/
+```
+
+---
+
+# 🎯 Mission
+
+**Perfumaria AI** merges science, art, and artificial intelligence to
+revolutionize fragrance creation through sustainable molecular
+innovation.
